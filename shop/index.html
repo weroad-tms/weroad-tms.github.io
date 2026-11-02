@@ -3,136 +3,232 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#1B2A4A">
+<meta name="theme-color" content="#1F5FBF">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="위펀 수리등록">
 <link rel="icon" href="../driver/icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="../driver/icon-192.png">
-<title>위펀 차량 수리 등록 (지정 공업사)</title>
+<title>위펀 차량 수리 등록</title>
 <style>
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-  html,body{margin:0;min-height:100%;background:#F3F5F9;color:#1A2233;font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",sans-serif}
-  body{padding:max(14px,env(safe-area-inset-top)) 16px max(20px,env(safe-area-inset-bottom));max-width:640px;margin:0 auto}
-  .brand{display:flex;align-items:center;gap:10px;margin-bottom:14px}
-  .brand .lg{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,#3E6AF2,#14B8A6);display:grid;place-items:center;font-weight:900;font-size:18px;color:#fff}
-  .brand b{font-size:17px}.brand small{color:#667085;margin-left:4px}
-  .shop{margin-left:auto;font-weight:800;color:#fff;background:var(--c,#3E6AF2);border-radius:999px;padding:5px 12px;font-size:13px}
-  .card{background:#fff;border:1px solid #E5EAF2;border-radius:18px;padding:16px;margin-bottom:12px}
-  h2{margin:0 0 4px;font-size:20px}.sub{color:#667085;font-size:13px;margin-bottom:10px}
-  label{display:block;font-size:13px;color:#475467;font-weight:700;margin:12px 0 5px}
-  input,select,textarea{width:100%;border:1px solid #DCE3EE;border-radius:12px;padding:12px;font-size:17px;font-family:inherit;color:#1A2233;background:#fff}
-  input.num{text-align:right;font-variant-numeric:tabular-nums;font-weight:800}
-  textarea{min-height:80px;resize:vertical;font-size:15px}
-  .two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-  .chips{display:flex;flex-wrap:wrap;gap:6px}.chips button{border:1px solid #DCE3EE;background:#fff;border-radius:999px;padding:7px 12px;font:inherit;font-size:14px;font-weight:700;color:#344054}
-  .chips button.on{background:#1A2233;border-color:#1A2233;color:#fff}
-  .plate{display:flex;gap:8px}.plate input{flex:1}.plate button{border:1px solid #DCE3EE;background:#fff;border-radius:12px;padding:0 14px;font:inherit;font-weight:700}
-  .hint{font-size:12.5px;color:#667085;margin-top:6px;line-height:1.5}.hint b{color:#B42318}
-  .big{width:100%;border:0;border-radius:16px;padding:18px;font-size:19px;font-weight:800;color:#fff;background:linear-gradient(135deg,#3E6AF2,#2449C9);box-shadow:0 10px 26px rgba(62,106,242,.3);font-family:inherit;margin:6px 0 12px}
-  .big:disabled{opacity:.5;box-shadow:none}
-  .ok{background:#ECFDF3;border-color:#A6E9C5;color:#067647}.warn{background:#FEF3F2;border-color:#FECDCA;color:#B42318}
-  .hist div{display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-top:1px solid #F0F3F8;font-size:14px}.hist div:first-child{border-top:0}
-  .hist b{font-variant-numeric:tabular-nums;white-space:nowrap}.hist small{display:block;color:#667085;font-size:12px}
-  .tag{display:inline-block;font-size:11px;font-weight:800;border-radius:4px;padding:1px 6px;margin-left:6px;vertical-align:1px}
-  .t-wait{background:#FFF3DD;color:#8F5300}.t-ok{background:#E3F6EC;color:#147A47}.t-no{background:#FEECEC;color:#C4262C}
-  .photo{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}.photo img{width:72px;height:72px;object-fit:cover;border-radius:10px;border:1px solid #E5EAF2}
-  .setup input{font-size:15px}
-  .foot{font-size:11.5px;color:#98A2B3;text-align:center;padding-top:10px}
+  html,body{margin:0;min-height:100%;background:#EEF2F7;color:#111827;font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",sans-serif}
+  body{padding:max(14px,env(safe-area-inset-top)) 16px max(24px,env(safe-area-inset-bottom));max-width:560px;margin:0 auto;font-size:18px}
+  .top{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+  .top b{font-size:22px}
+  .shop{margin-left:auto;font-weight:800;font-size:15px;border:2px solid #CBD5E1;background:#fff;border-radius:999px;padding:6px 14px}
+  .note{background:#FFF7E0;border:1px solid #F5D98B;border-radius:14px;padding:12px 14px;font-size:16px;line-height:1.5;margin-bottom:14px;color:#6B4E00}
+  .card{background:#fff;border:1px solid #DDE3EC;border-radius:18px;padding:18px;margin-bottom:14px}
+  .steps{display:flex;gap:6px;margin-bottom:12px}.steps i{flex:1;height:6px;border-radius:3px;background:#D5DCE6}.steps i.on{background:#1F5FBF}
+  h2{margin:0 0 6px;font-size:24px}.sub{color:#5B6575;font-size:16px;margin-bottom:14px;line-height:1.5}
+  input{width:100%;border:2px solid #C9D2DE;border-radius:14px;padding:16px;font-size:24px;font-weight:800;font-family:inherit;color:#111827;background:#fff;text-align:center}
+  input:focus{outline:0;border-color:#1F5FBF}
+  .big{display:block;width:100%;border:0;border-radius:16px;padding:20px;font-size:22px;font-weight:800;color:#fff;background:#1F5FBF;font-family:inherit;margin-top:14px}
+  .big.gray{background:#E5EAF1;color:#1F2937}.big.green{background:#15803D}
+  .big:disabled{opacity:.45}
+  .back{border:0;background:none;color:#5B6575;font:inherit;font-size:17px;padding:0 0 10px;font-weight:700}
+  .cars{display:grid;gap:10px;margin-top:12px}
+  .cars button{border:2px solid #C9D2DE;background:#fff;border-radius:14px;padding:16px;font:inherit;font-size:24px;font-weight:800;text-align:left}
+  .cars button small{display:block;font-size:15px;color:#5B6575;font-weight:600;margin-top:2px}
+  .jobs{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .jobs button{border:2px solid #C9D2DE;background:#fff;border-radius:14px;padding:14px 8px;font:inherit;font-size:18px;font-weight:800}
+  .jobs button:active{background:#E8F0FD}
+  .lines{margin-top:14px;display:grid;gap:10px}
+  .line{border:2px solid #1F5FBF;border-radius:14px;padding:12px;background:#F5F9FF}
+  .line .h{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+  .line .h input{text-align:left;font-size:18px;padding:8px 10px;border-width:1px}
+  .line .x{border:0;background:#fff;border:1px solid #C9D2DE;border-radius:10px;font-size:18px;width:44px;height:44px;flex:none}
+  .line .amt{display:flex;align-items:center;gap:8px}.line .amt input{text-align:right;font-size:24px}.line .amt span{font-size:18px;font-weight:800;flex:none}
+  .sum{display:flex;justify-content:space-between;font-size:18px;padding:6px 2px}.sum b{font-size:22px}
+  .sum.t{border-top:2px solid #E5EAF1;margin-top:6px;padding-top:10px}.sum.t b{color:#1F5FBF;font-size:26px}
+  .warn{background:#FEF2F2;border:1px solid #FCA5A5;color:#B91C1C;border-radius:14px;padding:12px 14px;font-size:16px;margin-top:12px}
+  .okbox{background:#ECFDF3;border:2px solid #86EFAC;border-radius:18px;padding:22px;text-align:center}
+  .okbox b{font-size:26px;display:block;margin-bottom:6px;color:#15803D}
+  .photo{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.photo img{width:84px;height:84px;object-fit:cover;border-radius:12px;border:1px solid #DDE3EC}
+  .pbtn{display:block;text-align:center;border:2px dashed #9AA8BA;border-radius:16px;padding:26px;font-size:20px;font-weight:800;color:#334155;background:#F8FAFC}
+  .row{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-top:1px solid #EEF2F7;font-size:17px}.row:first-child{border-top:0}
+  .row small{display:block;color:#5B6575;font-size:14px}
+  .tag{font-size:13px;font-weight:800;border-radius:6px;padding:2px 7px;margin-left:6px}
+  .t-wait{background:#FFF1D6;color:#8A5300}.t-ok{background:#DCFCE7;color:#166534}.t-no{background:#FEE2E2;color:#B91C1C}
+  .muted{color:#5B6575;font-size:15px}
+  [hidden]{display:none!important}
 </style>
 </head>
 <body>
-<div class="brand"><span class="lg">W</span><b>위펀 차량 수리 등록</b><small>지정 공업사</small><span class="shop" id="shopName" hidden></span></div>
+<div class="top"><b>위펀 차량 수리 등록</b><span class="shop" id="shopName" hidden></span></div>
 
-<div id="setup" class="card setup" hidden>
-  <h2>접속 설정</h2><div class="sub">위펀 물류팀이 보낸 링크로 열면 자동으로 채워집니다</div>
-  <label>공업사 이름</label><input id="s-shop" placeholder="오토대안">
-  <label>서버 주소</label><input id="s-s" placeholder="https://xxxx.supabase.co">
-  <label>서버 키</label><input id="s-k" type="password">
-  <button class="big" id="s-ok">저장하고 시작</button>
-</div>
+<div id="bad" class="card" hidden><h2>링크를 다시 받아 주세요</h2><div class="sub">위펀 물류팀이 보내 드린 공업사 전용 링크로 열어야 해요.</div></div>
 
-<div id="main" hidden>
-  <div class="card">
-    <h2>수리 내역 등록</h2><div class="sub">등록된 건만 정산됩니다. <b>100만원 이상</b>은 위펀 승인 후 정산돼요.</div>
-    <label>차량번호</label><div class="plate"><input id="r-plate" placeholder="83수1306" autocomplete="off" list="plates"><datalist id="plates"></datalist></div>
-    <div class="hint" id="r-car"></div>
-    <div class="two"><div><label>수리일</label><input id="r-date" type="date"></div><div><label>입고 계기판 (km)</label><input id="r-km" class="num" inputmode="numeric" placeholder="예: 246720"></div></div>
-    <label>수리 항목 (여러 개 선택)</label><div class="chips" id="r-items"></div>
-    <label>수리 내용</label><textarea id="r-desc" placeholder="예: 엔진오일·오일필터 교환, 앞 브레이크 패드 교환"></textarea>
-    <label>금액 (원, 부가세 포함)</label><input id="r-amt" class="num" inputmode="numeric" placeholder="예: 185000">
-    <div class="hint" id="r-amtHint"></div>
-    <label>사진 (영수증 · 교체 부품, 선택)</label><input id="r-photo" type="file" accept="image/*" multiple capture="environment"><div class="photo" id="r-prev"></div>
-    <label>담당자</label><input id="r-who" placeholder="이름">
+<div id="app" hidden>
+  <div class="note">위펀 차량 수리비는 <b>여기에 등록한 건만</b> 정산돼요. 수리 끝나면 바로 등록해 주세요.</div>
+
+  <!-- 처음 화면 -->
+  <div id="v-home">
+    <div class="card">
+      <button class="big" id="go">+ 수리 등록하기</button>
+      <div class="sum" style="margin-top:14px"><span>이번 달 등록</span><b id="mN">0건</b></div>
+      <div class="sum"><span>이번 달 합계 (부가세 포함)</span><b id="mAmt">0원</b></div>
+    </div>
+    <div class="card"><div class="muted" style="margin-bottom:6px">최근 등록</div><div id="hist" class="muted">불러오는 중…</div>
+      <div class="muted" style="margin-top:10px">등록한 건은 고칠 수 없어요. 잘못 올렸으면 접수번호를 위펀 담당자에게 알려 주세요.</div></div>
   </div>
-  <button class="big" id="r-save">등록</button>
-  <div class="card ok" id="r-ok" hidden></div>
-  <div class="card warn" id="r-warn" hidden></div>
-  <div class="card"><h2 style="font-size:16px">최근 등록 (이 공업사)</h2><div class="hist" id="r-hist">—</div></div>
+
+  <!-- 1 차량 -->
+  <div id="v-1" class="card" hidden>
+    <div class="steps"><i class="on"></i><i></i><i></i><i></i></div>
+    <button class="back" data-go="home">← 처음으로</button>
+    <h2>어떤 차를 수리했나요?</h2><div class="sub">차량번호 <b>뒤 4자리</b>만 넣으세요</div>
+    <input id="p4" inputmode="numeric" maxlength="4" placeholder="예: 1306" autocomplete="off">
+    <div class="cars" id="cars"></div>
+  </div>
+
+  <!-- 2 수리 내용 + 금액 -->
+  <div id="v-2" class="card" hidden>
+    <div class="steps"><i class="on"></i><i class="on"></i><i></i><i></i></div>
+    <button class="back" data-go="1">← 차량 다시 고르기</button>
+    <h2 id="carT">—</h2><div class="sub">한 일을 누르고 <b>금액(부가세 빼고)</b>을 넣으세요. 여러 개 가능해요.</div>
+    <div class="jobs" id="jobs"></div>
+    <div class="lines" id="lines"></div>
+    <div id="sumBox" hidden style="margin-top:12px">
+      <div class="sum"><span>공급가</span><b id="sSup">0원</b></div>
+      <div class="sum"><span>부가세 10%</span><b id="sVat">0원</b></div>
+      <div class="sum t"><span>합계</span><b id="sTot">0원</b></div>
+    </div>
+    <div class="warn" id="w2" hidden></div>
+    <button class="big" id="next2">다음</button>
+  </div>
+
+  <!-- 3 계기판 · 날짜 -->
+  <div id="v-3" class="card" hidden>
+    <div class="steps"><i class="on"></i><i class="on"></i><i class="on"></i><i></i></div>
+    <button class="back" data-go="2">← 수리 내용으로</button>
+    <h2>계기판 km</h2><div class="sub">입고 때 계기판 숫자 (모르면 비워 두세요)</div>
+    <input id="km" inputmode="numeric" placeholder="예: 246,720" autocomplete="off">
+    <h2 style="margin-top:20px">수리한 날</h2>
+    <input id="dt" type="date" style="font-size:22px">
+    <h2 style="margin-top:20px">사진 <span class="muted">(선택)</span></h2>
+    <label class="pbtn" for="ph">📷 영수증 · 부품 사진 찍기</label><input id="ph" type="file" accept="image/*" multiple hidden>
+    <div class="photo" id="phv"></div>
+    <button class="big" id="next3">다음</button>
+  </div>
+
+  <!-- 4 확인 -->
+  <div id="v-4" class="card" hidden>
+    <div class="steps"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></div>
+    <button class="back" data-go="3">← 고치기</button>
+    <h2>이대로 등록할까요?</h2>
+    <div id="conf" style="margin:10px 0 4px"></div>
+    <div class="warn" id="w4" hidden></div>
+    <button class="big green" id="save">등록하기</button>
+  </div>
+
+  <!-- 완료 -->
+  <div id="v-done" hidden>
+    <div class="okbox"><b>등록됐어요 ✓</b><div id="doneT" style="font-size:18px;line-height:1.6"></div></div>
+    <button class="big" data-go="1">+ 다른 차 또 등록</button>
+    <button class="big gray" data-go="home">처음으로</button>
+  </div>
 </div>
-<div class="foot">위로드 WeRoad · 위펀 운송관리 · 수리등록 v1</div>
 
 <script>
 (function () {
   'use strict';
+  // 공업사 전용 링크: ?s=<코드> — 코드로 공업사 이름을 정함 (서버 주소·키는 여기 고정, 공개용 키라 등록(쓰기)만 가능)
+  const SHOPS = { 'od-5c1e': '오토대안', 'hj-9a27': 'HJ모터스' };
+  const SERVER = 'https://evyxvhqerfuqmzwjhkgz.supabase.co', KEY = 'sb_publishable_DNESzKpu1WcxT9sx15D5fw_jVan14DH';
   const $ = (id) => document.getElementById(id);
-  const LS = 'wr-shop';
-  const ITEMS = ['오일·소모품', '브레이크', '타이어', '엔진·미션', '하체·조향', '냉각·에어컨', '전기·등화', '배터리', '유리·와이퍼', '판금·도색', '정기검사', '기타'];
-  const SHC = { '오토대안': '#1f9e89', 'HJ모터스': '#d9731f' };
-  let cfg = {}; try { cfg = JSON.parse(localStorage.getItem(LS) || '{}'); } catch (e) { cfg = {}; }
-  const q = new URLSearchParams(location.search);
-  if (q.get('shop') || q.get('su') || q.get('sk')) {
-    cfg = { shop: q.get('shop') || cfg.shop || '', s: (q.get('su') || cfg.s || '').replace(/\/+$/, ''), k: q.get('sk') || cfg.k || '' };
-    try { localStorage.setItem(LS, JSON.stringify(cfg)); } catch (e) { /* noop */ }
-    history.replaceState(null, '', location.pathname);
-  }
-  if (!cfg.shop || !cfg.s || !cfg.k) $('setup').hidden = false;
-  else { $('main').hidden = false; const sn = $('shopName'); sn.hidden = false; sn.textContent = cfg.shop; sn.style.setProperty('--c', SHC[cfg.shop] || '#3E6AF2'); }
-  $('s-shop').value = cfg.shop || ''; $('s-s').value = cfg.s || ''; $('s-k').value = cfg.k || '';
-  $('s-ok').onclick = () => { cfg = { shop: $('s-shop').value.trim(), s: $('s-s').value.trim().replace(/\/+$/, ''), k: $('s-k').value.trim() }; if (!cfg.shop || !cfg.s || !cfg.k) return alert('세 칸을 모두 채워 주세요'); localStorage.setItem(LS, JSON.stringify(cfg)); location.reload(); };
-
-  const H = { apikey: cfg.k, Authorization: 'Bearer ' + cfg.k, 'Content-Type': 'application/json' };
-  const api = async (path, opt = {}) => { const r = await fetch(cfg.s + '/rest/v1/' + path, { ...opt, headers: { ...H, ...(opt.headers || {}) } }); if (!r.ok) throw new Error('HTTP ' + r.status + ' ' + (await r.text()).slice(0, 100)); return r.status === 204 ? null : r.json(); };
-  const normP = (s) => String(s || '').replace(/\s+/g, '').replace(/^(서울|경기|인천|부산|대구|광주|대전|울산|세종|강원|충북|충남|전북|전남|경북|경남|제주)/, '');
-  const won = (n) => Number(n || 0).toLocaleString('ko-KR');
+  const won = (n) => Math.round(Number(n) || 0).toLocaleString('ko-KR');
   const today = () => new Date().toLocaleDateString('sv-SE');
-  let sel = new Set(), fleet = [], photos = [], hist = [];
-  $('r-date').value = today();
-  $('r-items').innerHTML = ITEMS.map((i) => `<button type="button" data-i="${i}">${i}</button>`).join('');
-  $('r-items').onclick = (e) => { const b = e.target.closest('button'); if (!b) return; const i = b.dataset.i; if (sel.has(i)) sel.delete(i); else sel.add(i); b.classList.toggle('on', sel.has(i)); };
-  $('r-amt').oninput = () => { const n = Number(String($('r-amt').value).replace(/[^\d]/g, '')); $('r-amtHint').innerHTML = n >= 1000000 ? '<b>100만원 이상</b> — 위펀 물류팀 승인 뒤 정산됩니다' : n ? won(n) + '원' : ''; };
-  $('r-plate').oninput = () => { const p = normP($('r-plate').value); const v = fleet.find((x) => normP(x.plate) === p); $('r-car').innerHTML = v ? `위펀 차량 ✓ ${v.model || ''}` : (p.length >= 7 ? '<b>위펀 차량 목록에 없는 번호</b>예요. 번호를 다시 확인해 주세요 (그래도 등록은 돼요)' : ''); };
-  $('r-photo').onchange = async () => {
-    photos = [];
-    for (const f of [...$('r-photo').files].slice(0, 4)) photos.push(await shrink(f));
-    $('r-prev').innerHTML = photos.map((p) => `<img src="${p}">`).join('');
+  const LS = 'wr-shop2';
+  const q = new URLSearchParams(location.search);
+  let code = q.get('s') || ''; try { if (code) localStorage.setItem(LS, code); else code = localStorage.getItem(LS) || ''; } catch (e) { /* noop */ }
+  const shop = SHOPS[code];
+  if (!shop) { $('bad').hidden = false; return; }
+  $('app').hidden = false; $('shopName').hidden = false; $('shopName').textContent = shop;
+  const api = async (path, opt = {}) => { const r = await fetch(SERVER + '/rest/v1/' + path, { ...opt, headers: { apikey: KEY, Authorization: 'Bearer ' + KEY, 'Content-Type': 'application/json', ...(opt.headers || {}) } }); const t = await r.text(); if (!r.ok) throw new Error('HTTP ' + r.status); return t ? JSON.parse(t) : null; };
+
+  // 자주 하는 작업 → 누르면 줄 추가. 분류(items)는 위로드 수리 탭·소모품 교체주기용
+  const JOBS = [
+    ['엔진오일+필터', '오일·소모품'], ['항균필터', '오일·소모품'], ['에어필터', '오일·소모품'], ['연료필터', '오일·소모품'],
+    ['타이어', '타이어'], ['얼라이먼트', '하체·조향'], ['브레이크 패드', '브레이크'], ['브레이크 오일', '브레이크'],
+    ['미션오일', '엔진·미션'], ['데후오일', '엔진·미션'], ['배터리', '배터리'], ['펑크수리', '타이어'],
+    ['냉동기 수리', '냉각·에어컨'], ['에어컨 가스', '냉각·에어컨'], ['전구 교체', '전기·등화'], ['정기검사', '정기검사'],
+    ['공임', '기타'], ['직접 쓰기', '기타'],
+  ];
+  const CAT_RE = [[/오일|필터|휠터|소모/, '오일·소모품'], [/타이어|펑크/, '타이어'], [/브레이크|패드|라이닝/, '브레이크'], [/얼라|쇼바|스프링|허브|아암|암|조향|하체|샤우드|샤프트|베어링/, '하체·조향'], [/엔진|미션|밋션|데후|클러치|인젝터|DPF|센서|터보/i, '엔진·미션'], [/냉동|에어컨|냉각|부동액|라디에이터/, '냉각·에어컨'], [/전구|등|램프|카메라|배선|전기/, '전기·등화'], [/배터리/, '배터리'], [/유리|와이퍼/, '유리·와이퍼'], [/판금|도색|도장/, '판금·도색'], [/검사/, '정기검사']];
+  const catOf = (t) => { for (const [re, c] of CAT_RE) if (re.test(t)) return c; return '기타'; };
+
+  let fleet = [], car = null, lines = [], photos = [], hist = [];
+  const show = (v) => { ['home', '1', '2', '3', '4', 'done'].forEach((k) => { $('v-' + k).hidden = k !== v; }); window.scrollTo(0, 0); if (v === '1') setTimeout(() => $('p4').focus(), 50); };
+  document.addEventListener('click', (e) => { const b = e.target.closest('[data-go]'); if (b) { if (b.dataset.go === '1' && $('v-done').hidden === false) reset(); show(b.dataset.go); } });
+  function reset() { car = null; lines = []; photos = []; $('p4').value = ''; $('cars').innerHTML = ''; $('km').value = ''; $('dt').value = today(); $('phv').innerHTML = ''; $('ph').value = ''; drawLines(); }
+  $('go').onclick = () => { reset(); show('1'); };
+
+  // 1 차량: 뒤 4자리 → 맞는 차 버튼
+  $('p4').oninput = () => {
+    const d = $('p4').value.replace(/\D/g, '').slice(0, 4); $('p4').value = d;
+    if (d.length < 2) { $('cars').innerHTML = ''; return; }
+    const m = fleet.filter((v) => String(v.plate).replace(/\s/g, '').endsWith(d) || (d.length < 4 && String(v.plate).includes(d)));
+    $('cars').innerHTML = m.slice(0, 6).map((v) => `<button data-p="${v.plate}">${v.plate}<small>${v.model || ''}</small></button>`).join('')
+      + (d.length === 4 && !m.length ? `<div class="warn">위펀 차량 목록에 없는 번호예요. 번호를 다시 확인하거나 아래를 눌러 주세요.</div><button data-p="?${d}">목록에 없음 — ****${d}로 등록<small>위펀 담당자가 확인해요</small></button>` : '');
   };
-  function shrink(file) {   // 사진은 긴 변 1000px JPEG로 줄여 저장 (base64, 표 한 칸에)
-    return new Promise((res) => { const img = new Image(); img.onload = () => { const s = Math.min(1, 1000 / Math.max(img.width, img.height)); const c = document.createElement('canvas'); c.width = Math.round(img.width * s); c.height = Math.round(img.height * s); c.getContext('2d').drawImage(img, 0, 0, c.width, c.height); res(c.toDataURL('image/jpeg', 0.72)); }; img.src = URL.createObjectURL(file); });
+  $('cars').onclick = (e) => { const b = e.target.closest('button[data-p]'); if (!b) return; car = b.dataset.p; $('carT').textContent = car.replace(/^\?/, '****'); show('2'); };
+
+  // 2 수리 내용 + 금액
+  $('jobs').innerHTML = JOBS.map(([n]) => `<button data-j="${n}">${n}</button>`).join('');
+  $('jobs').onclick = (e) => { const b = e.target.closest('button[data-j]'); if (!b) return; const n = b.dataset.j; lines.push({ name: n === '직접 쓰기' ? '' : n, amt: '' }); drawLines(); const ins = $('lines').querySelectorAll(n === '직접 쓰기' ? '.h input' : '.amt input'); const last = ins[ins.length - 1]; if (last) last.focus(); };
+  function drawLines() {
+    $('lines').innerHTML = lines.map((l, i) => `<div class="line"><div class="h"><input data-i="${i}" data-f="name" value="${String(l.name).replace(/"/g, '&quot;')}" placeholder="한 일 (예: 뒤 쇼바 교환)"><button class="x" data-x="${i}">✕</button></div><div class="amt"><input data-i="${i}" data-f="amt" inputmode="numeric" value="${l.amt ? won(l.amt) : ''}" placeholder="금액"><span>원</span></div></div>`).join('');
+    sum();
   }
-  async function load() {
-    try { fleet = await api('rpc/shop_plates', { method: 'POST', body: '{}' }); $('plates').innerHTML = fleet.map((v) => `<option value="${v.plate}">`).join(''); } catch (e) { /* 차량 목록은 선택 사항 */ }
-    try {
-      hist = await api('rpc/shop_recent', { method: 'POST', body: JSON.stringify({ p_shop: cfg.shop }) });
-      $('r-hist').innerHTML = hist.map((r) => { const ok = String(r.ok || ''); const tag = r.amt >= 1000000 ? (/^승인/.test(ok) ? '<span class="tag t-ok">승인</span>' : /^반려/.test(ok) ? '<span class="tag t-no">반려</span>' : '<span class="tag t-wait">승인 대기</span>') : ''; return `<div><span>${r.date.slice(5).replace('-', '/')} · <b>${r.plate}</b>${tag}<small>${(r.desc || '').slice(0, 40)}</small></span><b>${won(r.amt)}원</b></div>`; }).join('') || '—';
-    } catch (e) { $('r-hist').textContent = '불러오지 못했습니다 (' + e.message + ')'; }
-  }
-  $('r-save').onclick = async () => {
-    const w = $('r-warn'), ok = $('r-ok'); w.hidden = true; ok.hidden = true;
-    const plate = $('r-plate').value.replace(/\s+/g, '').trim(), date = $('r-date').value, km = Number(String($('r-km').value).replace(/[^\d]/g, '')) || null, amt = Number(String($('r-amt').value).replace(/[^\d]/g, '')), desc = $('r-desc').value.trim(), who = $('r-who').value.trim();
-    const miss = [!plate && '차량번호', !date && '수리일', !sel.size && '수리 항목', !desc && '수리 내용', !amt && '금액', !who && '담당자'].filter(Boolean);
-    if (miss.length) { w.hidden = false; w.textContent = miss.join(', ') + '을(를) 넣어 주세요.'; return; }
+  $('lines').oninput = (e) => { const t = e.target; const i = +t.dataset.i; if (t.dataset.f === 'amt') { const d = t.value.replace(/\D/g, ''); lines[i].amt = d ? +d : ''; t.value = d ? won(d) : ''; } else lines[i].name = t.value; sum(); };
+  $('lines').onclick = (e) => { const b = e.target.closest('[data-x]'); if (!b) return; lines.splice(+b.dataset.x, 1); drawLines(); };
+  const tot = () => { const s = lines.reduce((a, l) => a + (+l.amt || 0), 0); return { s, v: Math.round(s * 0.1), t: s + Math.round(s * 0.1) }; };
+  function sum() { const x = tot(); $('sumBox').hidden = !lines.length; $('sSup').textContent = won(x.s) + '원'; $('sVat').textContent = won(x.v) + '원'; $('sTot').textContent = won(x.t) + '원'; }
+  $('next2').onclick = () => {
+    const w = $('w2'); w.hidden = true;
+    lines = lines.filter((l) => String(l.name).trim() || l.amt);
+    if (!lines.length) { w.hidden = false; w.textContent = '한 일을 하나 이상 눌러 주세요.'; drawLines(); return; }
+    const bad = lines.find((l) => !String(l.name).trim()); if (bad) { w.hidden = false; w.textContent = '한 일 이름이 빈 줄이 있어요.'; drawLines(); return; }
+    if (!tot().s) { w.hidden = false; w.textContent = '금액을 넣어 주세요.'; return; }
+    show('3');
+  };
+
+  // 3 km · 날짜 · 사진
+  $('dt').value = today();
+  $('km').oninput = () => { const d = $('km').value.replace(/\D/g, ''); $('km').value = d ? won(d) : ''; };
+  $('ph').onchange = async () => { for (const f of [...$('ph').files].slice(0, 4 - photos.length)) photos.push(await shrink(f)); $('phv').innerHTML = photos.map((p) => `<img src="${p}">`).join(''); };
+  function shrink(file) { return new Promise((res) => { const img = new Image(); img.onload = () => { const s = Math.min(1, 1000 / Math.max(img.width, img.height)); const c = document.createElement('canvas'); c.width = Math.round(img.width * s); c.height = Math.round(img.height * s); c.getContext('2d').drawImage(img, 0, 0, c.width, c.height); res(c.toDataURL('image/jpeg', 0.7)); }; img.onerror = () => res(''); img.src = URL.createObjectURL(file); }); }
+  $('next3').onclick = () => {
+    const x = tot(), km = $('km').value.replace(/\D/g, '');
+    $('conf').innerHTML = `<div class="row"><span>차량</span><b>${$('carT').textContent}</b></div><div class="row"><span>수리한 날</span><b>${$('dt').value}</b></div>`
+      + lines.map((l) => `<div class="row"><span>${l.name}</span><b>${won(l.amt)}원</b></div>`).join('')
+      + `<div class="row"><span>부가세</span><b>${won(x.v)}원</b></div><div class="row"><span><b>합계</b></span><b style="color:#1F5FBF;font-size:22px">${won(x.t)}원</b></div>`
+      + (km ? `<div class="row"><span>계기판</span><b>${won(km)} km</b></div>` : '') + (photos.length ? `<div class="row"><span>사진</span><b>${photos.length}장</b></div>` : '')
+      + (x.t >= 1000000 ? '<div class="warn">100만원 이상이라 위펀 승인 뒤 정산돼요.</div>' : '');
+    show('4');
+  };
+
+  // 4 등록 → Supabase repairs (위로드 차량관리 › 수리·수리비에 바로 보임)
+  $('save').onclick = async () => {
+    const w = $('w4'); w.hidden = true; const x = tot(), date = $('dt').value || today();
     const no = 'R' + date.slice(2).replace(/-/g, '') + '-' + Math.random().toString(36).slice(2, 6).toUpperCase();
-    const row = { no, date, plate, shop: cfg.shop, items: [...sel], desc, km, amt, who, photos, ok: amt >= 1000000 ? '대기' : '', at: new Date().toISOString() };
-    $('r-save').disabled = true; $('r-save').textContent = '등록 중…';
-    try {
-      await api('repairs', { method: 'POST', headers: { Prefer: 'return=minimal' }, body: JSON.stringify(row) });
-      ok.hidden = false; ok.innerHTML = `<b>등록됐어요.</b> 접수번호 ${no} · ${plate} · ${won(amt)}원${amt >= 1000000 ? ' · 위펀 승인 뒤 정산' : ''}`;
-      $('r-plate').value = ''; $('r-km').value = ''; $('r-desc').value = ''; $('r-amt').value = ''; $('r-amtHint').textContent = ''; $('r-car').textContent = ''; $('r-photo').value = ''; $('r-prev').innerHTML = ''; photos = []; sel = new Set(); $('r-items').querySelectorAll('button').forEach((b) => b.classList.remove('on'));
-      load();
-    } catch (e) { w.hidden = false; w.textContent = '등록하지 못했습니다 — ' + e.message + ' (잠시 뒤 다시 눌러 주세요)'; }
-    $('r-save').disabled = false; $('r-save').textContent = '등록';
+    const row = { no, date, plate: car, shop, items: [...new Set(lines.map((l) => catOf(l.name)))], desc: lines.map((l) => `${l.name} ${won(l.amt)}`).join(' · ') + ` (공급가 ${won(x.s)} + 부가세 ${won(x.v)})`, km: +$('km').value.replace(/\D/g, '') || null, amt: x.t, who: shop, photos, ok: x.t >= 1000000 ? '대기' : '', at: new Date().toISOString() };
+    $('save').disabled = true; $('save').textContent = '등록 중…';
+    try { await api('repairs', { method: 'POST', headers: { Prefer: 'return=minimal' }, body: JSON.stringify(row) }); $('doneT').innerHTML = `접수번호 <b>${no}</b><br>${$('carT').textContent} · ${won(x.t)}원`; show('done'); load(); }
+    catch (e) { w.hidden = false; w.textContent = '등록이 안 됐어요. 인터넷 연결을 확인하고 다시 눌러 주세요. (' + e.message + ')'; }
+    $('save').disabled = false; $('save').textContent = '등록하기';
   };
-  if (!$('main').hidden) load();
+
+  async function load() {
+    try { fleet = (await api('rpc/shop_plates', { method: 'POST', body: '{}' })) || []; } catch (e) { fleet = []; }
+    try {
+      hist = (await api('rpc/shop_recent', { method: 'POST', body: JSON.stringify({ p_shop: shop }) })) || [];
+      const ym = today().slice(0, 7), mon = hist.filter((r) => String(r.date).slice(0, 7) === ym);
+      $('mN').textContent = mon.length + '건'; $('mAmt').textContent = won(mon.reduce((a, r) => a + (+r.amt || 0), 0)) + '원';
+      $('hist').innerHTML = hist.slice(0, 8).map((r) => { const ok = String(r.ok || ''); const tg = r.amt >= 1000000 ? (/^승인/.test(ok) ? '<span class="tag t-ok">승인</span>' : /^반려/.test(ok) ? '<span class="tag t-no">반려</span>' : '<span class="tag t-wait">승인 대기</span>') : ''; return `<div class="row"><span>${String(r.date).slice(5).replace('-', '/')} ${r.plate}${tg}<small>${String(r.desc || '').slice(0, 40)}</small></span><b>${won(r.amt)}원</b></div>`; }).join('') || '아직 등록한 수리가 없어요.';
+    } catch (e) { $('hist').textContent = '목록을 못 불러왔어요.'; }
+  }
+  load();
 })();
 </script>
 </body>
