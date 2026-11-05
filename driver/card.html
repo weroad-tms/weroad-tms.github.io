@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#1F5FBF">
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<title>거래처 요약카드</title>
+<style>
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;min-height:100%;background:#EEF2F7;color:#111827;font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",sans-serif}
+  body{padding:max(14px,env(safe-area-inset-top)) 16px max(28px,env(safe-area-inset-bottom));max-width:640px;margin:0 auto;font-size:17px;line-height:1.55}
+  .top{background:#1F5FBF;color:#fff;border-radius:20px;padding:18px 18px 16px;margin-bottom:14px}
+  .top small{opacity:.8;font-size:14px;font-weight:700}
+  .top h1{margin:4px 0 6px;font-size:23px;line-height:1.3}
+  .top p{margin:0;font-size:15px;opacity:.9}
+  .top a{color:#fff}
+  .sec{background:#fff;border:1px solid #DDE3EC;border-radius:18px;padding:16px 16px 6px;margin-bottom:12px}
+  .sec h2{margin:0 0 10px;font-size:19px;display:flex;align-items:center;gap:10px}
+  .sec h2 i{font-style:normal;width:28px;height:28px;border-radius:50%;background:#1F5FBF;color:#fff;font-size:15px;display:inline-grid;place-items:center;flex:none}
+  ol{margin:0;padding-left:22px}
+  li{margin:0 0 14px}
+  li p{margin:0;font-size:18px;font-weight:600}
+  .ph{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:8px}
+  .ph a{display:block;border-radius:12px;overflow:hidden;background:#E5EAF1;aspect-ratio:1/1}
+  .ph img{width:100%;height:100%;object-fit:cover;display:block}
+  .voc{list-style:none;padding:0}
+  .voc li{display:flex;gap:12px;padding:10px 0;border-bottom:1px solid #EEF1F6;margin:0}
+  .voc li:last-child{border-bottom:0}
+  .voc b{color:#B54708;min-width:66px;font-size:15px;padding-top:2px}
+  .voc span{font-size:17px;font-weight:600}
+  .empty{color:#6B7280;margin:0 0 12px;font-size:15px}
+  .file{display:flex;align-items:center;gap:8px;border:2px solid #C9D2DE;border-radius:14px;padding:14px;margin-bottom:10px;color:#1F5FBF;font-weight:800;text-decoration:none}
+  .msg{background:#fff;border-radius:18px;padding:28px 18px;text-align:center;color:#4B5563}
+  .foot{color:#8A94A6;font-size:13px;text-align:center;margin-top:16px}
+  #lb{position:fixed;inset:0;background:rgba(0,0,0,.9);display:none;align-items:center;justify-content:center;z-index:9}
+  #lb img{max-width:100%;max-height:100%}
+  #lb.on{display:flex}
+</style>
+</head>
+<body>
+<div id="app"><div class="msg">카드 불러오는 중…</div></div>
+<div id="lb"><img alt=""></div>
+<script>
+(function () {
+  'use strict';
+  var URL0 = 'https://evyxvhqerfuqmzwjhkgz.supabase.co', KEY = 'sb_publishable_DNESzKpu1WcxT9sx15D5fw_jVan14DH';
+  var app = document.getElementById('app'), lb = document.getElementById('lb');
+  var esc = function (s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); };
+  var id = new URLSearchParams(location.search).get('c') || '';
+  if (!/^[0-9a-f-]{36}$/i.test(id)) { app.innerHTML = '<div class="msg">링크가 올바르지 않아요. 물류팀에 다시 받아 주세요.</div>'; return; }
+  var photos = function (ph) { return ph && ph.length ? '<div class="ph">' + ph.map(function (u) { return '<a href="' + esc(u) + '" data-lb="' + esc(u) + '"><img loading="lazy" src="' + esc(u) + '" alt=""></a>'; }).join('') + '</div>' : ''; };
+  var items = function (a) { return a && a.length ? '<ol>' + a.map(function (x) { return '<li><p>' + esc(x.t) + '</p>' + photos(x.ph) + '</li>'; }).join('') + '</ol>' : '<p class="empty">아직 등록된 내용이 없어요.</p>'; };
+  fetch(URL0 + '/rest/v1/rpc/card_pub', { method: 'POST', headers: { apikey: KEY, 'Content-Type': 'application/json' }, body: JSON.stringify({ p_pub: id }) })
+    .then(function (r) { return r.json(); })
+    .then(function (c) {
+      if (!c || !c.cl) { app.innerHTML = '<div class="msg">카드를 찾을 수 없어요. 물류팀에 확인해 주세요.</div>'; return; }
+      document.title = c.cl + ' · 요약카드';
+      var voc = (c.voc || []).slice().sort(function (a, b) { return String(b.d).localeCompare(String(a.d)); });
+      var map = c.addr ? 'https://map.kakao.com/link/search/' + encodeURIComponent(c.addr) : '';
+      app.innerHTML =
+        '<div class="top"><small>거래처 요약카드</small><h1>' + esc(c.cl) + '</h1>' + (c.addr ? '<p>' + esc(c.addr) + (map ? ' · <a href="' + map + '">지도</a>' : '') + '</p>' : '') + '</div>' +
+        '<div class="sec"><h2><i>1</i>주차 · 출입</h2>' + items(c.park) + '</div>' +
+        '<div class="sec"><h2><i>2</i>진열</h2>' + items(c.disp) + '</div>' +
+        '<div class="sec"><h2><i>3</i>이전 VOC (꼭 확인)</h2>' + (voc.length ? '<ul class="voc">' + voc.map(function (v) { return '<li><b>' + esc(String(v.d || '').slice(2).replace(/-/g, '.')) + '</b><span>' + esc(v.t) + '</span></li>'; }).join('') + '</ul>' : '<p class="empty">기록된 VOC가 없어요.</p>') + '</div>' +
+        ((c.files || []).length ? '<div class="sec"><h2><i>+</i>가이드 파일</h2>' + c.files.map(function (f) { return '<a class="file" href="' + esc(f.url) + '" target="_blank" rel="noopener">📄 ' + esc(f.name || '파일 열기') + '</a>'; }).join('') + '</div>' : '') +
+        '<div class="foot">' + (c.updated_at ? new Date(c.updated_at).toLocaleDateString('ko-KR') + ' 수정 · ' : '') + '위펀 물류팀</div>';
+    })
+    .catch(function () { app.innerHTML = '<div class="msg">카드를 불러오지 못했어요. 인터넷 연결을 확인하고 새로고침 해 주세요.</div>'; });
+  document.addEventListener('click', function (e) {
+    var a = e.target.closest('[data-lb]'); if (a) { e.preventDefault(); lb.querySelector('img').src = a.dataset.lb; lb.classList.add('on'); return; }
+    if (e.target.closest('#lb')) lb.classList.remove('on');
+  });
+})();
+</script>
+</body>
+</html>

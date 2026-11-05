@@ -951,7 +951,9 @@ function renderData(C) {
     <div class="drop"><span class="lbl">시너지 저온</span><input type="file" id="fSynOff" accept=".xls,.xlsx"><span class="st ${F.synergyOff ? 'ok' : ''}">${esc(F.synergyOff || '판매현황(거래처) · 편의점종합 · 집계')}</span></div>
     <div class="drop"><span class="lbl">현대차 상온</span><input type="file" id="fHyOn" accept=".xls,.xlsx"><span class="st ${S.hyundai.on ? 'ok' : ''}">${S.hyundai.on ? fmt(S.hyundai.on) + '원' : 'H_ 담당 과세+면세'}</span></div>
     <div class="drop"><span class="lbl">현대차 저온</span><input type="file" id="fHyOff" accept=".xls,.xlsx"><span class="st ${S.hyundai.off ? 'ok' : ''}">${S.hyundai.off ? fmt(S.hyundai.off) + '원' : '판매현황(실배송) 현대 담당 ÷ 1.1'}</span></div>
-    <p style="margin-top:10px">스낵24·조식24 상차금액은 위로드 기사별 상차량을 그대로 씀 (위로드 연동 전까지는 각 탭 상차금액 칸에 직접 입력).</p>
+    <div class="drop"><span class="lbl">위로드 주행거리</span><button id="wrPull" class="primary">위로드에서 불러오기</button><span class="st ${F.weroad ? 'ok' : ''}">${esc(F.weroad || '위로드 마감 정산 → [마감정산으로 보내기] 한 뒤 누르기')}</span></div>
+    <p style="margin-top:10px">위로드에서 불러오면 <b>실거리유류</b> 기사의 TMS km(편도 합계, 회전수 반영)와 스낵24·조식24 기사 상차금액이 들어가요. <b>고정유류</b> 기사는 기사마스터의 고정유류비 그대로이고 km는 쓰지 않아요. 불러온 뒤 서비스 탭에서 고칠 수 있어요.</p>
+    ${S.weroadMiss && S.weroadMiss.length ? `<p class="hint" style="color:var(--bad)">기사마스터와 못 맞춘 위로드 기사: ${S.weroadMiss.map(esc).join(', ')}</p>` : ''}
     <h4 style="margin-top:16px">영업일 (서비스별 · 근무일 일할 기준)</h4>
     <div class="drop" style="flex-wrap:wrap;gap:12px">${SERVICES.map((s) => `<label class="hfield">${s.id} <input type="number" data-bd="${s.id}" value="${(S.businessDays || {})[s.id] ?? ''}" style="width:64px"></label>`).join('')}</div>
     </div>
@@ -981,8 +983,42 @@ function renderData(C) {
     try { const r = parseHyundaiSales(await readSheetRows(f)); S.hyundai[key] = r.total; delete S.serviceLoad['본점|창호통운|현대차']; save(); render(); toast('현대차 반영'); } catch (err) { alert(err.message); }
   });
   hy('#fHyOn', 'on'); hy('#fHyOff', 'off');
+  main.querySelector('#wrPull').onclick = pullWeroad;
   main.querySelectorAll('[data-own]').forEach((el) => (el.onchange = () => { if (el.value) S.ownerMap[el.dataset.own] = el.value; save(); render(); }));
   main.querySelectorAll('[data-unmap]').forEach((b) => (b.onclick = () => { delete S.ownerMap[b.dataset.unmap]; save(); render(); }));
+}
+
+/* ---------- 위로드 → 주행거리·상차량 (2026-11-05) ---------- */
+// 위로드 [마감정산으로 보내기]가 팀 저장소 settle_km_YYYY-MM 에 둔 자료를 기사마스터와 맞춤
+//   맞추는 순서: 이름 그대로 → 코스 번호(주간24=스주24, 야간01=야간1)가 한 명뿐일 때
+//   TMS km 은 실거리유류(REAL_KM) 기사만, 상차금액은 스낵24·조식24 기사 전부 (officeLoads)
+const courseKey = (c) => { const m = String(c || '').match(/(야간|스야|주간|스주)\s*0*(\d+)/); return m ? (/야/.test(m[1]) ? 'N' : 'D') + Number(m[2]) : ''; };
+async function pullWeroad() {
+  if (!S.month) return alert('정산월을 먼저 정해 주세요.');
+  let v;
+  try { v = await acall('app_kv_get', { p_key: 'settle_km_' + S.month }); } catch (e) { return alert('위로드 자료를 못 읽었어요: ' + e.message); }
+  if (!v || !Array.isArray(v.rows)) return alert(`${S.month} 위로드 자료가 아직 없어요.\n위로드 → 정산·분석 → 마감 정산 → 누적 결과 · 대시보드(월별, ${S.month})에서 [마감정산으로 보내기]를 먼저 눌러 주세요.`);
+  const pool = S.master.filter((m) => m.service === '스낵24' || m.service === '조식24');
+  const byName = new Map(pool.map((m) => [m.name, m]));
+  const byCourse = {}; for (const m of pool) { const k = courseKey(m.course); if (k) (byCourse[k] = byCourse[k] || []).push(m); }
+  const find = (name, course) => byName.get(name) || ((byCourse[courseKey(course)] || []).length === 1 ? byCourse[courseKey(course)][0] : null);
+  let km = 0, fixedSkip = 0, ld = 0; const miss = [], used = new Set();
+  for (const r of v.rows) {
+    const m = find(r.n, r.c); if (!m) { miss.push(`${r.n}(${r.c || '-'})`); continue; }
+    used.add(driverKey(m));
+    if (m.calc !== 'REAL_KM') { fixedSkip++; continue; }
+    const k = driverKey(m); S.inputs[k] = S.inputs[k] || {};
+    S.inputs[k].tmsKm = Math.round(r.km * 100) / 100;
+    if (r.k > 1) S.inputs[k].note = [String(S.inputs[k].note || '').replace(/\s*·?\s*\d회전[^·]*/g, '').trim(), `${r.k}회전(원 편도 ${r.raw})`].filter(Boolean).join(' · ');
+    km++;
+  }
+  S.officeLoads = S.officeLoads || {};
+  for (const [n, a] of Object.entries(v.loads || {})) { const m = byName.get(n); if (m) { S.officeLoads[driverKey(m)] = a; ld++; } }
+  const noKm = pool.filter((m) => m.calc === 'REAL_KM' && !used.has(driverKey(m))).map((m) => m.name);
+  S.weroadMiss = miss;
+  S.files = S.files || {}; S.files.weroad = `${S.month} · ${String(v.at || '').slice(5, 16).replace('T', ' ')} 보낸 자료 · 실거리 ${km}명 km · 상차금액 ${ld}명`;
+  save(); render();
+  alert(`위로드에서 불러왔어요 (${S.month})\n\n· 실거리유류 TMS km: ${km}명\n· 고정유류라 km 안 씀: ${fixedSkip}명\n· 상차금액: ${ld}명` + (miss.length ? `\n\n기사마스터에 없는 위로드 기사 ${miss.length}명: ${miss.join(', ')}` : '') + (noKm.length ? `\n\n위로드 km가 없는 실거리유류 기사 ${noKm.length}명: ${noKm.join(', ')}` : ''));
 }
 
 /* ---------- 별도 항목 탭 (토요일배송·긴급용차·로운 노선) ---------- */
