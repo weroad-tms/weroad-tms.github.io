@@ -87,6 +87,11 @@
   .lc-nt{font-size:12.5px;opacity:.7;margin-top:6px}
   button.big.save{background:linear-gradient(135deg,#3E6AF2,#8B5CF6);box-shadow:0 10px 30px rgba(62,106,242,.35);font-size:20px;padding:18px}
   .log{font-size:11.5px;opacity:.55;max-height:90px;overflow:auto;white-space:pre-wrap;word-break:break-all;margin-top:10px}
+  .agree{position:fixed;inset:0;z-index:50;background:#0F1A33;overflow:auto;padding:max(18px,env(safe-area-inset-top)) 18px max(24px,env(safe-area-inset-bottom))}
+  .agree h2{margin:6px 0 10px;font-size:22px}.agree ul{margin:0;padding-left:18px;line-height:1.65;font-size:15.5px}.agree li{margin-bottom:6px}.agree b{color:#fff}
+  .agree .note{opacity:.75;font-size:13.5px;line-height:1.6;margin-top:10px}
+  .agree button{display:block;width:100%;border:0;border-radius:16px;padding:18px;font:inherit;font-size:19px;font-weight:800;margin-top:12px}
+  .agree .yes{background:#3E6AF2;color:#fff}.agree .no{background:rgba(255,255,255,.1);color:#EAF0FF}
 </style>
 </head>
 <body>
@@ -94,10 +99,24 @@
 
 <div id="setup" class="card setup" hidden>
   <div class="name">로그인<small>이름과 휴대폰번호만 넣으면 됩니다</small></div>
-  <label>이름 (위펀오피스에 등록된 기사 이름)</label><input id="s-n" placeholder="홍길동" autocomplete="off">
+  <label>이름 (물류팀에 등록된 기사 이름)</label><input id="s-n" placeholder="홍길동" autocomplete="off">
   <label>비밀번호 (휴대폰번호, 숫자만)</label><input id="s-p" type="tel" inputmode="numeric" placeholder="01012345678" autocomplete="off">
   <button id="s-ok">시작하기</button>
   <p class="msg" style="margin-top:12px">로그인이 안 되면 관리자에게 "위로드 기사 등록"을 요청해 주세요.<br><a href="guide.html" style="color:#9CB4FF;font-weight:700">📖 설치·사용 가이드 보기</a></p>
+</div>
+
+<div id="agree" class="agree" hidden>
+  <div class="brand"><span class="lg">W</span><b>위로드</b><small>배송기사웹</small></div>
+  <h2>위치 정보 수집·이용 동의</h2>
+  <div class="card"><ul>
+    <li><b>무엇을</b> — 휴대폰 위치(위도·경도), 속도, 정확도, 수집 시각</li>
+    <li><b>왜</b> — <b>출퇴근 기록</b>과 <b>배송 경로 확인</b> (최종 배송지 도착·업무종료 시각 확인 포함)</li>
+    <li><b>언제</b> — 출근(위치 전송)을 켠 동안만. 퇴근해서 끄면 수집하지 않아요</li>
+    <li><b>보관</b> — 이동 경로 상세는 30일 뒤 지워요. 출퇴근·업무종료 같은 판정 결과만 근무·정산 기록으로 남아요</li>
+    <li><b>누가 봐요</b> — 위펀 물류팀·편의점팀 담당자만</li>
+  </ul>
+  <p class="note">동의하지 않아도 퇴근 기록·로케이션 등 다른 기능은 쓸 수 있어요. 위치 전송(출근)만 쓸 수 없어요. 궁금한 점은 물류팀에 물어봐 주세요.</p></div>
+  <button class="yes" id="ag-ok">동의하고 시작</button><button class="no" id="ag-no">동의하지 않음</button>
 </div>
 
 <div id="main" hidden>
@@ -217,6 +236,21 @@
   const isMaster = () => MASTERS.includes(String(cfg.n || '').replace(/\s/g, ''));
   if (!loggedIn()) { $('setup').hidden = false; }
   else { $('main').hidden = false; $('nm').firstChild.textContent = cfg.n; $('nm2').firstChild.textContent = cfg.n; if (isMaster()) { document.querySelector('.tabs button[data-tab=loc]').hidden = true; $('nm2').lastElementChild.textContent = '관리자 계정 — 어떤 차량이든 대신 기록할 수 있어요'; } }
+  // 11/6 위치 수집 동의 (한 번) — 동의 기록은 위치 서버에도 남김
+  const AGREE_VER = '2026-11-06';
+  if (loggedIn() && !isMaster() && cfg.agree !== AGREE_VER && !cfg.noAgree) $('agree').hidden = false;
+  $('ag-ok').onclick = async () => {
+    $('ag-ok').disabled = true;
+    try { await rpc('driver_consent', { p_name: cfg.n, p_token: cfg.tok, p_ver: AGREE_VER, p_ok: true }); } catch (e) { /* 기록 실패해도 진행 · 다음에 다시 기록 */ }
+    cfg.agree = AGREE_VER; delete cfg.noAgree; localStorage.setItem(LS, JSON.stringify(cfg)); $('agree').hidden = true;
+  };
+  $('ag-no').onclick = async () => {
+    try { await rpc('driver_consent', { p_name: cfg.n, p_token: cfg.tok, p_ver: AGREE_VER, p_ok: false }); } catch (e) { /* noop */ }
+    cfg.noAgree = true; localStorage.setItem(LS, JSON.stringify(cfg)); $('agree').hidden = true;
+    const t = document.querySelector('.tabs button[data-tab=loc]'); if (t) t.hidden = true;
+    const r = document.querySelector('.tabs button[data-tab=rec]'); if (r) r.click();
+  };
+  if (cfg.noAgree) { const t = document.querySelector('.tabs button[data-tab=loc]'); if (t) t.hidden = true; }
   $('s-n').value = cfg.n || '';
   const rpc = async (fn, body) => {
     const r = await fetch(SERVER + '/rest/v1/rpc/' + fn, { method: 'POST', headers: { 'Content-Type': 'application/json', apikey: KEY }, body: JSON.stringify(body) });
@@ -230,7 +264,7 @@
     $('s-ok').disabled = true; $('s-ok').textContent = '확인 중…';
     try {
       const tok = await rpc('driver_login', { p_name: n, p_pw: pw });
-      if (!tok) throw new Error('이름 또는 휴대폰번호가 맞지 않습니다. 위펀오피스에 등록된 이름·번호인지 확인해 주세요.');
+      if (!tok) throw new Error('이름 또는 휴대폰번호가 맞지 않습니다. 물류팀에 등록된 이름·번호인지 확인해 주세요.');
       cfg = { n, tok, v: cfg.v || '' }; localStorage.setItem(LS, JSON.stringify(cfg)); if (APP) { try { if (window.WeRoadApp.setAuth) window.WeRoadApp.setAuth(n, tok); else window.WeRoadApp.setDriver(n); } catch (e) { /* noop */ } } location.reload();
     } catch (e) { $('s-ok').disabled = false; $('s-ok').textContent = '시작하기'; alert(e.message); }
   };
