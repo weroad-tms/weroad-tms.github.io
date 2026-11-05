@@ -1,0 +1,619 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#1B2A4A">
+<link rel="icon" href="../driver/icon.svg" type="image/svg+xml">
+<title>위펀 운송료 마감</title>
+<style>
+:root{--bg:#F3F5F9;--card:#fff;--ink:#1A2233;--muted:#667085;--line:#E5EAF2;--line2:#F0F3F8;--brand:#3E6AF2;--teal:#14B8A6;--ok:#12B76A;--warn:#F79009;--bad:#E5484D;--in:#FFFBEA;--navy:#1B2A4A}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#0F141C;--card:#171E2A;--ink:#E6EAF2;--muted:#94A0B4;--line:#283244;--line2:#1E2634;--in:#2A2617}}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 -apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",sans-serif}
+body{padding:max(14px,env(safe-area-inset-top)) 16px 40px;max-width:1180px;margin:0 auto}
+.brand{display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+.lg{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--brand),var(--teal));display:grid;place-items:center;font-weight:900;font-size:18px;color:#fff}
+.brand b{font-size:17px}.brand small{color:var(--muted);margin-left:4px}
+.spacer{flex:1}
+.chip{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:4px 11px;font-size:12.5px;font-weight:700;background:var(--line2);color:var(--muted)}
+.chip.c-draft{background:#EEF2FF;color:var(--brand)}.chip.c-submitted{background:#FFF4E5;color:#B54708}.chip.c-returned{background:#FEECEC;color:var(--bad)}.chip.c-confirmed{background:#E7F8EF;color:#067647}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:14px}
+h2{margin:0 0 4px;font-size:19px}h3{margin:0;font-size:16px}
+.sub{color:var(--muted);font-size:13px}
+input,select,textarea{font:inherit;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:9px;padding:8px 10px}
+input[type=number]{text-align:right}
+button{font:inherit;cursor:pointer;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:10px;padding:8px 14px;font-weight:600}
+button.pri{background:var(--brand);border-color:var(--brand);color:#fff}
+button.ghost{border-color:transparent;background:transparent;color:var(--muted)}
+button:disabled{opacity:.5;cursor:not-allowed}
+.login{max-width:380px;margin:12vh auto 0}
+.login label{display:block;margin:10px 0 4px;font-size:13px;color:var(--muted)}
+.login input{width:100%;padding:11px 12px}
+.login button{width:100%;margin-top:16px;padding:12px}
+.err{color:var(--bad);font-size:13px;margin-top:8px;min-height:18px}
+.tabs{display:flex;gap:6px;margin:4px 0 12px;flex-wrap:wrap}
+.tabs button{border-radius:999px;padding:7px 16px}
+.tabs button.on{background:var(--navy);border-color:var(--navy);color:#fff}
+.head{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
+.note{border-radius:12px;padding:10px 12px;font-size:13px;margin:8px 0}
+.note.bad{background:#FEECEC;color:#B42318}.note.info{background:#EEF2FF;color:#3538CD}.note.ok{background:#E7F8EF;color:#067647}
+.tw{overflow:auto;border:1px solid var(--line);border-radius:12px}
+table{border-collapse:separate;border-spacing:0;width:100%;min-width:880px}
+th,td{padding:7px 8px;border-bottom:1px solid var(--line2);white-space:nowrap;text-align:left}
+th{background:var(--line2);color:var(--muted);font-weight:600;font-size:12.5px;position:sticky;top:0}
+td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
+td.in input{background:var(--in);width:92px}
+td.in input.w{width:180px}
+td.b{font-weight:700}
+tr.ret td{background:#FFF5F5}
+.rv{font-size:11.5px;font-weight:700;border-radius:6px;padding:2px 7px}
+.rv.ok{background:#E7F8EF;color:#067647}.rv.returned{background:#FEECEC;color:var(--bad)}
+.sum{display:flex;gap:22px;flex-wrap:wrap;justify-content:flex-end;margin-top:12px;font-size:14px}
+.sum span{color:var(--muted)}.sum b{color:var(--ink);font-size:16px;margin-left:6px}
+.sum .tot b{font-size:19px;color:var(--brand)}
+.foot{display:flex;gap:10px;justify-content:flex-end;align-items:center;margin-top:14px;flex-wrap:wrap}
+.saved{color:var(--muted);font-size:12.5px}
+.small{font-size:12px;color:var(--muted)}
+.modal{position:fixed;inset:0;background:rgba(15,20,28,.45);display:grid;place-items:center;padding:16px;z-index:10}
+.modal .card{max-width:420px;width:100%}
+@media (max-width:640px){body{padding-left:12px;padding-right:12px}.sum{justify-content:flex-start}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+/**
+ * 위로드 마감정산 계산 모듈 (weroad-settlement.js)
+ * ------------------------------------------------------------
+ * 운송사 공통 입력값 + 기사마스터 + 기사별 월 입력값 → 기사별 청구금액·상차금액 → 품의(본점/광주 × 운송사 × 서비스)
+ *
+ * 브라우저(위로드)와 Node 모두에서 동작하는 순수 함수 모듈. DOM·네트워크 의존 없음.
+ *
+ * ■ 품의 단위: 본점/광주 × 운송사 (세금계산서 단위, 8건). 서비스는 품의 안에 소계로 표시. 제목은 APPROVAL_TITLES
+ *
+ * ■ 금액 처리 규칙 (전 운송사 공통, 26.10 마감부터)
+ *   1) 유류비·보험료 등 중간값은 소수 그대로 계산
+ *   2) 기사별 청구금액은 마지막에 원 단위 반올림 1회 (10원 올림 폐지)
+ *   3) 세액 = 공급가액 × 10%, 원 미만 절사
+ *        - 운송사 발행(대산·창호·로운): 품의(=세금계산서) 공급가 합계로 계산
+ *        - 개별지입: 기사별 세금계산서이므로 기사별 계산 후 합산
+ *   4) 사업소득자 원천징수: 소득세 3%, 지방소득세 = 소득세 × 10%, 각각 10원 미만 절사
+ *
+ * ■ 상차금액 (VAT 별도)
+ *   - 편의점: 시너지 판매현황(거래처) 엑셀변환 → 담당별 '순매출액' 합 ÷ 1.1
+ *             (같은 기사의 A/B 담당, 상온·저온 합배송 담당까지 두 프로그램 합산)
+ *             시너지 담당명은 수정 불가 → 기사 변경분은 담당 매핑표(ownerMap)로 연결
+ *   - 현대차: 시너지 현대차 담당 합계 (parseHyundaiSales) → 서비스 단위 상차금액
+ *   - 스낵24·조식24: 위로드 기사별 상차량
+ *   - 기사별 수동 수정(loadOverrides)이 있으면 그 값이 우선
+ */
+
+const RULES = {
+  vatRate: 0.1,
+  fuelEfficiency: { '1톤': 7, '2.5톤': 6 },   // km/L
+  realKmFactor: 1.15,                           // 스낵·조식 실거리 보정계수 (TMS 예상거리 × 1.15)
+  insurance: { base: 0.501, sanjae: 0.0176 / 2, goyong: 0.016 / 2 }, // 산재·고용 (보수액 50.1% 기준, 사업주 절반)
+  withholding: { income: 0.03, localOfIncome: 0.1 },
+};
+
+const num = (v) => (typeof v === 'number' && isFinite(v) ? v : Number(v) || 0);
+const sum = (arr) => arr.reduce((a, b) => a + num(b), 0);
+const floorTo = (v, unit = 1) => Math.floor(v / unit + 1e-9) * unit;
+/** 기사 식별키: 같은 사람이 두 서비스를 뛰는 경우(예: 장윤구 현대차·편의점저온)가 있어 이름만으로는 구분 불가 */
+const driverKey = (o) => o.id || `${o.service}|${o.name}`;
+
+/** 오피넷 경유 단가(VAT 포함) → 정산용 단가(VAT 제외) */
+const fuelUnitPrice = (vatIncl) => num(vatIncl) / 1.1;
+
+/* ------------------------------------------------------------------ *
+ * 1. 기사별 청구금액
+ * ------------------------------------------------------------------ */
+/**
+ * @param {object} m   기사마스터 1건
+ *   { name, carrier, branch:'본점'|'광주', service, calc, ton, baseSalary, fixedFuel,
+ *     allowances:{근속수당,차량랩핑수당,...}, insurance:boolean, taxMode:'carrier'|'driver'|'withholding' }
+ *   calc: 'REAL_KM'(스낵·조식 실거리) | 'FIXED_FUEL'(고정유류) | 'CVS'(편의점) | 'FLAT'(정액, 현대차 등) | 'MANUAL'(직접입력)
+ * @param {object} i   해당 월 기사별 입력
+ *   { tmsKm, returnKm, extraKm, toll, parking, fines, other, workDays, baseOverride, manualBilling, note }
+ *   운송사 입력: workDays(근무일), parking(주차비), fines(과태료 — 위펀이 기사에게 지급, 청구금액에 더함)
+ *   ※ 통행비는 하이패스 지급으로 정산 제외(26.10~)  ※ 근무일 < 영업일이면 기본급·고정유류비 일할
+ *   위로드 입력: tmsKm, returnKm, extraKm  /  관리자 입력: other, baseOverride, manualBilling
+ *   extraKm: 특이건 추가거리(예: 우회·추가 착지 +420km). 보정계수 적용 후 거리에 더함
+ * @param {object} ctx { fuelPriceVatIncl, businessDays }  businessDays: 숫자 또는 서비스별 {스낵24:20, 편의점저온:24, ...}
+ */
+function calcDriver(m, i = {}, ctx) {
+  const unit = fuelUnitPrice(ctx.fuelPriceVatIncl);
+  const eff = RULES.fuelEfficiency[m.ton] || RULES.fuelEfficiency['1톤'];
+
+  // 기본급: 직접 지정 > 일할(근무일/영업일) > 마스터
+  let base = num(m.baseSalary);
+  let prorate = 1; // 일할 비율 (기본급 + 고정유류비에 적용. 실거리·편의점 유류비는 주행거리로 이미 반영)
+  if (i.baseOverride != null && i.baseOverride !== '') base = num(i.baseOverride);
+  else {
+    const bd = typeof ctx.businessDays === 'object' && ctx.businessDays ? ctx.businessDays[m.service] : ctx.businessDays;
+    if (i.workDays != null && i.workDays !== '' && num(bd) > 0 && num(i.workDays) < num(bd)) prorate = num(i.workDays) / num(bd); // 근무일 < 영업일이면 일할
+    base = base * prorate;
+  }
+
+  let fuel = 0, correctedKm = 0;
+  switch (m.calc) {
+    case 'REAL_KM':
+      correctedKm = num(i.tmsKm) * RULES.realKmFactor + num(i.extraKm);
+      fuel = (correctedKm / eff) * unit;
+      break;
+    case 'FIXED_FUEL':
+      fuel = num(m.fixedFuel) * prorate;
+      break;
+    case 'CVS':
+      correctedKm = num(i.tmsKm) + num(i.returnKm) + num(i.extraKm);
+      fuel = (correctedKm / eff) * unit;
+      break;
+    case 'FLAT':
+    case 'MANUAL':
+      break;
+    default:
+      throw new Error(`알 수 없는 계산유형: ${m.calc} (${m.name})`);
+  }
+
+  const allowances = sum(Object.values(m.allowances || {}));
+  const adds = num(i.toll) + num(i.parking) + num(i.fines) + num(i.other);
+  const salary = base + fuel;
+  const insBase = salary + allowances + adds;
+  const sanjae = m.insurance ? insBase * RULES.insurance.base * RULES.insurance.sanjae : 0;
+  const goyong = m.insurance ? insBase * RULES.insurance.base * RULES.insurance.goyong : 0;
+
+  const raw = m.calc === 'MANUAL' ? num(i.manualBilling) : insBase + sanjae + goyong;
+  const billing = Math.round(raw);
+
+  const out = {
+    name: m.name, course: m.course || '', carrier: m.carrier, branch: m.branch, service: m.service, calc: m.calc,
+    tmsKm: num(i.tmsKm), returnKm: num(i.returnKm), extraKm: num(i.extraKm), correctedKm, liters: m.calc === 'REAL_KM' || m.calc === 'CVS' ? correctedKm / eff : 0,
+    base, fuel, allowances, toll: num(i.toll), parking: num(i.parking), fines: num(i.fines), other: num(i.other), workDays: i.workDays ?? null,
+    sanjae, goyong, raw, billing, note: i.note || '',
+  };
+
+  const taxMode = m.taxMode || 'carrier';
+  if (taxMode === 'driver') out.vat = floorTo(billing * RULES.vatRate);
+  if (taxMode === 'withholding') {
+    out.incomeTax = floorTo(billing * RULES.withholding.income, 10);
+    out.localTax = floorTo(out.incomeTax * RULES.withholding.localOfIncome, 10);
+    out.netPay = billing - out.incomeTax - out.localTax;
+  }
+  return out;
+}
+
+/* ------------------------------------------------------------------ *
+ * 2. 상차금액 — 시너지 판매현황(거래처) 엑셀
+ * ------------------------------------------------------------------ */
+/** 시너지 '담당' 표기 → 기사명 추정 (예: 'A박택호[10]'→박택호, '김종범73B'→김종범, 'F(상)조숭[36]'→조숭)
+ *  추정이 틀린 경우는 기사마스터 synergyAliases 로 지정하면 그 값이 우선 */
+function normalizeSynergyOwner(owner) {
+  let k = String(owner || '').trim();
+  k = k.replace(/\[\d+\]$/, '');
+  k = k.replace(/\d+[AB]?\$?$/, '');
+  k = k.replace(/^(F\(상\)|야간\)|SW\)|DY|A(?=[가-힣]))/, '');
+  return k.trim();
+}
+
+/**
+ * @param {Array<Array>} rows  시트 전체 행 (SheetJS sheet_to_json(header:1) 결과). 3행이 헤더.
+ * @param {Array} master       기사마스터 (synergyAliases 사용)
+ * @param {Object} ownerMap     담당 → 기사키 직접 지정. '제외' 로 두면 집계에서 뺌 (기사 변경·겸업 담당 처리용, 위로드에서 월별 수정)
+ *                              예) {'A임영주[21]':'편의점저온|조민혁', '김유건84B':'제외'}
+ * @returns {{ byDriver: Object<기사키,number>, unmatched: Array<{owner,netSales}>, period: string }}
+ *   byDriver 값은 VAT 별도(순매출액 ÷ 1.1)
+ */
+function parseSynergySales(rows, master = [], ownerMap = {}) {
+  const headerIdx = rows.findIndex((r) => r && r.includes('담당') && r.includes('순매출액'));
+  if (headerIdx < 0) throw new Error('시너지 판매현황 헤더(담당/순매출액)를 찾지 못했습니다');
+  const h = rows[headerIdx];
+  const cOwner = h.indexOf('담당'), cCode = h.indexOf('코드'), cNet = h.indexOf('순매출액');
+  const period = (rows.slice(0, headerIdx).flat().find((v) => /판매일자/.test(String(v))) || '').toString();
+
+  // 편의점 서비스 기사만 대상. 별칭(synergyAliases) 지정이 자동 추정보다 우선
+  const cvs = master.filter((m) => /^편의점/.test(m.service || '') || m.synergy === true);
+  const alias = new Map();
+  for (const m of cvs) for (const a of m.synergyAliases || []) alias.set(a, driverKey(m));
+  const byName = new Map();
+  for (const m of cvs) byName.set(m.name, byName.has(m.name) ? null : driverKey(m)); // 동명이인이면 null → 별칭 지정 필요
+
+  const byDriver = {}, unmatchedMap = {};
+  for (const r of rows.slice(headerIdx + 1)) {
+    if (!r || r[cCode] == null || r[cCode] === '') continue; // 합계 행 제외
+    const owner = String(r[cOwner] ?? '').trim();
+    const net = num(r[cNet]);
+    const map = { ...DEFAULT_OWNER_MAP, ...ownerMap };
+    if (map[owner] === '제외') continue;
+    const who = map[owner] || alias.get(owner) || byName.get(normalizeSynergyOwner(owner));
+    if (who) byDriver[who] = (byDriver[who] || 0) + net / 1.1;
+    else unmatchedMap[owner] = (unmatchedMap[owner] || 0) + net;
+  }
+  const unmatched = Object.entries(unmatchedMap).map(([owner, netSales]) => ({ owner, netSales }))
+    .sort((a, b) => b.netSales - a.netSales);
+  return { byDriver, unmatched, period };
+}
+
+/**
+ * 현대차 상차금액 — 시너지 판매현황에서 현대차 담당만 뽑음 (기사별이 아니라 현대차 서비스 전체 금액)
+ *  - 상온(WH_WOORIN) 판매현황: 담당 'H_'로 시작(택배 담당 제외) → 과세금액 + 면세금액
+ *  - 저온(WC_HUMAN) 판매현황(실배송): 담당에 '현대' 포함 → 판매금액 ÷ 1.1
+ *  9월 검증: 상온 204,674,853 (실적과 일치), 저온 12,869,330 (실적 12,869,373, 43원 차이)
+ */
+function parseHyundaiSales(rows) {
+  const hi = rows.findIndex((r) => r && r.includes('담당') && (r.includes('과세금액') || r.includes('판매금액')));
+  if (hi < 0) throw new Error('현대차 판매현황 헤더를 찾지 못했습니다');
+  const h = rows[hi], cOwner = h.indexOf('담당'), cCode = h.indexOf('코드');
+  const taxed = h.indexOf('과세금액'), exempt = h.indexOf('면세금액'), sales = h.indexOf('판매금액');
+  let total = 0; const byOwner = {};
+  for (const r of rows.slice(hi + 1)) {
+    if (!r) continue;
+    const owner = String(r[cOwner] ?? '').trim(), code = String(r[cCode] ?? '').trim();
+    if (!owner || code === '소계' || code === '합계' || owner === '합계') continue;
+    let v = 0;
+    if (taxed >= 0) { if (!/^H_/.test(owner) || /택배/.test(owner)) continue; v = num(r[taxed]) + num(r[exempt]); }
+    else { if (!/현대/.test(owner)) continue; v = num(r[sales]) / 1.1; }
+    byOwner[owner] = (byOwner[owner] || 0) + v; total += v;
+  }
+  return { total, byOwner };
+}
+
+/** 기본 담당 매핑 (위로드에서 월별로 추가·수정). 값: 기사키 또는 '제외' */
+const DEFAULT_OWNER_MAP = {
+  'DY이완식[28]': '편의점저온|임현철',
+};
+
+/** 여러 파일(상온·저온) 결과 합산 */
+function mergeLoadAmounts(...maps) {
+  const out = {};
+  for (const m of maps) for (const [k, v] of Object.entries(m || {})) out[k] = (out[k] || 0) + v;
+  return out;
+}
+
+/* ------------------------------------------------------------------ *
+ * 3. 오피넷 유가 내려받기 CSV → 경유 평균단가
+ * ------------------------------------------------------------------ */
+/** @param {string} csvText  CP949 디코딩 후 텍스트 (브라우저: new TextDecoder('euc-kr'))
+ *  @returns {{ average:number, stations:number, period:string, region:string }} */
+function parseOpinetDiesel(csvText, region = '경기 광주시') {
+  const lines = csvText.split(/\r?\n/).filter(Boolean)
+    .map((l) => l.split('","').map((s) => s.replace(/^"|"$/g, '')));
+  const h = lines[0];
+  const cRegion = h.indexOf('지역'), cDiesel = h.indexOf('경유'), cPeriod = h.indexOf('기간');
+  const data = lines.filter((r) => r[cRegion] === region && num(r[cDiesel]) > 0);
+  if (!data.length) throw new Error(`${region} 경유 데이터가 없습니다`);
+  const avg = sum(data.map((r) => num(r[cDiesel]))) / data.length;
+  return { average: Math.round(avg * 100) / 100, stations: data.length, period: data[0][cPeriod], region };
+}
+
+/* ------------------------------------------------------------------ *
+ * 4. 전체 마감 → 기사별 결과 + 품의 그룹
+ * ------------------------------------------------------------------ */
+const APPROVAL_EXCLUDED = new Set(['위풀', '핫픽스']); // 실적에는 표시, 위펀풀필먼트 품의 대상 아님
+
+/**
+ * @param {object} p
+ *  { month:'2026-10', fuelPriceVatIncl, businessDays,
+ *    master:[...], inputs:[{name,...}], extras:[{carrier,branch,service,label,unitPrice,qty}|{...,amount}],
+ *    loadAmounts:{기사키:금액}, loadOverrides:{기사키:금액},
+ *    serviceLoadAmounts:{'본점|창호통운|현대차':금액}  (기사별이 아닌 서비스 단위 상차금액, 현대차 등)
+ *    prevMonth?: <이 함수의 이전 결과> }
+ *  기사키 = driverKey() → master.id 가 있으면 id, 없으면 '서비스|기사명'
+ */
+function buildSettlement(p) {
+  const ctx = { fuelPriceVatIncl: p.fuelPriceVatIncl, businessDays: p.businessDays };
+  const inputBy = Object.fromEntries((p.inputs || []).map((i) => [driverKey(i), i]));
+  const ov = p.loadOverrides || {}, la = p.loadAmounts || {};
+
+  const drivers = p.master.map((m) => {
+    const k = driverKey(m);
+    const d = calcDriver(m, inputBy[k], ctx);
+    d.key = k;
+    d.loadAmount = ov[k] != null ? num(ov[k]) : num(la[k]);
+    d.loadOverridden = ov[k] != null;
+    d.ratio = d.loadAmount ? d.billing / d.loadAmount : null;
+    d.inApproval = !APPROVAL_EXCLUDED.has(m.carrier);
+    return d;
+  });
+
+  const extras = (p.extras || []).map((e) => ({ ...e, amount: e.amount != null ? num(e.amount) : num(e.unitPrice) * num(e.qty) }));
+
+  // 품의 = 세금계산서 단위(본점/광주 × 운송사). 서비스는 품의 안의 소계로 표시
+  const groups = new Map();
+  const key = (o) => `${o.branch}|${o.carrier}`;
+  const taxModeOf = (carrier) => (p.master.find((m) => m.carrier === carrier) || {}).taxMode || 'carrier';
+  const ensure = (o) => {
+    if (!groups.has(key(o))) groups.set(key(o), { branch: o.branch, carrier: o.carrier, drivers: [], extras: [] });
+    return groups.get(key(o));
+  };
+  for (const d of drivers.filter((x) => x.inApproval)) ensure(d).drivers.push(d);
+  for (const e of extras) ensure(e).extras.push(e);
+
+  const templates = { ...APPROVAL_TITLES, ...(p.approvalTitles || {}) };
+  const approvals = [...groups.values()].map((g) => {
+    const mode = taxModeOf(g.carrier);
+    const svcNames = [...new Set([...g.drivers, ...g.extras].map((x) => x.service))];
+    const services = svcNames.map((sv) => {
+      const ds = g.drivers.filter((d) => d.service === sv), es = g.extras.filter((e) => e.service === sv);
+      const supply = sum(ds.map((d) => d.billing)) + sum(es.map((e) => e.amount));
+      const loadAmount = sum(ds.map((d) => d.loadAmount)) + num((p.serviceLoadAmounts || {})[`${g.branch}|${g.carrier}|${sv}`]);
+      return { service: sv, vehicles: ds.length, supply, loadAmount, ratio: loadAmount ? supply / loadAmount : null, extras: es };
+    });
+    const supply = sum(services.map((x) => x.supply));
+    const out = { ...g, taxMode: mode, services, supply, loadAmount: sum(services.map((x) => x.loadAmount)), vehicles: g.drivers.length };
+    if (mode === 'withholding') {
+      out.vat = 0;
+      out.incomeTax = sum(g.drivers.map((d) => d.incomeTax));
+      out.localTax = sum(g.drivers.map((d) => d.localTax));
+      out.total = supply;
+      out.payTotal = supply - out.incomeTax - out.localTax;
+    } else {
+      out.vat = mode === 'driver'
+        ? sum(g.drivers.map((d) => d.vat)) + floorTo(sum(g.extras.map((e) => e.amount)) * RULES.vatRate)
+        : floorTo(supply * RULES.vatRate);
+      out.total = supply + out.vat;
+      out.payTotal = out.total;
+    }
+    out.ratio = out.loadAmount ? supply / out.loadAmount : null;
+    const t = templates[key(g)];
+    out.order = t ? t.order : 99;
+    out.title = approvalTitle(t ? t.title : `{service} ${g.carrier} 운송료 지급의 건`, p.month, svcNames.join('/'));
+    if (p.prevMonth) out.vsPrev = compareWithPrev(out, p.prevMonth, p);
+    return out;
+  }).sort((a, b) => a.order - b.order);
+
+  return { month: p.month, fuelPriceVatIncl: p.fuelPriceVatIncl, fuelUnit: fuelUnitPrice(p.fuelPriceVatIncl), drivers, approvals };
+}
+
+/**
+ * 품의 제목 (품의 = 본점/광주 × 운송사). '{yy}년 {m}월 ' 은 자동으로 붙음. 수정·추가는 여기서 하거나 buildSettlement({approvalTitles}) 로 덮어쓰기
+ * order = flex 상신 순서
+ */
+const APPROVAL_TITLES = {
+  '본점|사업소득자': { order: 1, title: '편의점저온 사업소득자 급여 지급의 건' },
+  '본점|개별지입':   { order: 2, title: '편의점상온 개별지입 운송료 지급의 건' },
+  '본점|로운로지스': { order: 3, title: '로운로지스 운송료 지급의 건(편의점 지방간선)' },
+  '광주|개별지입':   { order: 4, title: '편의점저온 개별지입 운송료 지급의 건' },
+  '본점|대산물류':   { order: 5, title: '스낵24/조식24 대산물류 운송료 지급의 건' },
+  '본점|창호통운':   { order: 6, title: '스낵/편의점상온/현대차 창호통운 운송료 지급의 건' },
+  '광주|창호통운':   { order: 7, title: '편의점저온 창호통운 운송료 지급의 건' },
+  '광주|대산물류':   { order: 8, title: '편의점저온 대산물류 운송료 지급의 건' },
+};
+
+/** "26년 10월 " + 제목. 제목 안의 {service} 는 품의에 포함된 서비스명으로 치환 */
+function approvalTitle(title, month, serviceLabel = '') {
+  const [y, m] = String(month).split('-');
+  return `${y.slice(2)}년 ${Number(m)}월 ${title.replace('{service}', serviceLabel)}`;
+}
+
+/**
+ * 전월대비 증감 분해 (품의 본문 3번용)
+ *   유가요인   = Σ(이번달 리터) × (이번달 단가 − 전월 단가)
+ *   나머지      = 총증감 − 유가요인  (주행거리·영업일·인원 변동)
+ * ※ 9월 품의서의 분해 방식 확인 후 확정 예정
+ */
+function compareWithPrev(g, prev, cur) {
+  const pg = prev.approvals.find((x) => x.branch === g.branch && x.carrier === g.carrier);
+  if (!pg) return null;
+  const diff = g.total - pg.total;
+  const liters = sum(g.drivers.map((d) => d.liters));
+  const fuelEffect = liters * (fuelUnitPrice(cur.fuelPriceVatIncl) - prev.fuelUnit) * (1 + (g.taxMode === 'carrier' || g.taxMode === 'driver' ? RULES.vatRate : 0));
+  return {
+    prevTotal: pg.total, diff, diffRate: pg.total ? diff / pg.total : null,
+    fuelEffect, otherEffect: diff - fuelEffect,
+    vehiclesPrev: pg.vehicles, vehicles: g.vehicles,
+    fuelPrev: prev.fuelPriceVatIncl, fuelCur: cur.fuelPriceVatIncl,
+  };
+}
+
+</script>
+<script>
+const SB_URL = 'https://evyxvhqerfuqmzwjhkgz.supabase.co', SB_KEY = 'sb_publishable_DNESzKpu1WcxT9sx15D5fw_jVan14DH';
+const LS = 'wf-settle-carrier';
+const KINDS = { daesan: ['긴급용차'], changho: ['긴급용차'], roun: ['간선운행', '용차실비'] };
+const KIND_HELP = { 위펀입력: '위펀이 넣은 항목 (토요일배송 등) — 수정할 수 없어요', 긴급용차: '정규 기사 외 긴급 투입한 용차 (일자·기사·차량·금액)', 간선운행: '노선별 이번 달 운행 횟수 (단가는 위펀 계약 단가)', 용차실비: '간선 외 용적량 초과·격오지·반품회송 등 실비 청구 건' };
+const ST = { draft: '작성 중', submitted: '제출 완료 · 위펀 확인 중', returned: '반려 · 수정 필요', confirmed: '확정' };
+
+let A = load() || null, D = null, br = '본점', busy = false, savedAt = null;
+function load() { try { return JSON.parse(localStorage.getItem(LS) || 'null'); } catch (e) { return null; } }
+function store() { try { A ? localStorage.setItem(LS, JSON.stringify(A)) : localStorage.removeItem(LS); } catch (e) {} }
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const won = (v) => (v == null || isNaN(v) ? '' : Math.round(v).toLocaleString('ko-KR'));
+const nv = (v) => (v === '' || v == null ? null : Number(v));
+
+async function rpc(fn, body) {
+  const r = await fetch(`${SB_URL}/rest/v1/rpc/${fn}`, { method: 'POST', headers: { apikey: SB_KEY, 'Content-Type': 'application/json' }, body: JSON.stringify(body || {}) });
+  const t = await r.text(); let j = null; try { j = t ? JSON.parse(t) : null; } catch (e) {}
+  if (!r.ok) { const e = new Error((j && j.message) || ('오류 ' + r.status)); e.code = j && j.code; throw e; }
+  return j;
+}
+async function call(fn, body) {
+  try { return await rpc(fn, Object.assign({ p_token: A.token }, body)); }
+  catch (e) { if (e.code === '28000') { A = null; store(); render(); } throw e; }
+}
+
+/* ---------- 계산 (위펀 정산 규칙과 동일한 모듈) ---------- */
+function lineCalc(l, P) {
+  const m = { name: l.name, service: l.service, calc: l.calc, ton: l.ton, baseSalary: l.base_salary, fixedFuel: l.fixed_fuel, allowances: l.allowances || {}, insurance: l.insurance };
+  const i = { tmsKm: l.tms_km, returnKm: l.return_km, extraKm: l.extra_km, parking: l.parking, fines: l.fines, other: l.other, workDays: l.work_days };
+  return calcDriver(m, i, { fuelPriceVatIncl: P.fuel_price, businessDays: P.business_days || {} });
+}
+
+/* ---------- 화면 ---------- */
+function render() {
+  const app = document.getElementById('app');
+  if (!A) { app.innerHTML = loginView(); bindLogin(); return; }
+  if (!D) { app.innerHTML = `<div class="brand"><div class="lg">W</div><b>운송료 마감</b></div><p class="sub">불러오는 중…</p>`; return; }
+  app.innerHTML = mainView(); bindMain();
+}
+function loginView() {
+  return `<div class="login card"><div class="brand"><div class="lg">W</div><b>위펀 운송료 마감</b><small>운송사 전용</small></div>
+    <p class="sub">위펀에서 받은 아이디와 비밀번호로 로그인해 주세요. <a href="guide.html" target="_blank" style="font-weight:700">사용 가이드</a></p>
+    <form id="lf"><label>아이디</label><input name="id" autocomplete="username" required>
+    <label>비밀번호</label><input name="pw" type="password" autocomplete="current-password" required>
+    <button class="pri" ${busy ? 'disabled' : ''}>${busy ? '확인 중…' : '로그인'}</button><div class="err" id="le"></div></form></div>`;
+}
+function bindLogin() {
+  document.getElementById('lf').onsubmit = async (e) => {
+    e.preventDefault(); const f = new FormData(e.target); busy = true; render();
+    try { const j = await rpc('st_login', { p_id: f.get('id'), p_pw: f.get('pw') }); A = { token: j.token, name: j.name, carrier: j.carrier_name, cid: j.carrier_id }; store(); busy = false; await refresh(); }
+    catch (err) { busy = false; render(); document.getElementById('le').textContent = err.message; }
+  };
+}
+async function refresh(month) {
+  try { D = await call('st_c_load', { p_month: month || (D && D.period && D.period.month) || null }); }
+  catch (e) { if (A) alert(e.message); return; }
+  const brs = (D.submissions || []).map((s) => s.branch);
+  if (!brs.includes(br)) br = brs[0] || '본점';
+  render();
+}
+
+function mainView() {
+  const P = D.period;
+  if (!P) return header() + `<div class="card"><h2>아직 열린 마감이 없어요</h2><p class="sub">위펀에서 이번 달 자료를 올리면 여기에 기사 명단이 나와요.</p></div>`;
+  const subs = D.submissions || [], sub = subs.find((s) => s.branch === br) || {};
+  const editable = P.is_open && (sub.status === 'draft' || sub.status === 'returned');
+  const lines = (D.lines || []).filter((l) => l.branch === br);
+  const kinds = [...new Set([...(KINDS[A.cid] || []), ...(D.extras || []).map((e) => e.kind)])];
+  const extras = (D.extras || []).filter((e) => e.branch === br);
+  const [y, m] = P.month.split('-');
+
+  let h = header();
+  h += `<div class="head"><h2>${y}년 ${Number(m)}월 마감</h2>
+    ${(D.months || []).length > 1 ? `<select id="mon">${D.months.map((x) => `<option ${x === P.month ? 'selected' : ''}>${x}</option>`).join('')}</select>` : ''}
+    <span class="small">제출 기한 ${P.due_date ? esc(P.due_date) : '-'} · 주유단가 ${P.fuel_price ? Number(P.fuel_price).toFixed(2) + '원/L (VAT 포함, 오피넷 경기 광주시 경유 평균)' : '-'}</span></div>`;
+  if (subs.length > 1) h += `<div class="tabs">${subs.map((s) => `<button data-br="${s.branch}" class="${s.branch === br ? 'on' : ''}">${s.branch === '광주' ? '광주지점(종사업장)' : '본점'} <span class="chip c-${s.status}" style="margin-left:6px">${ST[s.status]}</span></button>`).join('')}</div>`;
+  else h += `<p><span class="chip c-${sub.status}">${ST[sub.status] || ''}</span></p>`;
+  if (sub.status === 'returned') h += `<div class="note bad"><b>위펀에서 반려했어요.</b> ${esc(sub.admin_note || '')} — 빨간 줄을 고친 뒤 다시 제출해 주세요.</div>`;
+  if (sub.status === 'submitted') h += `<div class="note info">제출했어요 (${new Date(sub.submitted_at).toLocaleString('ko-KR')}). 위펀 확인 중이라 수정할 수 없어요. 고칠 게 있으면 위펀 담당자에게 반려를 요청해 주세요.</div>`;
+  if (sub.status === 'confirmed') h += `<div class="note ok"><b>확정됐어요.</b> 아래 합계 금액으로 세금계산서를 발행해 주세요.</div>`;
+
+  // 기사별
+  let sumB = 0;
+  if (lines.length) {
+    h += `<div class="card"><h3>기사별 운송료</h3><p class="sub">노란 칸만 입력해요: 근무일 · 주차비 · 과태료 · 비고. 근무일이 영업일보다 적으면 기본급·고정유류비가 일할 계산돼요. 통행비는 하이패스로 지급돼 정산에서 빠져요.</p>
+      <div class="tw"><table><thead><tr><th>서비스</th><th>코스</th><th>기사</th><th class="n">기본급</th><th class="n">주행 km</th><th class="n">유류비</th><th class="n">수당</th>
+      <th class="n">영업일</th><th>근무일</th><th>주차비</th><th>과태료</th><th>비고</th><th class="n">산재·고용</th><th class="n">청구금액</th><th></th></tr></thead><tbody>`;
+    for (const l of lines) {
+      const c = lineCalc(l, P); sumB += c.billing;
+      const km = l.calc === 'REAL_KM' ? `${won(l.tms_km)} <span class="small">×1.15</span>` : l.calc === 'CVS' ? `${won((l.tms_km || 0) + (l.return_km || 0) + (l.extra_km || 0))}` : l.calc === 'FIXED_FUEL' ? '<span class="small">고정</span>' : '';
+      const bd = (P.business_days || {})[l.service];
+      const dis = editable ? '' : 'disabled';
+      h += `<tr class="${l.review === 'returned' ? 'ret' : ''}"><td>${esc(l.service)}</td><td>${esc(l.course || '')}</td><td><b>${esc(l.name)}</b></td>
+        <td class="n">${won(c.base)}</td><td class="n">${km}</td><td class="n">${won(c.fuel)}</td><td class="n">${won(c.allowances + (l.other || 0))}</td><td class="n">${bd || ''}</td>
+        <td class="in"><input type="number" min="0" max="31" data-k="${esc(l.driver_key)}" data-f="work_days" value="${l.work_days ?? ''}" placeholder="${bd || ''}" style="width:64px" ${dis}></td>
+        <td class="in"><input type="number" min="0" step="10" data-k="${esc(l.driver_key)}" data-f="parking" value="${l.parking ?? ''}" ${dis}></td>
+        <td class="in"><input type="number" min="0" step="10" data-k="${esc(l.driver_key)}" data-f="fines" value="${l.fines ?? ''}" ${dis}></td>
+        <td class="in"><input class="w" data-k="${esc(l.driver_key)}" data-f="carrier_note" value="${esc(l.carrier_note || '')}" ${dis}></td>
+        <td class="n">${won(c.sanjae + c.goyong)}</td><td class="n b">${won(c.billing)}</td>
+        <td>${l.review === 'returned' ? `<span class="rv returned" title="${esc(l.review_note || '')}">반려</span> <span class="small">${esc(l.review_note || '')}</span>` : l.review === 'ok' ? '<span class="rv ok">확인</span>' : ''}</td></tr>`;
+    }
+    h += `</tbody></table></div></div>`;
+  }
+
+  // 추가 내역
+  let sumE = 0;
+  for (const kind of kinds) {
+    const list = extras.filter((e) => e.kind === kind);
+    if ((kind === '간선운행' || kind === '위펀입력') && !list.length) continue;
+    h += `<div class="card"><div class="head" style="margin:0 0 4px"><h3>${kind === '위펀입력' ? '위펀 입력 항목' : kind}</h3>${!['간선운행', '위펀입력'].includes(kind) && editable ? `<button data-add="${kind}">+ 추가</button>` : ''}</div><p class="sub">${KIND_HELP[kind] || ''}</p>`;
+    if (!list.length) { h += `<p class="small">입력한 내역이 없어요.</p></div>`; continue; }
+    h += `<div class="tw"><table style="min-width:720px"><thead><tr>`;
+    if (kind === '위펀입력') h += `<th>항목</th><th>구분</th><th class="n">금액(VAT 별도)</th>`;
+    else if (kind === '간선운행') h += `<th>노선</th><th class="n">단가</th><th>운행 횟수</th><th class="n">금액</th><th>비고</th><th></th>`;
+    else h += `<th>일자</th>${kind === '긴급용차' ? '<th>기사</th><th>차량번호</th>' : '<th>구간 · 사유</th>'}<th>금액(VAT 별도)</th><th>비고</th><th></th><th></th>`;
+    h += `</tr></thead><tbody>`;
+    for (const e of list) {
+      sumE += Number(e.amount || 0);
+      const dis = editable ? '' : 'disabled', rv = e.review === 'returned' ? `<span class="rv returned">반려</span> <span class="small">${esc(e.review_note || '')}</span>` : e.review === 'ok' ? '<span class="rv ok">확인</span>' : '';
+      if (kind === '위펀입력') h += `<tr><td><b>${esc(e.route || '')}</b></td><td>${esc(e.memo || '')}</td><td class="n b">${won(e.amount)}</td></tr>`;
+      else if (kind === '간선운행') h += `<tr class="${e.review === 'returned' ? 'ret' : ''}"><td><b>${esc(e.route)}</b></td><td class="n">${won(e.unit_price)}</td>
+        <td class="in"><input type="number" min="0" data-x="${e.id}" data-f="trips" value="${e.trips ?? ''}" style="width:70px" ${dis}></td><td class="n b">${won(e.amount)}</td>
+        <td class="in"><input class="w" data-x="${e.id}" data-f="memo" value="${esc(e.memo || '')}" ${dis}></td><td>${rv}</td></tr>`;
+      else h += `<tr class="${e.review === 'returned' ? 'ret' : ''}"><td class="in"><input type="date" data-x="${e.id}" data-f="work_date" value="${e.work_date || ''}" style="width:140px" ${dis}></td>
+        ${kind === '긴급용차' ? `<td class="in"><input data-x="${e.id}" data-f="driver" value="${esc(e.driver || '')}" ${dis}></td><td class="in"><input data-x="${e.id}" data-f="vehicle_no" value="${esc(e.vehicle_no || '')}" style="width:120px" ${dis}></td>`
+          : `<td class="in"><input class="w" data-x="${e.id}" data-f="route" value="${esc(e.route || '')}" placeholder="예) 위펀 → 제천 2착" ${dis}></td>`}
+        <td class="in"><input type="number" min="0" step="1000" data-x="${e.id}" data-f="amount" value="${e.amount ?? ''}" style="width:120px" ${dis}></td>
+        <td class="in"><input class="w" data-x="${e.id}" data-f="memo" value="${esc(e.memo || '')}" ${dis}></td><td>${rv}</td>
+        <td>${editable ? `<button class="ghost" data-del="${e.id}" title="삭제">✕</button>` : ''}</td></tr>`;
+    }
+    h += `</tbody></table></div></div>`;
+  }
+
+  const supply = Math.round(sumB) + Math.round(sumE), vat = Math.floor(supply * 0.1 + 1e-9);
+  h += `<div class="card"><div class="sum"><div><span>기사 운송료</span><b>${won(sumB)}</b></div>${sumE ? `<div><span>추가 내역</span><b>${won(sumE)}</b></div>` : ''}
+    <div><span>공급가액</span><b>${won(supply)}</b></div><div><span>세액(10%)</span><b>${won(vat)}</b></div><div class="tot"><span>합계</span><b>${won(supply + vat)}</b></div></div>
+    <div class="foot"><span class="saved" id="sv">${savedAt ? '자동 저장됨 ' + savedAt.toLocaleTimeString('ko-KR') : '입력하면 자동 저장돼요'}</span>
+    ${editable ? `<button class="pri" id="submit">${br === '광주' ? '광주지점' : '본점'} 제출하기</button>` : ''}</div>
+    <p class="small" style="text-align:right;margin:6px 0 0">금액은 위펀 정산 규칙으로 계산돼요. 기사별 금액은 원 단위 반올림, 세액은 공급가액 × 10% 원 미만 절사.</p></div>`;
+  return h;
+}
+function header() {
+  return `<div class="brand"><div class="lg">W</div><b>운송료 마감</b><small>${esc(A.carrier || '')}${A.name ? ' · ' + esc(A.name) : ''}</small><div class="spacer"></div>
+    <button class="ghost" id="pw">비밀번호 변경</button><button class="ghost" id="out">로그아웃</button></div>`;
+}
+
+let timers = {};
+function bindMain() {
+  const $ = (s) => document.querySelector(s), $$ = (s) => document.querySelectorAll(s);
+  $('#out').onclick = async () => { try { await rpc('st_logout', { p_token: A.token }); } catch (e) {} A = null; D = null; store(); render(); };
+  $('#pw').onclick = pwModal;
+  if ($('#mon')) $('#mon').onchange = (e) => refresh(e.target.value);
+  $$('[data-br]').forEach((b) => (b.onclick = () => { br = b.dataset.br; render(); }));
+  $$('[data-k]').forEach((el) => (el.onchange = () => {
+    const l = D.lines.find((x) => x.driver_key === el.dataset.k); const f = el.dataset.f;
+    l[f] = f === 'carrier_note' ? el.value : nv(el.value); l.review = 'pending';
+    clearTimeout(timers[l.driver_key]);
+    timers[l.driver_key] = setTimeout(async () => {
+      try { await call('st_c_save_line', { p_month: D.period.month, p_key: l.driver_key, p_work_days: l.work_days, p_parking: l.parking, p_fines: l.fines, p_note: l.carrier_note || null }); savedAt = new Date(); const s = document.getElementById('sv'); if (s) s.textContent = '자동 저장됨 ' + savedAt.toLocaleTimeString('ko-KR'); }
+      catch (e) { alert('저장 실패: ' + e.message); refresh(); }
+    }, 300);
+    render();
+  }));
+  $$('[data-x]').forEach((el) => (el.onchange = () => {
+    const e = D.extras.find((x) => String(x.id) === el.dataset.x); const f = el.dataset.f;
+    e[f] = ['trips', 'amount'].includes(f) ? nv(el.value) : el.value || null;
+    if (e.kind === '간선운행') e.amount = (e.trips || 0) * (e.unit_price || 0);
+    e.review = 'pending';
+    saveExtra(e); render();
+  }));
+  $$('[data-add]').forEach((b) => (b.onclick = async () => {
+    try { await call('st_c_save_extra', { p_month: D.period.month, p_id: null, p_branch: br, p_kind: b.dataset.add, p_date: null, p_driver: null, p_vehicle: null, p_route: null, p_trips: null, p_amount: b.dataset.add === '긴급용차' ? 250000 : 0, p_memo: null }); await refresh(); }
+    catch (e) { alert(e.message); }
+  }));
+  $$('[data-del]').forEach((b) => (b.onclick = async () => { if (!confirm('이 내역을 삭제할까요?')) return; try { await call('st_c_delete_extra', { p_id: Number(b.dataset.del) }); await refresh(); } catch (e) { alert(e.message); } }));
+  if ($('#submit')) $('#submit').onclick = async () => {
+    const empty = D.lines.filter((l) => l.branch === br && (l.work_days == null || l.work_days === '')).length;
+    if (!confirm(`${br} 자료를 제출할까요?${empty ? `\n\n근무일을 비워 둔 기사가 ${empty}명 있어요 (비우면 만근으로 계산).` : ''}\n제출하면 위펀 확인 전까지 수정할 수 없어요.`)) return;
+    try { await Promise.all(Object.values(pending)); await call('st_c_submit', { p_month: D.period.month, p_branch: br }); await refresh(); } catch (e) { alert(e.message); }
+  };
+}
+const pending = {};
+function saveExtra(e) {
+  clearTimeout(timers['x' + e.id]);
+  timers['x' + e.id] = setTimeout(() => {
+    pending[e.id] = call('st_c_save_extra', { p_month: D.period.month, p_id: e.id, p_branch: e.branch, p_kind: e.kind, p_date: e.work_date || null, p_driver: e.driver || null, p_vehicle: e.vehicle_no || null, p_route: e.route || null, p_trips: e.trips, p_amount: e.amount, p_memo: e.memo || null })
+      .then(() => { savedAt = new Date(); const s = document.getElementById('sv'); if (s) s.textContent = '자동 저장됨 ' + savedAt.toLocaleTimeString('ko-KR'); })
+      .catch((err) => { alert('저장 실패: ' + err.message); refresh(); })
+      .finally(() => delete pending[e.id]);
+  }, 300);
+}
+function pwModal() {
+  const w = document.createElement('div'); w.className = 'modal';
+  w.innerHTML = `<form class="card login" style="margin:0"><h3>비밀번호 변경</h3><label>현재 비밀번호</label><input name="o" type="password" required autocomplete="current-password">
+    <label>새 비밀번호 (6자 이상)</label><input name="n" type="password" minlength="6" required autocomplete="new-password"><label>새 비밀번호 확인</label><input name="n2" type="password" required autocomplete="new-password">
+    <button class="pri">변경</button><button type="button" class="ghost" id="cx">취소</button><div class="err"></div></form>`;
+  document.body.appendChild(w);
+  w.querySelector('#cx').onclick = () => w.remove();
+  w.querySelector('form').onsubmit = async (e) => {
+    e.preventDefault(); const f = new FormData(e.target);
+    if (f.get('n') !== f.get('n2')) { w.querySelector('.err').textContent = '새 비밀번호 확인이 달라요'; return; }
+    try { await call('st_change_pw', { p_old: f.get('o'), p_new: f.get('n') }); w.remove(); alert('비밀번호를 바꿨어요.'); } catch (err) { w.querySelector('.err').textContent = err.message; }
+  };
+}
+
+render();
+if (A) refresh();
+</script>
+</body>
+</html>

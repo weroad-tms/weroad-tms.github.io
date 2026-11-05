@@ -1,0 +1,1047 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>위로드 마감정산 관리자</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+:root{
+  --bg:#f4f6fa; --panel:#ffffff; --ink:#1b2333; --muted:#6b7588; --line:#e3e7ef; --line2:#eef1f6;
+  --brand:#2f5597; --brand-soft:#e8eef8; --accent:#0f9d76; --warn:#d9822b; --warn-soft:#fff4e6; --bad:#c9393f;
+  --snack:#2f7fd8; --breakfast:#7a55c7; --hyundai:#1d8a8a; --cvs-on:#d9822b; --cvs-off:#2a9bc4;
+  --input:#fffdf3; --override:#fff1d6;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#11151d; --panel:#181e29; --ink:#e6eaf2; --muted:#93a0b5; --line:#2a3242; --line2:#212837;
+    --brand:#7aa2e3; --brand-soft:#1f2a3e; --accent:#3cc59b; --warn:#f0a556; --warn-soft:#33281a; --bad:#ef6b70;
+    --input:#22262d; --override:#3a2f1b;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#11151d; --panel:#181e29; --ink:#e6eaf2; --muted:#93a0b5; --line:#2a3242; --line2:#212837;
+  --brand:#7aa2e3; --brand-soft:#1f2a3e; --accent:#3cc59b; --warn:#f0a556; --warn-soft:#33281a; --bad:#ef6b70;
+  --input:#22262d; --override:#3a2f1b;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:13px/1.5 "Noto Sans KR",system-ui,sans-serif}
+header{background:var(--panel);border-bottom:1px solid var(--line);padding:14px 20px;display:flex;flex-wrap:wrap;gap:14px 24px;align-items:center;position:sticky;top:0;z-index:20}
+.logo{font-weight:700;font-size:17px;color:var(--brand);letter-spacing:-.3px}
+.logo small{font-weight:500;color:var(--muted);font-size:13px;margin-left:6px}
+.hfield{display:flex;align-items:center;gap:6px;color:var(--muted)}
+.hfield input{width:110px}
+input,select{font:inherit;color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:4px 7px}
+input[type=number]{text-align:right}
+button{font:inherit;cursor:pointer;border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:7px;padding:6px 12px}
+button.primary{background:var(--brand);border-color:var(--brand);color:#fff}
+button.ghost{border-color:transparent;color:var(--muted)}
+button:hover{filter:brightness(.97)}
+.spacer{flex:1}
+nav.tabs{display:flex;gap:4px;padding:12px 20px 0;flex-wrap:wrap}
+nav.tabs button{border-radius:9px 9px 0 0;border-bottom:none;padding:8px 16px;background:transparent;color:var(--muted);font-weight:500;position:relative}
+nav.tabs button.on{background:var(--panel);color:var(--ink);border-color:var(--line)}
+nav.tabs button .dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:1px}
+nav.tabs button .cnt{color:var(--muted);font-size:11px;margin-left:5px}
+nav.tabs .sep{width:1px;background:var(--line);margin:6px 8px}
+main{background:var(--panel);border-top:1px solid var(--line);min-height:70vh;padding:16px 20px 40px}
+.toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:999px;background:var(--brand-soft);color:var(--brand);font-weight:500;font-size:12px}
+.sum{display:flex;gap:18px;flex-wrap:wrap;margin-left:auto;color:var(--muted)}
+.sum b{color:var(--ink);font-size:14px}
+.tablewrap{overflow:auto;border:1px solid var(--line);border-radius:10px;max-height:68vh}
+table{border-collapse:separate;border-spacing:0;width:max-content;min-width:100%}
+th,td{border-bottom:1px solid var(--line2);padding:4px 6px;white-space:nowrap}
+thead th{position:sticky;top:0;background:var(--panel);z-index:3;font-weight:500;color:var(--muted);font-size:12px;border-bottom:1px solid var(--line)}
+thead tr.grp th{top:0;font-size:11px;letter-spacing:.5px;text-align:center;color:var(--ink)}
+thead tr.col th{top:27px}
+th.g-m{background:var(--brand-soft)} th.g-i{background:var(--warn-soft)} th.g-r{background:color-mix(in srgb,var(--accent) 12%,var(--panel))}
+td.sticky,th.sticky{position:sticky;left:0;background:var(--panel);z-index:2}
+thead th.sticky{z-index:4}
+td input{width:100%;min-width:60px;border-color:transparent;background:transparent;padding:3px 5px}
+td input:hover{border-color:var(--line)}
+td input:focus{border-color:var(--brand);outline:none;background:var(--panel)}
+td.in input{background:var(--input)}
+td.ov input{background:var(--override)}
+td select{border-color:transparent;background:transparent;padding:2px 3px}
+td.num{text-align:right;font-variant-numeric:tabular-nums}
+td.res{font-weight:500}
+td.muted{color:var(--muted)}
+tr:hover td{background:color-mix(in srgb,var(--brand) 4%,var(--panel))}
+tr:hover td.sticky{background:color-mix(in srgb,var(--brand) 4%,var(--panel))}
+tr.excluded td{color:var(--muted)}
+.tag{display:inline-block;font-size:11px;padding:1px 7px;border-radius:5px;background:var(--line2);color:var(--muted)}
+.tag.warn{background:var(--warn-soft);color:var(--warn)}
+.del{color:var(--muted);border:none;background:none;padding:2px 6px}
+.del:hover{color:var(--bad)}
+.legend{display:flex;gap:14px;color:var(--muted);font-size:12px;margin-top:8px;flex-wrap:wrap}
+.legend span::before{content:"";display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:5px;vertical-align:-2px;border:1px solid var(--line)}
+.legend .l-in::before{background:var(--input)} .legend .l-ov::before{background:var(--override)}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(420px,1fr));gap:14px}
+.card{border:1px solid var(--line);border-radius:12px;padding:14px 16px;background:var(--panel)}
+.card h3{margin:0 0 4px;font-size:14.5px;display:flex;gap:8px;align-items:flex-start}
+.card h3 .no{background:var(--brand);color:#fff;border-radius:6px;font-size:12px;padding:1px 7px;margin-top:1px}
+.card .meta{color:var(--muted);font-size:12px;margin-bottom:10px}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:3px 14px}
+.kv div:nth-child(odd){color:var(--muted)}
+.kv div:nth-child(even){text-align:right;font-variant-numeric:tabular-nums}
+.kv .big{font-size:16px;font-weight:700;color:var(--ink)}
+.svc{margin-top:10px;border-top:1px dashed var(--line);padding-top:8px}
+.svc table{width:100%;min-width:0}
+.svc td,.svc th{padding:3px 4px;border:none}
+.svc th{color:var(--muted);font-weight:400;text-align:right;position:static;background:none}
+.svc th:first-child{text-align:left}
+.copybar{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
+.copybar button{font-size:12px;padding:4px 9px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(380px,1fr));gap:16px}
+.box{border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+.box h4{margin:0 0 10px;font-size:14px}
+.box p{margin:4px 0;color:var(--muted)}
+.drop{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--line2)}
+.drop:last-child{border-bottom:none}
+.drop .lbl{width:150px;font-weight:500}
+.drop .st{color:var(--muted);font-size:12px}
+.drop .st.ok{color:var(--accent)}
+.pick{width:auto;margin:0 6px 0 0;vertical-align:-2px;accent-color:var(--brand)}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:1px}
+.subtot{margin:0 0 14px;max-width:980px}
+.subtot table{width:100%;min-width:0;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.subtot th{position:static;background:var(--line2);color:var(--muted);font-weight:500;text-align:right;padding:6px 10px}
+.subtot th:first-child,.subtot td:first-child{text-align:left}
+.subtot td{padding:6px 10px}
+.subtot tr.total td{font-weight:700;border-top:1px solid var(--line)}
+.subtot tr.vat td{background:var(--brand-soft);color:var(--brand)}
+.subtot .hint{color:var(--muted);font-size:12px;margin:6px 2px 0}
+.loginwrap{position:fixed;inset:0;background:rgba(15,20,28,.55);display:grid;place-items:center;padding:16px;z-index:60;overflow:auto}
+.loginbox{max-width:380px;width:100%;background:var(--panel)}
+.loginbox label,.loginwrap label{display:block;color:var(--muted);font-size:12px;margin-top:8px}
+.loginbox input,.loginwrap form input,.loginwrap form select{width:100%;margin-top:3px;padding:8px}
+.loginbox button{width:100%;margin-top:14px;padding:9px}
+.err{color:var(--bad);font-size:12.5px;min-height:16px}
+.hint{color:var(--muted);font-size:12.5px}
+.loginwrap .box{background:var(--panel)}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--panel);padding:8px 16px;border-radius:8px;opacity:0;transition:.2s;pointer-events:none;z-index:50}
+.toast.on{opacity:1}
+@media (max-width:700px){header{padding:10px 16px}main{padding:12px 16px}.cards,.grid2{grid-template-columns:1fr}nav.tabs{padding:10px 16px 0}}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">위로드<small>마감정산</small></div>
+  <label class="hfield">정산월 <input type="month" id="month"></label>
+  <label class="hfield">주유단가(VAT 포함) <input type="number" step="0.01" id="fuel"></label>
+  <span class="hfield" id="fuelUnit"></span>
+  <div class="spacer"></div>
+  <span class="hfield" id="srv"></span>
+  <button id="btnImport" title="백업 JSON 또는 기사마스터 JSON 불러오기">JSON 불러오기</button>
+  <button id="btnExport" title="지금 화면 자료를 파일로 백업">백업 받기</button>
+  <span class="hfield"><b id="who"></b></span><button id="btnOut" class="ghost">로그아웃</button>
+  <input type="file" id="fileImport" accept=".json" hidden>
+</header>
+
+<nav class="tabs" id="tabs"></nav>
+<main id="main"></main>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ===== 계산 모듈 (weroad-settlement.js) ===== */
+/**
+ * 위로드 마감정산 계산 모듈 (weroad-settlement.js)
+ * ------------------------------------------------------------
+ * 운송사 공통 입력값 + 기사마스터 + 기사별 월 입력값 → 기사별 청구금액·상차금액 → 품의(본점/광주 × 운송사 × 서비스)
+ *
+ * 브라우저(위로드)와 Node 모두에서 동작하는 순수 함수 모듈. DOM·네트워크 의존 없음.
+ *
+ * ■ 품의 단위: 본점/광주 × 운송사 (세금계산서 단위, 8건). 서비스는 품의 안에 소계로 표시. 제목은 APPROVAL_TITLES
+ *
+ * ■ 금액 처리 규칙 (전 운송사 공통, 26.10 마감부터)
+ *   1) 유류비·보험료 등 중간값은 소수 그대로 계산
+ *   2) 기사별 청구금액은 마지막에 원 단위 반올림 1회 (10원 올림 폐지)
+ *   3) 세액 = 공급가액 × 10%, 원 미만 절사
+ *        - 운송사 발행(대산·창호·로운): 품의(=세금계산서) 공급가 합계로 계산
+ *        - 개별지입: 기사별 세금계산서이므로 기사별 계산 후 합산
+ *   4) 사업소득자 원천징수: 소득세 3%, 지방소득세 = 소득세 × 10%, 각각 10원 미만 절사
+ *
+ * ■ 상차금액 (VAT 별도)
+ *   - 편의점: 시너지 판매현황(거래처) 엑셀변환 → 담당별 '순매출액' 합 ÷ 1.1
+ *             (같은 기사의 A/B 담당, 상온·저온 합배송 담당까지 두 프로그램 합산)
+ *             시너지 담당명은 수정 불가 → 기사 변경분은 담당 매핑표(ownerMap)로 연결
+ *   - 현대차: 시너지 현대차 담당 합계 (parseHyundaiSales) → 서비스 단위 상차금액
+ *   - 스낵24·조식24: 위로드 기사별 상차량
+ *   - 기사별 수동 수정(loadOverrides)이 있으면 그 값이 우선
+ */
+
+const RULES = {
+  vatRate: 0.1,
+  fuelEfficiency: { '1톤': 7, '2.5톤': 6 },   // km/L
+  realKmFactor: 1.15,                           // 스낵·조식 실거리 보정계수 (TMS 예상거리 × 1.15)
+  insurance: { base: 0.501, sanjae: 0.0176 / 2, goyong: 0.016 / 2 }, // 산재·고용 (보수액 50.1% 기준, 사업주 절반)
+  withholding: { income: 0.03, localOfIncome: 0.1 },
+};
+
+const num = (v) => (typeof v === 'number' && isFinite(v) ? v : Number(v) || 0);
+const sum = (arr) => arr.reduce((a, b) => a + num(b), 0);
+const floorTo = (v, unit = 1) => Math.floor(v / unit + 1e-9) * unit;
+/** 기사 식별키: 같은 사람이 두 서비스를 뛰는 경우(예: 장윤구 현대차·편의점저온)가 있어 이름만으로는 구분 불가 */
+const driverKey = (o) => o.id || `${o.service}|${o.name}`;
+
+/** 오피넷 경유 단가(VAT 포함) → 정산용 단가(VAT 제외) */
+const fuelUnitPrice = (vatIncl) => num(vatIncl) / 1.1;
+
+/* ------------------------------------------------------------------ *
+ * 1. 기사별 청구금액
+ * ------------------------------------------------------------------ */
+/**
+ * @param {object} m   기사마스터 1건
+ *   { name, carrier, branch:'본점'|'광주', service, calc, ton, baseSalary, fixedFuel,
+ *     allowances:{근속수당,차량랩핑수당,...}, insurance:boolean, taxMode:'carrier'|'driver'|'withholding' }
+ *   calc: 'REAL_KM'(스낵·조식 실거리) | 'FIXED_FUEL'(고정유류) | 'CVS'(편의점) | 'FLAT'(정액, 현대차 등) | 'MANUAL'(직접입력)
+ * @param {object} i   해당 월 기사별 입력
+ *   { tmsKm, returnKm, extraKm, toll, parking, fines, other, workDays, baseOverride, manualBilling, note }
+ *   운송사 입력: workDays(근무일), parking(주차비), fines(과태료 — 위펀이 기사에게 지급, 청구금액에 더함)
+ *   ※ 통행비는 하이패스 지급으로 정산 제외(26.10~)  ※ 근무일 < 영업일이면 기본급·고정유류비 일할
+ *   위로드 입력: tmsKm, returnKm, extraKm  /  관리자 입력: other, baseOverride, manualBilling
+ *   extraKm: 특이건 추가거리(예: 우회·추가 착지 +420km). 보정계수 적용 후 거리에 더함
+ * @param {object} ctx { fuelPriceVatIncl, businessDays }  businessDays: 숫자 또는 서비스별 {스낵24:20, 편의점저온:24, ...}
+ */
+function calcDriver(m, i = {}, ctx) {
+  const unit = fuelUnitPrice(ctx.fuelPriceVatIncl);
+  const eff = RULES.fuelEfficiency[m.ton] || RULES.fuelEfficiency['1톤'];
+
+  // 기본급: 직접 지정 > 일할(근무일/영업일) > 마스터
+  let base = num(m.baseSalary);
+  let prorate = 1; // 일할 비율 (기본급 + 고정유류비에 적용. 실거리·편의점 유류비는 주행거리로 이미 반영)
+  if (i.baseOverride != null && i.baseOverride !== '') base = num(i.baseOverride);
+  else {
+    const bd = typeof ctx.businessDays === 'object' && ctx.businessDays ? ctx.businessDays[m.service] : ctx.businessDays;
+    if (i.workDays != null && i.workDays !== '' && num(bd) > 0 && num(i.workDays) < num(bd)) prorate = num(i.workDays) / num(bd); // 근무일 < 영업일이면 일할
+    base = base * prorate;
+  }
+
+  let fuel = 0, correctedKm = 0;
+  switch (m.calc) {
+    case 'REAL_KM':
+      correctedKm = num(i.tmsKm) * RULES.realKmFactor + num(i.extraKm);
+      fuel = (correctedKm / eff) * unit;
+      break;
+    case 'FIXED_FUEL':
+      fuel = num(m.fixedFuel) * prorate;
+      break;
+    case 'CVS':
+      correctedKm = num(i.tmsKm) + num(i.returnKm) + num(i.extraKm);
+      fuel = (correctedKm / eff) * unit;
+      break;
+    case 'FLAT':
+    case 'MANUAL':
+      break;
+    default:
+      throw new Error(`알 수 없는 계산유형: ${m.calc} (${m.name})`);
+  }
+
+  const allowances = sum(Object.values(m.allowances || {}));
+  const adds = num(i.toll) + num(i.parking) + num(i.fines) + num(i.other);
+  const salary = base + fuel;
+  const insBase = salary + allowances + adds;
+  const sanjae = m.insurance ? insBase * RULES.insurance.base * RULES.insurance.sanjae : 0;
+  const goyong = m.insurance ? insBase * RULES.insurance.base * RULES.insurance.goyong : 0;
+
+  const raw = m.calc === 'MANUAL' ? num(i.manualBilling) : insBase + sanjae + goyong;
+  const billing = Math.round(raw);
+
+  const out = {
+    name: m.name, course: m.course || '', carrier: m.carrier, branch: m.branch, service: m.service, calc: m.calc,
+    tmsKm: num(i.tmsKm), returnKm: num(i.returnKm), extraKm: num(i.extraKm), correctedKm, liters: m.calc === 'REAL_KM' || m.calc === 'CVS' ? correctedKm / eff : 0,
+    base, fuel, allowances, toll: num(i.toll), parking: num(i.parking), fines: num(i.fines), other: num(i.other), workDays: i.workDays ?? null,
+    sanjae, goyong, raw, billing, note: i.note || '',
+  };
+
+  const taxMode = m.taxMode || 'carrier';
+  if (taxMode === 'driver') out.vat = floorTo(billing * RULES.vatRate);
+  if (taxMode === 'withholding') {
+    out.incomeTax = floorTo(billing * RULES.withholding.income, 10);
+    out.localTax = floorTo(out.incomeTax * RULES.withholding.localOfIncome, 10);
+    out.netPay = billing - out.incomeTax - out.localTax;
+  }
+  return out;
+}
+
+/* ------------------------------------------------------------------ *
+ * 2. 상차금액 — 시너지 판매현황(거래처) 엑셀
+ * ------------------------------------------------------------------ */
+/** 시너지 '담당' 표기 → 기사명 추정 (예: 'A박택호[10]'→박택호, '김종범73B'→김종범, 'F(상)조숭[36]'→조숭)
+ *  추정이 틀린 경우는 기사마스터 synergyAliases 로 지정하면 그 값이 우선 */
+function normalizeSynergyOwner(owner) {
+  let k = String(owner || '').trim();
+  k = k.replace(/\[\d+\]$/, '');
+  k = k.replace(/\d+[AB]?\$?$/, '');
+  k = k.replace(/^(F\(상\)|야간\)|SW\)|DY|A(?=[가-힣]))/, '');
+  return k.trim();
+}
+
+/**
+ * @param {Array<Array>} rows  시트 전체 행 (SheetJS sheet_to_json(header:1) 결과). 3행이 헤더.
+ * @param {Array} master       기사마스터 (synergyAliases 사용)
+ * @param {Object} ownerMap     담당 → 기사키 직접 지정. '제외' 로 두면 집계에서 뺌 (기사 변경·겸업 담당 처리용, 위로드에서 월별 수정)
+ *                              예) {'A임영주[21]':'편의점저온|조민혁', '김유건84B':'제외'}
+ * @returns {{ byDriver: Object<기사키,number>, unmatched: Array<{owner,netSales}>, period: string }}
+ *   byDriver 값은 VAT 별도(순매출액 ÷ 1.1)
+ */
+function parseSynergySales(rows, master = [], ownerMap = {}) {
+  const headerIdx = rows.findIndex((r) => r && r.includes('담당') && r.includes('순매출액'));
+  if (headerIdx < 0) throw new Error('시너지 판매현황 헤더(담당/순매출액)를 찾지 못했습니다');
+  const h = rows[headerIdx];
+  const cOwner = h.indexOf('담당'), cCode = h.indexOf('코드'), cNet = h.indexOf('순매출액');
+  const period = (rows.slice(0, headerIdx).flat().find((v) => /판매일자/.test(String(v))) || '').toString();
+
+  // 편의점 서비스 기사만 대상. 별칭(synergyAliases) 지정이 자동 추정보다 우선
+  const cvs = master.filter((m) => /^편의점/.test(m.service || '') || m.synergy === true);
+  const alias = new Map();
+  for (const m of cvs) for (const a of m.synergyAliases || []) alias.set(a, driverKey(m));
+  const byName = new Map();
+  for (const m of cvs) byName.set(m.name, byName.has(m.name) ? null : driverKey(m)); // 동명이인이면 null → 별칭 지정 필요
+
+  const byDriver = {}, unmatchedMap = {};
+  for (const r of rows.slice(headerIdx + 1)) {
+    if (!r || r[cCode] == null || r[cCode] === '') continue; // 합계 행 제외
+    const owner = String(r[cOwner] ?? '').trim();
+    const net = num(r[cNet]);
+    const map = { ...DEFAULT_OWNER_MAP, ...ownerMap };
+    if (map[owner] === '제외') continue;
+    const who = map[owner] || alias.get(owner) || byName.get(normalizeSynergyOwner(owner));
+    if (who) byDriver[who] = (byDriver[who] || 0) + net / 1.1;
+    else unmatchedMap[owner] = (unmatchedMap[owner] || 0) + net;
+  }
+  const unmatched = Object.entries(unmatchedMap).map(([owner, netSales]) => ({ owner, netSales }))
+    .sort((a, b) => b.netSales - a.netSales);
+  return { byDriver, unmatched, period };
+}
+
+/**
+ * 현대차 상차금액 — 시너지 판매현황에서 현대차 담당만 뽑음 (기사별이 아니라 현대차 서비스 전체 금액)
+ *  - 상온(WH_WOORIN) 판매현황: 담당 'H_'로 시작(택배 담당 제외) → 과세금액 + 면세금액
+ *  - 저온(WC_HUMAN) 판매현황(실배송): 담당에 '현대' 포함 → 판매금액 ÷ 1.1
+ *  9월 검증: 상온 204,674,853 (실적과 일치), 저온 12,869,330 (실적 12,869,373, 43원 차이)
+ */
+function parseHyundaiSales(rows) {
+  const hi = rows.findIndex((r) => r && r.includes('담당') && (r.includes('과세금액') || r.includes('판매금액')));
+  if (hi < 0) throw new Error('현대차 판매현황 헤더를 찾지 못했습니다');
+  const h = rows[hi], cOwner = h.indexOf('담당'), cCode = h.indexOf('코드');
+  const taxed = h.indexOf('과세금액'), exempt = h.indexOf('면세금액'), sales = h.indexOf('판매금액');
+  let total = 0; const byOwner = {};
+  for (const r of rows.slice(hi + 1)) {
+    if (!r) continue;
+    const owner = String(r[cOwner] ?? '').trim(), code = String(r[cCode] ?? '').trim();
+    if (!owner || code === '소계' || code === '합계' || owner === '합계') continue;
+    let v = 0;
+    if (taxed >= 0) { if (!/^H_/.test(owner) || /택배/.test(owner)) continue; v = num(r[taxed]) + num(r[exempt]); }
+    else { if (!/현대/.test(owner)) continue; v = num(r[sales]) / 1.1; }
+    byOwner[owner] = (byOwner[owner] || 0) + v; total += v;
+  }
+  return { total, byOwner };
+}
+
+/** 기본 담당 매핑 (위로드에서 월별로 추가·수정). 값: 기사키 또는 '제외' */
+const DEFAULT_OWNER_MAP = {
+  'DY이완식[28]': '편의점저온|임현철',
+};
+
+/** 여러 파일(상온·저온) 결과 합산 */
+function mergeLoadAmounts(...maps) {
+  const out = {};
+  for (const m of maps) for (const [k, v] of Object.entries(m || {})) out[k] = (out[k] || 0) + v;
+  return out;
+}
+
+/* ------------------------------------------------------------------ *
+ * 3. 오피넷 유가 내려받기 CSV → 경유 평균단가
+ * ------------------------------------------------------------------ */
+/** @param {string} csvText  CP949 디코딩 후 텍스트 (브라우저: new TextDecoder('euc-kr'))
+ *  @returns {{ average:number, stations:number, period:string, region:string }} */
+function parseOpinetDiesel(csvText, region = '경기 광주시') {
+  const lines = csvText.split(/\r?\n/).filter(Boolean)
+    .map((l) => l.split('","').map((s) => s.replace(/^"|"$/g, '')));
+  const h = lines[0];
+  const cRegion = h.indexOf('지역'), cDiesel = h.indexOf('경유'), cPeriod = h.indexOf('기간');
+  const data = lines.filter((r) => r[cRegion] === region && num(r[cDiesel]) > 0);
+  if (!data.length) throw new Error(`${region} 경유 데이터가 없습니다`);
+  const avg = sum(data.map((r) => num(r[cDiesel]))) / data.length;
+  return { average: Math.round(avg * 100) / 100, stations: data.length, period: data[0][cPeriod], region };
+}
+
+/* ------------------------------------------------------------------ *
+ * 4. 전체 마감 → 기사별 결과 + 품의 그룹
+ * ------------------------------------------------------------------ */
+const APPROVAL_EXCLUDED = new Set(['위풀', '핫픽스']); // 실적에는 표시, 위펀풀필먼트 품의 대상 아님
+
+/**
+ * @param {object} p
+ *  { month:'2026-10', fuelPriceVatIncl, businessDays,
+ *    master:[...], inputs:[{name,...}], extras:[{carrier,branch,service,label,unitPrice,qty}|{...,amount}],
+ *    loadAmounts:{기사키:금액}, loadOverrides:{기사키:금액},
+ *    serviceLoadAmounts:{'본점|창호통운|현대차':금액}  (기사별이 아닌 서비스 단위 상차금액, 현대차 등)
+ *    prevMonth?: <이 함수의 이전 결과> }
+ *  기사키 = driverKey() → master.id 가 있으면 id, 없으면 '서비스|기사명'
+ */
+function buildSettlement(p) {
+  const ctx = { fuelPriceVatIncl: p.fuelPriceVatIncl, businessDays: p.businessDays };
+  const inputBy = Object.fromEntries((p.inputs || []).map((i) => [driverKey(i), i]));
+  const ov = p.loadOverrides || {}, la = p.loadAmounts || {};
+
+  const drivers = p.master.map((m) => {
+    const k = driverKey(m);
+    const d = calcDriver(m, inputBy[k], ctx);
+    d.key = k;
+    d.loadAmount = ov[k] != null ? num(ov[k]) : num(la[k]);
+    d.loadOverridden = ov[k] != null;
+    d.ratio = d.loadAmount ? d.billing / d.loadAmount : null;
+    d.inApproval = !APPROVAL_EXCLUDED.has(m.carrier);
+    return d;
+  });
+
+  const extras = (p.extras || []).map((e) => ({ ...e, amount: e.amount != null ? num(e.amount) : num(e.unitPrice) * num(e.qty) }));
+
+  // 품의 = 세금계산서 단위(본점/광주 × 운송사). 서비스는 품의 안의 소계로 표시
+  const groups = new Map();
+  const key = (o) => `${o.branch}|${o.carrier}`;
+  const taxModeOf = (carrier) => (p.master.find((m) => m.carrier === carrier) || {}).taxMode || 'carrier';
+  const ensure = (o) => {
+    if (!groups.has(key(o))) groups.set(key(o), { branch: o.branch, carrier: o.carrier, drivers: [], extras: [] });
+    return groups.get(key(o));
+  };
+  for (const d of drivers.filter((x) => x.inApproval)) ensure(d).drivers.push(d);
+  for (const e of extras) ensure(e).extras.push(e);
+
+  const templates = { ...APPROVAL_TITLES, ...(p.approvalTitles || {}) };
+  const approvals = [...groups.values()].map((g) => {
+    const mode = taxModeOf(g.carrier);
+    const svcNames = [...new Set([...g.drivers, ...g.extras].map((x) => x.service))];
+    const services = svcNames.map((sv) => {
+      const ds = g.drivers.filter((d) => d.service === sv), es = g.extras.filter((e) => e.service === sv);
+      const supply = sum(ds.map((d) => d.billing)) + sum(es.map((e) => e.amount));
+      const loadAmount = sum(ds.map((d) => d.loadAmount)) + num((p.serviceLoadAmounts || {})[`${g.branch}|${g.carrier}|${sv}`]);
+      return { service: sv, vehicles: ds.length, supply, loadAmount, ratio: loadAmount ? supply / loadAmount : null, extras: es };
+    });
+    const supply = sum(services.map((x) => x.supply));
+    const out = { ...g, taxMode: mode, services, supply, loadAmount: sum(services.map((x) => x.loadAmount)), vehicles: g.drivers.length };
+    if (mode === 'withholding') {
+      out.vat = 0;
+      out.incomeTax = sum(g.drivers.map((d) => d.incomeTax));
+      out.localTax = sum(g.drivers.map((d) => d.localTax));
+      out.total = supply;
+      out.payTotal = supply - out.incomeTax - out.localTax;
+    } else {
+      out.vat = mode === 'driver'
+        ? sum(g.drivers.map((d) => d.vat)) + floorTo(sum(g.extras.map((e) => e.amount)) * RULES.vatRate)
+        : floorTo(supply * RULES.vatRate);
+      out.total = supply + out.vat;
+      out.payTotal = out.total;
+    }
+    out.ratio = out.loadAmount ? supply / out.loadAmount : null;
+    const t = templates[key(g)];
+    out.order = t ? t.order : 99;
+    out.title = approvalTitle(t ? t.title : `{service} ${g.carrier} 운송료 지급의 건`, p.month, svcNames.join('/'));
+    if (p.prevMonth) out.vsPrev = compareWithPrev(out, p.prevMonth, p);
+    return out;
+  }).sort((a, b) => a.order - b.order);
+
+  return { month: p.month, fuelPriceVatIncl: p.fuelPriceVatIncl, fuelUnit: fuelUnitPrice(p.fuelPriceVatIncl), drivers, approvals };
+}
+
+/**
+ * 품의 제목 (품의 = 본점/광주 × 운송사). '{yy}년 {m}월 ' 은 자동으로 붙음. 수정·추가는 여기서 하거나 buildSettlement({approvalTitles}) 로 덮어쓰기
+ * order = flex 상신 순서
+ */
+const APPROVAL_TITLES = {
+  '본점|사업소득자': { order: 1, title: '편의점저온 사업소득자 급여 지급의 건' },
+  '본점|개별지입':   { order: 2, title: '편의점상온 개별지입 운송료 지급의 건' },
+  '본점|로운로지스': { order: 3, title: '로운로지스 운송료 지급의 건(편의점 지방간선)' },
+  '광주|개별지입':   { order: 4, title: '편의점저온 개별지입 운송료 지급의 건' },
+  '본점|대산물류':   { order: 5, title: '스낵24/조식24 대산물류 운송료 지급의 건' },
+  '본점|창호통운':   { order: 6, title: '스낵/편의점상온/현대차 창호통운 운송료 지급의 건' },
+  '광주|창호통운':   { order: 7, title: '편의점저온 창호통운 운송료 지급의 건' },
+  '광주|대산물류':   { order: 8, title: '편의점저온 대산물류 운송료 지급의 건' },
+};
+
+/** "26년 10월 " + 제목. 제목 안의 {service} 는 품의에 포함된 서비스명으로 치환 */
+function approvalTitle(title, month, serviceLabel = '') {
+  const [y, m] = String(month).split('-');
+  return `${y.slice(2)}년 ${Number(m)}월 ${title.replace('{service}', serviceLabel)}`;
+}
+
+/**
+ * 전월대비 증감 분해 (품의 본문 3번용)
+ *   유가요인   = Σ(이번달 리터) × (이번달 단가 − 전월 단가)
+ *   나머지      = 총증감 − 유가요인  (주행거리·영업일·인원 변동)
+ * ※ 9월 품의서의 분해 방식 확인 후 확정 예정
+ */
+function compareWithPrev(g, prev, cur) {
+  const pg = prev.approvals.find((x) => x.branch === g.branch && x.carrier === g.carrier);
+  if (!pg) return null;
+  const diff = g.total - pg.total;
+  const liters = sum(g.drivers.map((d) => d.liters));
+  const fuelEffect = liters * (fuelUnitPrice(cur.fuelPriceVatIncl) - prev.fuelUnit) * (1 + (g.taxMode === 'carrier' || g.taxMode === 'driver' ? RULES.vatRate : 0));
+  return {
+    prevTotal: pg.total, diff, diffRate: pg.total ? diff / pg.total : null,
+    fuelEffect, otherEffect: diff - fuelEffect,
+    vehiclesPrev: pg.vehicles, vehicles: g.vehicles,
+    fuelPrev: prev.fuelPriceVatIncl, fuelCur: cur.fuelPriceVatIncl,
+  };
+}
+
+
+</script>
+<script>
+/* ===================== 서버 연동 (관리자) ===================== */
+const SB_URL = 'https://evyxvhqerfuqmzwjhkgz.supabase.co', SB_KEY = 'sb_publishable_DNESzKpu1WcxT9sx15D5fw_jVan14DH';
+const AUTH_LS = 'wf-settle-admin';
+const CARRIER_ID = { 대산물류: 'daesan', 창호통운: 'changho', 로운로지스: 'roun' };
+const CARRIER_NAME = Object.fromEntries(Object.entries(CARRIER_ID).map(([k, v]) => [v, k]));
+const ST_LABEL = { draft: '작성 중', submitted: '제출됨', returned: '반려', confirmed: '확정' };
+let AD = (() => { try { return JSON.parse(localStorage.getItem(AUTH_LS) || 'null'); } catch (e) { return null; } })();
+let R = null;               // 서버 마감 자료 (st_a_load)
+let srvSavedAt = null, srvTimer = null, srvBusy = false;
+
+async function rpc(fn, body) {
+  const r = await fetch(`${SB_URL}/rest/v1/rpc/${fn}`, { method: 'POST', headers: { apikey: SB_KEY, 'Content-Type': 'application/json' }, body: JSON.stringify(body || {}) });
+  const t = await r.text(); let j = null; try { j = t ? JSON.parse(t) : null; } catch (e) {}
+  if (!r.ok) { const e = new Error((j && (j.message || j.hint)) || ('오류 ' + r.status)); e.code = j && j.code; e.status = r.status; throw e; }
+  return j;
+}
+async function acall(fn, body) {
+  try { return await rpc(fn, Object.assign({ p_token: AD.token }, body)); }
+  catch (e) { if (e.code === '28000' || e.code === '42501' || e.status === 403) { if (/로그인|관리자/.test(e.message)) { AD = null; try { localStorage.removeItem(AUTH_LS); } catch (x) {} showLogin(e.message); } } throw e; }
+}
+
+// 서버 저장 (관리자 화면 상태 전체) — 입력 후 1.5초 뒤 자동
+function serverSave() {
+  if (!AD) return;
+  clearTimeout(srvTimer);
+  setSrv('저장 대기…');
+  srvTimer = setTimeout(async () => {
+    try { srvBusy = true; const t = await acall('st_a_state_set', { p_key: 'settle_state', p_value: S }); srvSavedAt = new Date(t); setSrv('서버 저장됨 ' + srvSavedAt.toLocaleTimeString('ko-KR')); }
+    catch (e) { setSrv('서버 저장 실패: ' + e.message, true); }
+    finally { srvBusy = false; }
+  }, 1500);
+}
+function setSrv(t, bad) { const el = document.getElementById('srv'); if (el) { el.textContent = t; el.style.color = bad ? 'var(--bad)' : ''; } }
+
+function showLogin(msg) {
+  let w = document.getElementById('login');
+  if (!w) { w = document.createElement('div'); w.id = 'login'; document.body.appendChild(w); }
+  w.className = 'loginwrap';
+  w.innerHTML = `<form class="box loginbox"><div class="logo">위로드<small>마감정산 관리자</small></div>
+    <p class="hint">위로드 관리자 아이디로 로그인해 주세요. 운송사 계정은 운송사 입력 페이지(이 주소에서 admin.html 를 뺀 곳)에서 씁니다.</p>
+    <label>아이디<input name="id" autocomplete="username" required></label>
+    <label>비밀번호<input name="pw" type="password" autocomplete="current-password" required></label>
+    <button class="primary">로그인</button><p class="err">${esc(msg || '')}</p></form>`;
+  w.querySelector('form').onsubmit = async (e) => {
+    e.preventDefault(); const f = new FormData(e.target); const err = w.querySelector('.err'); err.textContent = '확인 중…';
+    try {
+      const j = await rpc('app_login', { p_id: f.get('id'), p_pw: f.get('pw') });
+      if (j.role !== 'admin') throw new Error('관리자 계정만 쓸 수 있어요.');
+      AD = { token: j.token, name: j.name, id: j.id }; try { localStorage.setItem(AUTH_LS, JSON.stringify(AD)); } catch (x) {}
+      w.remove(); await afterLogin();
+    } catch (x) { err.textContent = x.message; }
+  };
+}
+async function afterLogin() {
+  document.getElementById('who').textContent = AD.name || AD.id || '';
+  try {
+    const st = await acall('st_a_state_get', { p_key: 'settle_state' });
+    if (st && st.value) {
+      const local = load();
+      const useServer = !local || !local._savedAt || new Date(st.updated_at) >= new Date(local._savedAt) || confirm('이 PC에 서버보다 최근 작업이 있어요. 서버 자료로 바꿀까요? (취소 = 이 PC 자료 유지 후 서버에 저장)');
+      if (useServer) { S = Object.assign(blank(), st.value); save(true); setSrv('서버 자료 불러옴 (' + new Date(st.updated_at).toLocaleString('ko-KR') + ', ' + (st.updated_by || '') + ')'); }
+      else serverSave();
+    } else if (S.master.length) serverSave();
+  } catch (e) { return; }
+  if (S.month) await loadRemote(true);
+  render();
+}
+async function boot() {
+  if (!AD) { showLogin(); return; }
+  try { await acall('st_a_whoami', {}); await afterLogin(); } catch (e) { if (AD) showLogin(e.message); }
+}
+async function loadRemote(silent) {
+  if (!AD || !S.month) return;
+  try { R = await acall('st_a_load', { p_month: S.month }); } catch (e) { if (!silent) alert(e.message); }
+}
+
+/* ---------- 월 자료 내려주기 ---------- */
+function dueDefault(month) { const [y, m] = month.split('-').map(Number); const d = new Date(y, m, 5); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-05`; }
+function buildPublish() {
+  const lines = [], routes = [];
+  S.master.forEach((m, idx) => {
+    const cid = CARRIER_ID[m.carrier]; if (!cid || cid === 'roun') return;
+    const i = S.inputs[driverKey(m)] || {};
+    lines.push({ driver_key: driverKey(m), carrier_id: cid, branch: m.branch, service: m.service, name: m.name, course: m.course || null, sort: idx,
+      calc: m.calc, ton: m.ton || null, base_salary: i.baseOverride != null && i.baseOverride !== '' ? Number(i.baseOverride) : (m.baseSalary ?? null), fixed_fuel: m.fixedFuel ?? null,
+      allowances: m.allowances || {}, insurance: !!m.insurance, tms_km: i.tmsKm ?? null, return_km: i.returnKm ?? null, extra_km: i.extraKm ?? null, other: i.other ?? null });
+  });
+  const items = [];
+  for (const e of S.extras) {
+    const cid = CARRIER_ID[e.carrier];
+    if (!cid || e.src === 'carrier' || /긴급|실비/.test(e.label || '')) continue;
+    if (cid === 'roun' && e.amount == null) continue;   // 간선 노선은 routes 로
+    const amt = e.amount != null && e.amount !== '' ? Number(e.amount) : Number(e.unitPrice || 0) * Number(e.qty || 0);
+    items.push({ carrier_id: cid, branch: e.branch || '본점', label: e.label, amount: amt, memo: e.service || null });
+  }
+  for (const e of S.extras) if (e.carrier === '로운로지스' && e.src !== 'carrier' && e.unitPrice && e.amount == null && !/실비/.test(e.label || '')) routes.push({ carrier_id: 'roun', branch: e.branch || '본점', route: e.label, unit_price: Number(e.unitPrice) });
+  return { lines, routes, items };
+}
+async function publish() {
+  if (!S.month) return alert('정산월을 먼저 정해 주세요.');
+  if (!S.fuelPriceVatIncl) return alert('주유단가를 먼저 넣어 주세요 (자료·매핑 탭에서 오피넷 CSV).');
+  const { lines, routes, items } = buildPublish();
+  const due = (R && R.period && R.period.due_date) || dueDefault(S.month);
+  if (!confirm(`${S.month} 자료를 운송사에 내려줄까요?\n\n· 기사 ${lines.length}명 (대산물류·창호통운)\n· 로운 간선 노선 ${routes.length}개\n· 위펀 입력 항목 ${items.length}건 (토요일배송 등, 운송사 화면엔 읽기 전용)\n· 제출 기한 ${due}\n\n운송사가 이미 넣은 근무일·주차비·과태료는 그대로 남아요.`)) return;
+  try {
+    const r = await acall('st_a_publish', { p_month: S.month, p_fuel: S.fuelPriceVatIncl, p_bdays: typeof S.businessDays === 'object' ? S.businessDays : {}, p_due: due, p_lines: lines, p_routes: routes, p_remove_missing: true });
+    await acall('st_a_set_items', { p_month: S.month, p_items: items });
+    toast(`내려줬어요: 기사 ${r.lines}명 · 노선 ${r.routes}개 · 항목 ${items.length}건`); await loadRemote(); render();
+  } catch (e) { alert(e.message); }
+}
+
+/* ---------- 운송사 입력 → 정산에 반영 ---------- */
+function importRemote() {
+  if (!R) return;
+  let n = 0;
+  for (const l of R.lines || []) {
+    const k = l.driver_key; S.inputs[k] = S.inputs[k] || {};
+    Object.assign(S.inputs[k], { workDays: l.work_days, parking: l.parking, fines: l.fines, carrierNote: l.carrier_note || '' }); n++;
+  }
+  const ex = R.extras || [];
+  const has = (cid, kind) => ex.some((e) => e.carrier_id === cid && e.kind === kind && Number(e.amount));
+  S.extras = S.extras.filter((e) => e.src !== 'carrier' && !(
+    (has(CARRIER_ID[e.carrier], '긴급용차') && /긴급/.test(e.label || '')) ||
+    (has(CARRIER_ID[e.carrier], '용차실비') && /실비/.test(e.label || ''))));
+  for (const e of ex) {
+    const carrier = CARRIER_NAME[e.carrier_id];
+    if (e.kind === '위펀입력') continue;
+    if (e.kind === '간선운행') { const t = S.extras.find((x) => x.carrier === carrier && x.label === e.route && x.src !== 'carrier'); if (t) t.qty = e.trips ?? 0; continue; }
+    if (!Number(e.amount)) continue;
+    S.extras.push({ src: 'carrier', rid: e.id, carrier, branch: e.branch, service: e.kind === '긴급용차' ? '스낵24' : '간선·용차',
+      label: `${e.kind} ${e.work_date || ''} ${e.kind === '긴급용차' ? (e.driver || '') + ' ' + (e.vehicle_no || '') : (e.route || '')}`.replace(/\s+/g, ' ').trim(), amount: Number(e.amount) });
+  }
+  save(); toast(`운송사 입력 반영: 기사 ${n}명 · 추가내역 ${ex.filter((e) => e.kind !== '간선운행' && Number(e.amount)).length}건`); render();
+}
+
+/* ---------- 운송사 제출 탭 ---------- */
+function renderRemote() {
+  const main = document.getElementById('main');
+  if (!R) { main.innerHTML = `<div class="toolbar"><button class="primary" id="rLoad">서버 자료 불러오기</button></div><p class="hint">정산월 ${esc(S.month || '(미지정)')} 자료를 불러와요.</p>`; main.querySelector('#rLoad').onclick = async () => { await loadRemote(); render(); }; bindAccountsBtn(main); return; }
+  const P = R.period;
+  let h = `<div class="toolbar"><span class="chip">${esc(S.month)} 마감</span>
+    <button class="primary" id="rPub">운송사에 자료 내려주기</button><button id="rImp">운송사 입력 정산에 반영</button><button id="rLoad">새로고침</button>
+    <button id="rAcc">운송사 계정</button>
+    ${P ? `<label class="hfield">제출 기한 <input type="date" id="rDue" value="${esc(P.due_date || '')}"></label>
+    <label class="hfield"><input type="checkbox" id="rOpen" ${P.is_open ? 'checked' : ''} style="width:auto"> 운송사 입력 열림</label>` : ''}</div>`;
+  if (!P) h += `<p class="hint">아직 이 달 자료를 운송사에 내려주지 않았어요. [운송사에 자료 내려주기]를 누르면 대산·창호 기사 행과 로운 간선 노선이 운송사 화면에 생겨요.</p>`;
+  const subs = (R.submissions || []).slice().sort((a, b) => (a.carrier_id + a.branch).localeCompare(b.carrier_id + b.branch));
+  h += `<div class="cards">`;
+  for (const s of subs) {
+    const ls = (R.lines || []).filter((l) => l.carrier_id === s.carrier_id && l.branch === s.branch);
+    const xs = (R.extras || []).filter((e) => e.carrier_id === s.carrier_id && e.branch === s.branch);
+    let bill = 0; const P2 = P || {};
+    const rows = ls.map((l) => {
+      const c = calcDriver({ name: l.name, service: l.service, calc: l.calc, ton: l.ton, baseSalary: l.base_salary, fixedFuel: l.fixed_fuel, allowances: l.allowances || {}, insurance: l.insurance },
+        { tmsKm: l.tms_km, returnKm: l.return_km, extraKm: l.extra_km, parking: l.parking, fines: l.fines, other: l.other, workDays: l.work_days }, { fuelPriceVatIncl: P2.fuel_price, businessDays: P2.business_days || {} });
+      bill += c.billing;
+      const touched = l.work_days != null || l.parking || l.fines || l.carrier_note;
+      return touched || l.review === 'returned' ? `<tr><td>${esc(l.service)}</td><td><b>${esc(l.name)}</b></td><td class="num">${l.work_days ?? ''}</td><td class="num">${fmt(l.parking)}</td><td class="num">${fmt(l.fines)}</td><td>${esc(l.carrier_note || '')}</td><td class="num">${fmt(c.billing)}</td>
+        <td>${revBtns('l', l.driver_key, l.review, l.review_note)}</td></tr>` : '';
+    }).join('');
+    const xrows = xs.map((e) => `<tr><td>${esc(e.kind)}</td><td>${esc(e.work_date || '')} ${esc(e.driver || e.route || '')} ${esc(e.vehicle_no || '')}</td><td class="num">${e.kind === '간선운행' ? (e.trips ?? '') + '회' : ''}</td><td class="num">${fmt(e.amount)}</td><td>${esc(e.memo || '')}</td><td>${revBtns('x', e.id, e.review, e.review_note)}</td></tr>`).join('');
+    const exSum = xs.reduce((a, e) => a + Number(e.amount || 0), 0), sup = bill + exSum;
+    h += `<div class="card"><h3><span>${esc(CARRIER_NAME[s.carrier_id] || s.carrier_id)} · ${s.branch}</span> <span class="tag ${s.status === 'returned' ? 'warn' : ''}">${ST_LABEL[s.status]}</span></h3>
+      <div class="meta">기사 ${ls.length}명 · 추가내역 ${xs.length}건${s.submitted_at ? ' · 제출 ' + new Date(s.submitted_at).toLocaleString('ko-KR') : ''}${s.admin_note ? ' · 메모: ' + esc(s.admin_note) : ''}</div>
+      <div class="kv"><div>운송사 화면 공급가액</div><div class="big">${fmt(sup)}</div><div>세액 / 합계</div><div>${fmt(Math.floor(sup * 0.1 + 1e-9))} / ${fmt(sup + Math.floor(sup * 0.1 + 1e-9))}</div></div>
+      ${rows ? `<div class="svc"><table><tr><th>서비스</th><th>기사</th><th>근무일</th><th>주차비</th><th>과태료</th><th>비고</th><th>청구금액</th><th></th></tr>${rows}</table></div>` : '<p class="hint">운송사가 고친 기사 행이 아직 없어요 (비어 있으면 만근·0원으로 계산).</p>'}
+      ${xrows ? `<div class="svc"><table><tr><th>구분</th><th>내용</th><th>횟수</th><th>금액</th><th>비고</th><th></th></tr>${xrows}</table></div>` : ''}
+      <div class="copybar"><button data-st="returned" data-c="${s.carrier_id}" data-b="${s.branch}">반려</button><button data-st="confirmed" data-c="${s.carrier_id}" data-b="${s.branch}" class="primary">확정</button>
+      <button data-st="draft" data-c="${s.carrier_id}" data-b="${s.branch}" class="ghost">작성 중으로 되돌리기</button></div></div>`;
+  }
+  h += `</div><p class="hint" style="margin-top:12px">확정 전에 [운송사 입력 정산에 반영]을 눌러야 품의·서비스 탭 금액에 근무일·주차비·과태료·긴급용차·용차실비·간선 횟수가 들어가요.</p>`;
+  main.innerHTML = h;
+  main.querySelector('#rPub').onclick = publish;
+  main.querySelector('#rImp').onclick = importRemote;
+  main.querySelector('#rLoad').onclick = async () => { await loadRemote(); render(); };
+  bindAccountsBtn(main);
+  const due = main.querySelector('#rDue'); if (due) due.onchange = async () => { try { await acall('st_a_publish', { p_month: S.month, p_fuel: P.fuel_price, p_bdays: P.business_days, p_due: due.value, p_lines: [], p_routes: [] }); await loadRemote(); render(); toast('기한 변경'); } catch (e) { alert(e.message); } };
+  const op = main.querySelector('#rOpen'); if (op) op.onchange = async () => { try { await acall('st_a_set_period_open', { p_month: S.month, p_open: op.checked }); await loadRemote(); render(); } catch (e) { alert(e.message); } };
+  main.querySelectorAll('[data-st]').forEach((b) => (b.onclick = async () => {
+    const st = b.dataset.st; let note = null;
+    if (st === 'returned') { note = prompt('반려 사유 (운송사 화면에 보여요)'); if (note == null) return; }
+    if (st === 'confirmed' && !confirm('확정하면 운송사가 더 이상 고칠 수 없어요. 확정할까요?')) return;
+    try { await acall('st_a_set_status', { p_month: S.month, p_carrier: b.dataset.c, p_branch: b.dataset.b, p_status: st, p_note: note }); await loadRemote(); render(); } catch (e) { alert(e.message); }
+  }));
+  main.querySelectorAll('[data-rv]').forEach((b) => (b.onclick = async () => {
+    const [t, id] = [b.dataset.t, b.dataset.id], rv = b.dataset.rv; let note = null;
+    if (rv === 'returned') { note = prompt('반려 사유'); if (note == null) return; }
+    try { await acall('st_a_review', { p_month: S.month, p_key: t === 'l' ? id : null, p_extra_id: t === 'x' ? Number(id) : null, p_review: rv, p_note: note }); await loadRemote(); render(); } catch (e) { alert(e.message); }
+  }));
+}
+function revBtns(t, id, rv, note) {
+  return `${rv === 'ok' ? '<span class="tag">확인</span>' : `<button class="ghost" data-t="${t}" data-id="${esc(String(id))}" data-rv="ok" title="확인">✓</button>`}
+    ${rv === 'returned' ? `<span class="tag warn" title="${esc(note || '')}">반려</span>` : `<button class="ghost" data-t="${t}" data-id="${esc(String(id))}" data-rv="returned" title="반려">반려</button>`}`;
+}
+function bindAccountsBtn(main) { const b = main.querySelector('#rAcc'); if (b) b.onclick = accountsModal; }
+function accountsModal() {
+  const list = (R && R.accounts) || [];
+  const w = document.createElement('div'); w.className = 'loginwrap';
+  w.innerHTML = `<div class="box" style="max-width:640px;width:100%"><h4>운송사 계정</h4>
+    <table style="min-width:0;width:100%"><tr><th style="position:static">아이디</th><th style="position:static">이름</th><th style="position:static">운송사</th><th style="position:static">사용</th><th style="position:static"></th></tr>
+    ${list.map((a) => `<tr><td>${esc(a.login_id)}</td><td>${esc(a.name || '')}</td><td>${esc(CARRIER_NAME[a.carrier_id] || a.carrier_id)}</td><td>${a.active ? '사용' : '중지'}</td><td><button class="ghost" data-ed="${esc(a.login_id)}">수정</button></td></tr>`).join('') || '<tr><td colspan="5" class="muted">아직 계정이 없어요</td></tr>'}</table>
+    <form id="accf" style="margin-top:14px;display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <label>아이디 (영문 소문자·숫자)<input name="lid" required pattern="[a-z0-9_.\\-]{3,30}"></label><label>이름<input name="nm" placeholder="담당자 이름"></label>
+      <label>운송사<select name="c">${Object.entries(CARRIER_NAME).map(([id, nm]) => `<option value="${id}">${nm}</option>`).join('')}</select></label>
+      <label>비밀번호 (새 계정·변경 시에만)<input name="pw" type="password" autocomplete="new-password" minlength="6"></label>
+      <label style="display:flex;align-items:center;gap:6px"><input type="checkbox" name="ac" checked style="width:auto"> 사용</label><span></span>
+      <button class="primary">저장</button><button type="button" id="accx">닫기</button></form><p class="err" id="acce"></p></div>`;
+  document.body.appendChild(w);
+  const f = w.querySelector('#accf');
+  w.querySelector('#accx').onclick = () => w.remove();
+  w.querySelectorAll('[data-ed]').forEach((b) => (b.onclick = () => { const a = list.find((x) => x.login_id === b.dataset.ed); f.lid.value = a.login_id; f.nm.value = a.name || ''; f.c.value = a.carrier_id; f.ac.checked = a.active; f.pw.value = ''; }));
+  f.onsubmit = async (e) => {
+    e.preventDefault();
+    try { await acall('st_a_account_set', { p_login: f.lid.value, p_pw: f.pw.value || null, p_carrier: f.c.value, p_name: f.nm.value || null, p_active: f.ac.checked }); await loadRemote(true); w.remove(); accountsModal(); toast('계정 저장'); }
+    catch (x) { w.querySelector('#acce').textContent = x.message; }
+  };
+}
+
+const SERVICES = [
+  { id: '스낵24', color: 'var(--snack)', calcs: ['REAL_KM', 'FIXED_FUEL', 'MANUAL'] },
+  { id: '조식24', color: 'var(--breakfast)', calcs: ['REAL_KM', 'FIXED_FUEL', 'MANUAL'] },
+  { id: '현대차', color: 'var(--hyundai)', calcs: ['FLAT', 'MANUAL'] },
+  { id: '편의점상온', color: 'var(--cvs-on)', calcs: ['CVS', 'FLAT', 'MANUAL'] },
+  { id: '편의점저온', color: 'var(--cvs-off)', calcs: ['CVS', 'FLAT', 'MANUAL'] },
+];
+const CARRIERS = ['대산물류', '창호통운', '개별지입', '사업소득자', '로운로지스', '위풀', '핫픽스'];
+const CALC_LABEL = { REAL_KM: '실거리유류', FIXED_FUEL: '고정유류', CVS: '편의점', FLAT: '정액', MANUAL: '직접입력' };
+const TAXMODE_BY_CARRIER = { 개별지입: 'driver', 사업소득자: 'withholding' };
+const LS = 'weroad.settlement.v1';
+
+let S = blank();
+const LSUI = 'weroad.settlement.ui';
+let sel = new Set(['스낵24']), view = 'svc', carrierFilter = '전체', branchFilter = '전체';
+try { const u = JSON.parse(localStorage.getItem(LSUI) || 'null'); if (u) { sel = new Set(u.sel); view = u.view; carrierFilter = u.cf; branchFilter = u.bf; } } catch (e) {}
+const saveUi = () => { try { localStorage.setItem(LSUI, JSON.stringify({ sel: [...sel], view, cf: carrierFilter, bf: branchFilter })); } catch (e) {} };
+
+function blank() {
+  return { month: '', fuelPriceVatIncl: 0, businessDays: {}, master: [], inputs: {}, extras: [], ownerMap: {}, loadOverrides: {}, officeLoads: {}, serviceLoad: {}, synergyRows: { on: null, off: null }, hyundai: { on: 0, off: 0 }, files: {} };
+}
+function fromSample(x) {
+  const s = blank();
+  Object.assign(s, { month: x.month || '', fuelPriceVatIncl: x.fuelPriceVatIncl || 0, businessDays: x.businessDays || {}, master: x.master.map((m) => ({ ...m, taxMode: m.taxMode || TAXMODE_BY_CARRIER[m.carrier] })), extras: x.extras || [], ownerMap: x.ownerMap || {}, loadOverrides: x.loadOverrides || {}, serviceLoad: x.serviceLoad || {}, synergyRows: x.synergyRows || { on: null, off: null } });
+  for (const i of x.inputs) s.inputs[driverKey(i)] = { ...i };
+  return s;
+}
+const save = (noServer) => { S._savedAt = new Date().toISOString(); try { localStorage.setItem(LS, JSON.stringify(S)); } catch (e) {} if (!noServer && typeof serverSave === 'function') serverSave(); };
+function load() { try { const v = localStorage.getItem(LS); if (v) return JSON.parse(v); } catch (e) {} return null; }
+
+const fmt = (v, d = 0) => (v == null || v === '' || isNaN(v) ? '' : Number(v).toLocaleString('ko-KR', { maximumFractionDigits: d, minimumFractionDigits: d }));
+const pct = (v) => (v == null || !isFinite(v) ? '' : (v * 100).toFixed(2) + '%');
+const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+function toast(t) { const el = document.getElementById('toast'); el.textContent = t; el.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(() => el.classList.remove('on'), 1600); }
+
+/* ---------- 계산 ---------- */
+function compute() {
+  let syn = { byDriver: {}, unmatched: [] };
+  const parts = [];
+  for (const k of ['on', 'off']) if (S.synergyRows[k]) { try { parts.push(parseSynergySales(S.synergyRows[k], S.master, S.ownerMap)); } catch (e) { console.warn(e); } }
+  syn.byDriver = mergeLoadAmounts(...parts.map((p) => p.byDriver));
+  syn.unmatched = parts.flatMap((p, i) => p.unmatched.map((u) => ({ ...u, file: i === 0 && S.synergyRows.on ? '상온' : '저온' })));
+  const loadAmounts = { ...S.officeLoads, ...syn.byDriver };
+  const serviceLoadAmounts = { ...S.serviceLoad };
+  if (S.hyundai.on || S.hyundai.off) serviceLoadAmounts['본점|창호통운|현대차'] = S.hyundai.on + S.hyundai.off;
+  const res = buildSettlement({
+    month: S.month || '2026-01', fuelPriceVatIncl: S.fuelPriceVatIncl, businessDays: S.businessDays,
+    master: S.master, inputs: Object.entries(S.inputs).map(([k, v]) => ({ ...v, id: k })).map((i) => ({ ...i })), extras: S.extras,
+    loadAmounts, loadOverrides: S.loadOverrides, serviceLoadAmounts,
+  });
+  return { res, syn, loadAmounts };
+}
+// inputs 는 driverKey 로 저장 → master 에 id 가 없으면 '서비스|이름' 으로 매칭되도록 id 부여
+function ensureIds() { for (const m of S.master) if (!m.id) m.id = `${m.service}|${m.name}`; }
+
+/* ---------- 탭 (서비스는 여러 개 같이 선택 가능) ---------- */
+function renderTabs() {
+  const counts = Object.fromEntries(SERVICES.map((s) => [s.id, S.master.filter((m) => m.service === s.id).length]));
+  const el = document.getElementById('tabs');
+  const onSvc = view === 'svc';
+  el.innerHTML = SERVICES.map((s) => `<button data-svc="${s.id}" class="${onSvc && sel.has(s.id) ? 'on' : ''}" title="클릭: 이 서비스만 · Ctrl/⌘+클릭 또는 체크: 여러 개 같이"><input type="checkbox" class="pick" data-pick="${s.id}" ${sel.has(s.id) ? 'checked' : ''}><span class="dot" style="background:${s.color}"></span>${s.id}<span class="cnt">${counts[s.id]}</span></button>`).join('')
+    + `<button data-all class="ghost" style="border:none">전체 선택</button><span class="sep"></span>`
+    + ['품의', '운송사 제출', '자료·매핑', '별도 항목'].map((t) => `<button data-view="${t}" class="${view === t ? 'on' : ''}">${t}</button>`).join('');
+  el.querySelectorAll('[data-svc]').forEach((b) => (b.onclick = (e) => {
+    const id = b.dataset.svc;
+    if (e.target.classList.contains('pick') || e.ctrlKey || e.metaKey) {
+      if (sel.has(id) && sel.size > 1) sel.delete(id); else sel.add(id);
+    } else { sel = new Set([id]); }
+    view = 'svc'; saveUi(); render();
+  }));
+  el.querySelector('[data-all]').onclick = () => { sel = new Set(SERVICES.map((s) => s.id)); view = 'svc'; saveUi(); render(); };
+  el.querySelectorAll('[data-view]').forEach((b) => (b.onclick = () => { view = b.dataset.view; saveUi(); render(); }));
+}
+
+/* ---------- 서비스 표 (기사마스터 + 월 입력 + 결과) ---------- */
+// 칸별 적용 서비스: 선택한 서비스 중 하나라도 쓰면 칸을 보여주고, 해당 안 되는 행은 빈칸
+const SD = (s) => s === '스낵24' || s === '조식24', CVS = (s) => s.startsWith('편의점'), NOT_HY = (s) => s !== '현대차', ALL = () => true;
+const MASTER_COLS = [
+  ['carrier', '소속', 'sel', CARRIERS, ALL], ['branch', '본/광주', 'sel', ['본점', '광주'], ALL], ['course', '코스', 'text', null, SD],
+  ['name', '기사', 'text', null, ALL], ['calc', '계산유형', 'sel', null, ALL], ['ton', '톤', 'sel', ['1톤', '2.5톤'], NOT_HY],
+  ['baseSalary', '기본급', 'num', null, ALL], ['fixedFuel', '고정유류비', 'num', null, SD],
+  ['al.근속수당', '근속수당', 'num', null, SD], ['al.차량랩핑수당', '랩핑수당', 'num', null, SD], ['insurance', '산재·고용', 'chk', null, SD],
+];
+const INPUT_COLS = [
+  ['tmsKm', 'TMS km', 'num', NOT_HY], ['returnKm', '회차거리', 'num', CVS], ['extraKm', '추가거리', 'num', NOT_HY], ['toll', '통행비', 'num', SD],
+  ['parking', '주차비', 'num', ALL], ['other', '기타수당', 'num', ALL], ['baseOverride', '기본급 직접', 'num', ALL], ['manualBilling', '청구 직접', 'num', ALL], ['note', '비고', 'text', ALL],
+];
+function getM(m, f) { if (f.startsWith('al.')) return (m.allowances || {})[f.slice(3)]; return m[f]; }
+function setM(m, f, v) { if (f.startsWith('al.')) { m.allowances = m.allowances || {}; m.allowances[f.slice(3)] = v; } else m[f] = v; }
+
+function renderService(C) {
+  const svcs = SERVICES.filter((s) => sel.has(s.id)).map((s) => s.id);
+  const multi = svcs.length > 1;
+  const mcols = MASTER_COLS.filter((c) => svcs.some(c[4]));
+  const icols = INPUT_COLS.filter((c) => svcs.some(c[3]));
+  const anyFuel = svcs.some(NOT_HY);
+  const inScope = (o) => sel.has(o.service) && (carrierFilter === '전체' || o.carrier === carrierFilter) && (branchFilter === '전체' || o.branch === branchFilter);
+  const rows = S.master.map((m, idx) => ({ m, idx })).filter(({ m }) => inScope(m))
+    .sort((a, b) => svcs.indexOf(a.m.service) - svcs.indexOf(b.m.service));
+  const dmap = Object.fromEntries(C.res.drivers.map((d) => [d.key, d]));
+  const pool = S.master.filter((m) => sel.has(m.service));
+  const carriersHere = ['전체', ...new Set(pool.map((m) => m.carrier))];
+
+  // 서비스별 소계 (기사 + 별도 항목 + 서비스 단위 상차금액)
+  const svcLoadOf = (sv) => (sv === '현대차' && (carrierFilter === '전체' || carrierFilter === '창호통운') && (branchFilter === '전체' || branchFilter === '본점')
+    ? ((S.hyundai.on + S.hyundai.off) || S.serviceLoad['본점|창호통운|현대차'] || 0) : 0);
+  const subs = svcs.map((sv) => {
+    const ds = rows.filter(({ m }) => m.service === sv).map(({ m }) => dmap[driverKey(m)]).filter(Boolean);
+    const inAppr = ds.filter((d) => d.inApproval);
+    const ex = S.extras.filter((e) => e.service === sv && inScope(e));
+    const exAmt = ex.reduce((a, e) => a + (e.amount != null && e.amount !== '' ? Number(e.amount) : (e.unitPrice || 0) * (e.qty || 0)), 0);
+    const billing = inAppr.reduce((a, d) => a + d.billing, 0) + exAmt;
+    const load = ds.reduce((a, d) => a + d.loadAmount, 0) + svcLoadOf(sv);
+    const outside = ds.filter((d) => !d.inApproval).reduce((a, d) => a + d.billing, 0);
+    return { sv, n: ds.length, billing, exAmt, load, outside };
+  });
+  const T = subs.reduce((a, s) => ({ n: a.n + s.n, billing: a.billing + s.billing, load: a.load + s.load, outside: a.outside + s.outside }), { n: 0, billing: 0, load: 0, outside: 0 });
+  const oneCarrier = carrierFilter !== '전체';
+  const mode = oneCarrier ? (TAXMODE_BY_CARRIER[carrierFilter] || 'carrier') : null;
+  const vat = mode === 'carrier' ? Math.floor(T.billing * 0.1 + 1e-9) : null;
+
+  let h = `<div class="toolbar">
+    <label class="hfield">소속 <select id="cf">${carriersHere.map((c) => `<option ${c === carrierFilter ? 'selected' : ''}>${c}</option>`).join('')}</select></label>
+    <label class="hfield">본/광주 <select id="bf">${['전체', '본점', '광주'].map((c) => `<option ${c === branchFilter ? 'selected' : ''}>${c}</option>`).join('')}</select></label>
+    <button id="addRow">+ 기사 추가</button>
+    <span class="chip">${svcs.join(' + ')}</span></div>`;
+
+  // 소계 표
+  h += `<div class="subtot"><table><thead><tr><th>서비스</th><th>기사</th><th>청구금액(공급가)</th><th>별도 항목</th><th>상차금액</th><th>운송비율</th>${T.outside ? '<th>품의 제외(위풀·핫픽스)</th>' : ''}</tr></thead><tbody>`;
+  for (const s of subs.filter((x) => x.n || x.exAmt || x.load)) h += `<tr><td><span class="dot" style="background:${SERVICES.find((x) => x.id === s.sv).color}"></span>${s.sv}</td><td class="num">${s.n}</td><td class="num">${fmt(s.billing)}</td><td class="num muted">${s.exAmt ? fmt(s.exAmt) : ''}</td><td class="num">${fmt(s.load)}</td><td class="num">${pct(s.load ? s.billing / s.load : null)}</td>${T.outside ? `<td class="num muted">${s.outside ? fmt(s.outside) : ''}</td>` : ''}</tr>`;
+  h += `<tr class="total"><td>합계${multi ? ` (${svcs.length}개 서비스)` : ''}</td><td class="num">${T.n}</td><td class="num">${fmt(T.billing)}</td><td></td><td class="num">${fmt(T.load)}</td><td class="num">${pct(T.load ? T.billing / T.load : null)}</td>${T.outside ? `<td class="num muted">${fmt(T.outside)}</td>` : ''}</tr>`;
+  if (vat != null) h += `<tr class="vat"><td colspan="2">${esc(carrierFilter)}${branchFilter !== '전체' ? ' ' + branchFilter : ''} 세액 (10%, 원 미만 절사)</td><td class="num">${fmt(vat)}</td><td colspan="${T.outside ? 4 : 3}" class="num"><b>VAT 포함 ${fmt(T.billing + vat)}</b></td></tr>`;
+  h += `</tbody></table>${!oneCarrier ? '<p class="hint">소속을 하나 고르면 세액과 VAT 포함 합계까지 나와요 (예: 창호통운 · 본점 · 스낵24+편의점상온+현대차)</p>' : ''}</div>`;
+
+  const resCols = [...(anyFuel ? [['리터'], ['유류비']] : []), ['산재·고용'], ['청구금액'], ['상차금액'], ['운송비율']];
+  h += `<div class="tablewrap"><table><thead><tr class="grp"><th class="sticky"></th>${multi ? '<th class="g-m"></th>' : ''}<th class="g-m" colspan="${mcols.length}">기사마스터 (고정값)</th><th class="g-i" colspan="${icols.length}">${esc(S.month)} 월 입력</th><th class="g-r" colspan="${resCols.length}">계산 결과</th></tr>
+    <tr class="col"><th class="sticky"></th>${multi ? '<th>서비스</th>' : ''}${mcols.map((c) => `<th>${c[1]}</th>`).join('')}${icols.map((c) => `<th>${c[1]}</th>`).join('')}${resCols.map((c) => `<th>${c[0]}</th>`).join('')}</tr></thead><tbody>`;
+  for (const { m, idx } of rows) {
+    const k = driverKey(m), i = S.inputs[k] || {}, d = dmap[k] || {};
+    const svcDef = SERVICES.find((s) => s.id === m.service);
+    h += `<tr class="${APPROVAL_EXCLUDED.has(m.carrier) ? 'excluded' : ''}"><td class="sticky"><button class="del" data-del="${idx}" title="삭제">✕</button></td>`;
+    if (multi) h += `<td><span class="dot" style="background:${svcDef.color}"></span>${m.service}</td>`;
+    for (const [f, , t, opts, applies] of mcols) {
+      if (!applies(m.service)) { h += '<td></td>'; continue; }
+      const v = getM(m, f), o = f === 'calc' ? svcDef.calcs : opts;
+      if (t === 'sel') h += `<td><select data-m="${idx}" data-f="${f}">${o.map((x) => `<option value="${x}" ${x === v ? 'selected' : ''}>${CALC_LABEL[x] || x}</option>`).join('')}</select></td>`;
+      else if (t === 'chk') h += `<td style="text-align:center"><input type="checkbox" data-m="${idx}" data-f="${f}" ${v ? 'checked' : ''} style="width:auto"></td>`;
+      else h += `<td><input data-m="${idx}" data-f="${f}" ${t === 'num' ? 'type="number"' : ''} value="${esc(v ?? '')}" style="${t === 'num' ? 'width:95px' : f === 'name' ? 'width:80px' : 'width:70px'}"></td>`;
+    }
+    for (const [f, , t, applies] of icols) {
+      if (!applies(m.service)) { h += '<td></td>'; continue; }
+      h += `<td class="in"><input data-i="${esc(k)}" data-f="${f}" ${t === 'num' ? 'type="number"' : ''} value="${esc(i[f] ?? '')}" style="width:${f === 'note' ? 160 : 85}px"></td>`;
+    }
+    const ov = S.loadOverrides[k] != null;
+    if (anyFuel) h += NOT_HY(m.service) ? `<td class="num muted">${fmt(d.liters, 1)}</td><td class="num">${fmt(d.fuel)}</td>` : '<td></td><td></td>';
+    h += `<td class="num muted">${fmt((d.sanjae || 0) + (d.goyong || 0))}</td><td class="num res">${fmt(d.billing)}</td>`;
+    h += `<td class="${ov ? 'ov' : ''}"><input type="number" data-ov="${esc(k)}" value="${ov ? S.loadOverrides[k] : ''}" placeholder="${fmt(C.loadAmounts[k])}" title="비우면 자동값(시너지/위로드). 입력하면 수정값 우선" style="width:120px"></td>`;
+    h += `<td class="num">${pct(d.ratio)}</td></tr>`;
+  }
+  h += `</tbody></table></div><div class="legend"><span class="l-in">월 입력 칸</span><span class="l-ov">상차금액 수정값 (자동값 대신 사용)</span><span>회색 행 = 위풀·핫픽스 (실적 표시, 품의 제외)</span><span>서비스 탭 체크박스 또는 Ctrl/⌘+클릭 = 여러 서비스 같이 보기</span></div>`;
+  const main = document.getElementById('main'); main.innerHTML = h;
+
+  main.querySelector('#cf').onchange = (e) => { carrierFilter = e.target.value; saveUi(); render(); };
+  main.querySelector('#bf').onchange = (e) => { branchFilter = e.target.value; saveUi(); render(); };
+  main.querySelector('#addRow').onclick = () => {
+    const svc = svcs[0];
+    const name = '신규' + (S.master.filter((m) => /^신규/.test(m.name)).length + 1);
+    S.master.push({ name, carrier: carrierFilter !== '전체' ? carrierFilter : '창호통운', branch: branchFilter !== '전체' ? branchFilter : svc === '편의점저온' ? '광주' : '본점', service: svc, calc: SERVICES.find((s) => s.id === svc).calcs[0], ton: '1톤', baseSalary: 0, allowances: {}, insurance: false, id: `${svc}|${name}` });
+    save(); render();
+  };
+  bindRowEvents(main);
+}
+function bindRowEvents(main) {
+  main.querySelectorAll('[data-del]').forEach((b) => (b.onclick = () => { const m = S.master[b.dataset.del]; if (confirm(`${m.name || '(이름 없음)'} 기사를 삭제할까요?`)) { S.master.splice(b.dataset.del, 1); save(); render(); } }));
+  main.querySelectorAll('[data-m]').forEach((el) => (el.onchange = () => {
+    const m = S.master[el.dataset.m], f = el.dataset.f;
+    const oldKey = driverKey(m);
+    const v = el.type === 'checkbox' ? el.checked : el.type === 'number' ? (el.value === '' ? null : Number(el.value)) : el.value;
+    setM(m, f, v);
+    if (f === 'carrier') m.taxMode = TAXMODE_BY_CARRIER[v];
+    if (f === 'name') {
+      const newKey = `${m.service}|${v}`; m.id = newKey;
+      if (S.inputs[oldKey]) { S.inputs[newKey] = S.inputs[oldKey]; delete S.inputs[oldKey]; }
+      if (S.loadOverrides[oldKey] != null) { S.loadOverrides[newKey] = S.loadOverrides[oldKey]; delete S.loadOverrides[oldKey]; }
+    }
+    save(); render();
+  }));
+  main.querySelectorAll('[data-i]').forEach((el) => (el.onchange = () => {
+    const k = el.dataset.i; S.inputs[k] = S.inputs[k] || {};
+    S.inputs[k][el.dataset.f] = el.type === 'number' ? (el.value === '' ? null : Number(el.value)) : el.value;
+    save(); render();
+  }));
+  main.querySelectorAll('[data-ov]').forEach((el) => (el.onchange = () => {
+    if (el.value === '') delete S.loadOverrides[el.dataset.ov]; else S.loadOverrides[el.dataset.ov] = Number(el.value);
+    save(); render();
+  }));
+}
+
+/* ---------- 품의 탭 ---------- */
+function renderApprovals(C) {
+  const A = C.res.approvals;
+  const total = A.reduce((a, g) => a + g.payTotal, 0);
+  let h = `<div class="toolbar"><span class="chip">품의 ${A.length}건</span><div class="sum"><span>지급총액 합계 <b>${fmt(total)}</b></span></div></div><div class="cards">`;
+  for (const g of A) {
+    const modeLbl = { carrier: '세금계산서 (운송사 발행)', driver: '세금계산서 (기사별 발행)', withholding: '원천징수 3.3%' }[g.taxMode];
+    h += `<div class="card"><h3><span class="no">${g.order}</span><span>${esc(g.title)}</span></h3>
+      <div class="meta">${g.branch} · ${g.carrier} · ${modeLbl} · 차량 ${g.vehicles}대</div>
+      <div class="kv">
+        <div>공급가액</div><div>${fmt(g.supply)}</div>
+        ${g.taxMode === 'withholding' ? `<div>소득세 / 지방소득세</div><div>${fmt(g.incomeTax)} / ${fmt(g.localTax)}</div>` : `<div>세액</div><div>${fmt(g.vat)}</div>`}
+        <div>${g.taxMode === 'withholding' ? '지급총액' : '비용(VAT 포함)'}</div><div class="big">${fmt(g.payTotal)}</div>
+        <div>상차금액</div><div>${fmt(g.loadAmount)}</div>
+        <div>운송비율</div><div>${pct(g.ratio)}</div>
+      </div>`;
+    if (g.services.length > 1 || g.extras.length) {
+      h += `<div class="svc"><table><tr><th>서비스</th><th>차량</th><th>공급가액</th><th>상차금액</th><th>비율</th></tr>`;
+      for (const s of g.services) h += `<tr><td>${s.service}</td><td class="num">${s.vehicles}</td><td class="num">${fmt(s.supply)}</td><td class="num">${fmt(s.loadAmount)}</td><td class="num">${pct(s.ratio)}</td></tr>`;
+      for (const e of g.extras) h += `<tr><td class="muted">└ ${esc(e.label)}</td><td></td><td class="num muted">${fmt(e.amount)}</td><td></td><td></td></tr>`;
+      h += `</table></div>`;
+    }
+    const body = `1. 주요내용 : ${g.branch} ${g.carrier} ${g.taxMode === 'withholding' ? '급여' : '운송료'} 지급\n\n2. 총 지급액 : ${fmt(g.payTotal)}원\n(공급가액 ${fmt(g.supply)}원${g.taxMode === 'withholding' ? ` - 소득세 ${fmt(g.incomeTax)}원 - 지방소득세 ${fmt(g.localTax)}원` : ` + 세액 ${fmt(g.vat)}원`})`;
+    h += `<div class="copybar"><button data-copy="${esc(g.title)}">제목 복사</button><button data-copy="${fmt(g.payTotal)}">금액 복사</button><button data-copy="${esc(body)}">본문 1·2 복사</button></div></div>`;
+  }
+  h += `</div><p class="tag" style="margin-top:14px">본문 3번(전월대비 증감)과 차트는 전월 마감을 저장해 두면 자동으로 붙도록 다음 단계에서 연결</p>`;
+  const main = document.getElementById('main'); main.innerHTML = h;
+  main.querySelectorAll('[data-copy]').forEach((b) => (b.onclick = async () => { try { await navigator.clipboard.writeText(b.dataset.copy); toast('복사했어요'); } catch (e) { toast('복사 실패 — 직접 선택해 주세요'); } }));
+}
+
+/* ---------- 자료·매핑 탭 ---------- */
+async function readSheetRows(file) { const buf = await file.arrayBuffer(); const wb = XLSX.read(buf, { type: 'array' }); return XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { header: 1 }); }
+function renderData(C) {
+  const cvsDrivers = S.master.filter((m) => m.service.startsWith('편의점'));
+  const opts = `<option value="">(미지정)</option><option value="제외">제외</option>` + cvsDrivers.map((m) => `<option value="${esc(driverKey(m))}">${esc(m.service)} · ${esc(m.name)} (${esc(m.carrier)})</option>`).join('');
+  const F = S.files || {};
+  let h = `<div class="grid2"><div class="box"><h4>월 자료 업로드</h4>
+    <div class="drop"><span class="lbl">오피넷 유가 CSV</span><input type="file" id="fOpinet" accept=".csv"><span class="st ${F.opinet ? 'ok' : ''}">${esc(F.opinet || '경기 광주시 경유 월평균 → 주유단가')}</span></div>
+    <div class="drop"><span class="lbl">시너지 상온</span><input type="file" id="fSynOn" accept=".xls,.xlsx"><span class="st ${F.synergyOn ? 'ok' : ''}">${esc(F.synergyOn || '판매현황(거래처) · 편의점종합 · 집계')}</span></div>
+    <div class="drop"><span class="lbl">시너지 저온</span><input type="file" id="fSynOff" accept=".xls,.xlsx"><span class="st ${F.synergyOff ? 'ok' : ''}">${esc(F.synergyOff || '판매현황(거래처) · 편의점종합 · 집계')}</span></div>
+    <div class="drop"><span class="lbl">현대차 상온</span><input type="file" id="fHyOn" accept=".xls,.xlsx"><span class="st ${S.hyundai.on ? 'ok' : ''}">${S.hyundai.on ? fmt(S.hyundai.on) + '원' : 'H_ 담당 과세+면세'}</span></div>
+    <div class="drop"><span class="lbl">현대차 저온</span><input type="file" id="fHyOff" accept=".xls,.xlsx"><span class="st ${S.hyundai.off ? 'ok' : ''}">${S.hyundai.off ? fmt(S.hyundai.off) + '원' : '판매현황(실배송) 현대 담당 ÷ 1.1'}</span></div>
+    <p style="margin-top:10px">스낵24·조식24 상차금액은 위로드 기사별 상차량을 그대로 씀 (위로드 연동 전까지는 각 탭 상차금액 칸에 직접 입력).</p>
+    <h4 style="margin-top:16px">영업일 (서비스별 · 근무일 일할 기준)</h4>
+    <div class="drop" style="flex-wrap:wrap;gap:12px">${SERVICES.map((s) => `<label class="hfield">${s.id} <input type="number" data-bd="${s.id}" value="${(S.businessDays || {})[s.id] ?? ''}" style="width:64px"></label>`).join('')}</div>
+    </div>
+    <div class="box"><h4>담당 매핑 <span class="tag">${C.syn.unmatched.length}건 미연결</span></h4>
+    <p>시너지 담당 중 기사와 자동 연결되지 않은 것. 기사 변경분은 기사를 지정하고, 기사 담당이 아니면 '제외'.</p>
+    <div class="tablewrap" style="max-height:420px"><table><thead><tr class="col" style="top:0"><th style="top:0">파일</th><th style="top:0">담당</th><th style="top:0">순매출액</th><th style="top:0">연결</th></tr></thead><tbody>`;
+  for (const u of C.syn.unmatched) h += `<tr><td class="muted">${u.file}</td><td>${esc(u.owner || '(공란)')}</td><td class="num">${fmt(u.netSales)}</td><td><select data-own="${esc(u.owner)}">${opts}</select></td></tr>`;
+  h += `</tbody></table></div>`;
+  const mapped = Object.entries({ ...DEFAULT_OWNER_MAP, ...S.ownerMap });
+  if (mapped.length) h += `<p style="margin-top:10px">지정된 매핑</p>` + mapped.map(([o, k]) => `<div class="drop"><span class="lbl">${esc(o)}</span><span>→ ${esc(k)}</span>${S.ownerMap[o] ? `<button class="del" data-unmap="${esc(o)}">해제</button>` : '<span class="tag">기본</span>'}</div>`).join('');
+  h += `</div></div>`;
+  const main = document.getElementById('main'); main.innerHTML = h;
+
+  main.querySelectorAll('[data-bd]').forEach((el) => (el.onchange = () => { S.businessDays = S.businessDays && typeof S.businessDays === 'object' ? S.businessDays : {}; if (el.value === '') delete S.businessDays[el.dataset.bd]; else S.businessDays[el.dataset.bd] = Number(el.value); save(); render(); }));
+  main.querySelector('#fOpinet').onchange = async (e) => {
+    const f = e.target.files[0]; if (!f) return;
+    const txt = new TextDecoder('euc-kr').decode(await f.arrayBuffer());
+    try { const r = parseOpinetDiesel(txt); S.fuelPriceVatIncl = r.average; S.files.opinet = `${r.period} ${r.region} 경유 ${r.average.toFixed(2)}원 (${r.stations}곳 평균)`; save(); render(); toast('주유단가 반영'); } catch (err) { alert(err.message); }
+  };
+  const syn = (id, key, label) => (main.querySelector(id).onchange = async (e) => {
+    const f = e.target.files[0]; if (!f) return;
+    try { const rows = await readSheetRows(f); parseSynergySales(rows, S.master); S.synergyRows[key] = rows; S.files[label] = f.name; save(); render(); toast('시너지 반영'); } catch (err) { alert(err.message); }
+  });
+  syn('#fSynOn', 'on', 'synergyOn'); syn('#fSynOff', 'off', 'synergyOff');
+  const hy = (id, key) => (main.querySelector(id).onchange = async (e) => {
+    const f = e.target.files[0]; if (!f) return;
+    try { const r = parseHyundaiSales(await readSheetRows(f)); S.hyundai[key] = r.total; delete S.serviceLoad['본점|창호통운|현대차']; save(); render(); toast('현대차 반영'); } catch (err) { alert(err.message); }
+  });
+  hy('#fHyOn', 'on'); hy('#fHyOff', 'off');
+  main.querySelectorAll('[data-own]').forEach((el) => (el.onchange = () => { if (el.value) S.ownerMap[el.dataset.own] = el.value; save(); render(); }));
+  main.querySelectorAll('[data-unmap]').forEach((b) => (b.onclick = () => { delete S.ownerMap[b.dataset.unmap]; save(); render(); }));
+}
+
+/* ---------- 별도 항목 탭 (토요일배송·긴급용차·로운 노선) ---------- */
+function renderExtras() {
+  const groups = Object.keys(APPROVAL_TITLES);
+  let h = `<div class="toolbar"><span class="chip">기사 행이 아닌 금액 (토요일배송, 긴급용차, 로운 노선·실비)</span><button id="addEx">+ 항목 추가</button></div>
+  <div class="tablewrap"><table><thead><tr class="col" style="top:0"><th style="top:0"></th><th style="top:0">품의</th><th style="top:0">서비스</th><th style="top:0">항목</th><th style="top:0">단가</th><th style="top:0">수량</th><th style="top:0">금액 직접</th><th style="top:0">금액</th></tr></thead><tbody>`;
+  S.extras.forEach((e, i) => {
+    const amt = e.amount != null && e.amount !== '' ? Number(e.amount) : (e.unitPrice || 0) * (e.qty || 0);
+    h += `<tr><td><button class="del" data-xdel="${i}">✕</button></td>
+      <td><select data-x="${i}" data-f="grp">${groups.map((g) => `<option value="${g}" ${g === `${e.branch}|${e.carrier}` ? 'selected' : ''}>${APPROVAL_TITLES[g].order}. ${g.replace('|', ' ')}</option>`).join('')}</select></td>
+      <td><input data-x="${i}" data-f="service" value="${esc(e.service)}" style="width:100px"></td>
+      <td><input data-x="${i}" data-f="label" value="${esc(e.label)}" style="width:240px"></td>
+      <td class="in"><input type="number" data-x="${i}" data-f="unitPrice" value="${e.unitPrice ?? ''}" style="width:100px"></td>
+      <td class="in"><input type="number" data-x="${i}" data-f="qty" value="${e.qty ?? ''}" style="width:60px"></td>
+      <td class="in"><input type="number" data-x="${i}" data-f="amount" value="${e.amount ?? ''}" style="width:110px"></td>
+      <td class="num res">${fmt(amt)}</td></tr>`;
+  });
+  h += `</tbody></table></div>`;
+  const main = document.getElementById('main'); main.innerHTML = h;
+  main.querySelector('#addEx').onclick = () => { S.extras.push({ branch: '광주', carrier: '창호통운', service: '편의점저온', label: '토요일배송', unitPrice: 250000, qty: 0 }); save(); render(); };
+  main.querySelectorAll('[data-xdel]').forEach((b) => (b.onclick = () => { S.extras.splice(b.dataset.xdel, 1); save(); render(); }));
+  main.querySelectorAll('[data-x]').forEach((el) => (el.onchange = () => {
+    const e = S.extras[el.dataset.x], f = el.dataset.f;
+    if (f === 'grp') { const [b, c] = el.value.split('|'); e.branch = b; e.carrier = c; }
+    else e[f] = el.type === 'number' ? (el.value === '' ? null : Number(el.value)) : el.value;
+    save(); render();
+  }));
+}
+
+/* ---------- 공통 ---------- */
+function render() {
+  ensureIds();
+  document.getElementById('month').value = S.month || '';
+  document.getElementById('fuel').value = S.fuelPriceVatIncl || '';
+  document.getElementById('fuelUnit').textContent = S.fuelPriceVatIncl ? `→ VAT 제외 ${fmt(fuelUnitPrice(S.fuelPriceVatIncl), 2)}원/L` : '';
+  renderTabs();
+  let C;
+  try { C = compute(); } catch (e) { document.getElementById('main').innerHTML = `<p style="color:var(--bad)">계산 오류: ${esc(e.message)}</p>`; return; }
+  if (view === 'svc') renderService(C);
+  else if (view === '품의') renderApprovals(C);
+  else if (view === '자료·매핑') renderData(C);
+  else if (view === '운송사 제출') renderRemote();
+  else renderExtras();
+}
+document.getElementById('month').onchange = async (e) => { S.month = e.target.value; R = null; save(); await loadRemote(true); render(); };
+document.getElementById('fuel').onchange = (e) => { S.fuelPriceVatIncl = Number(e.target.value); save(); render(); };
+document.getElementById('btnOut').onclick = async () => { try { await rpc('app_logout', { p_token: AD && AD.token }); } catch (e) {} AD = null; R = null; try { localStorage.removeItem(AUTH_LS); } catch (e) {} showLogin(); };
+document.getElementById('btnExport').onclick = () => {
+  const blob = new Blob([JSON.stringify(S, null, 1)], { type: 'application/json' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `마감정산_${S.month || 'draft'}.json`; a.click();
+};
+document.getElementById('btnImport').onclick = () => document.getElementById('fileImport').click();
+document.getElementById('fileImport').onchange = async (e) => { const f = e.target.files[0]; if (!f) return; if (S.master.length && !confirm('지금 화면 자료를 파일 내용으로 바꿀까요? (서버에도 저장돼요)')) return; try { const x = JSON.parse(await f.text()); S = Array.isArray(x.inputs) ? fromSample(x) : Object.assign(blank(), x); save(); render(); toast('불러왔어요'); } catch (err) { alert('불러오기 실패: ' + err.message); } };
+
+S = load() ? Object.assign(blank(), load()) : blank();
+if (typeof S.businessDays !== 'object' || !S.businessDays) S.businessDays = {};
+render();
+boot();
+</script>
+</body>
+</html>
