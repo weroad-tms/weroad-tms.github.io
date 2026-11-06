@@ -120,15 +120,14 @@
 
 <div id="agree" class="agree" hidden>
   <div class="brand"><span class="lg">W</span><b>위로드</b><small>배송기사웹</small></div>
-  <h2>위치 정보 수집·이용 동의</h2>
+  <h2>위로드앱 위치정보수집동의</h2>
   <div class="card"><ul>
-    <li><b>무엇을</b> — 휴대폰 위치(위도·경도), 속도, 정확도, 수집 시각</li>
-    <li><b>왜</b> — <b>출퇴근 기록</b>과 <b>배송 경로 확인</b> (최종 배송지 도착·업무종료 시각 확인 포함)</li>
-    <li><b>언제</b> — 출근(위치 전송)을 켠 동안만. 퇴근해서 끄면 수집하지 않아요</li>
-    <li><b>보관</b> — 이동 경로 상세는 30일 뒤 지워요. 출퇴근·업무종료 같은 판정 결과만 근무·정산 기록으로 남아요</li>
-    <li><b>누가 봐요</b> — 위펀 물류팀·편의점팀 담당자만</li>
-  </ul>
-  <p class="note">동의하지 않아도 퇴근 기록·로케이션 등 다른 기능은 쓸 수 있어요. 위치 전송(출근)만 쓸 수 없어요. 궁금한 점은 물류팀에 물어봐 주세요.</p></div>
+    <li><b>수집정보</b> — 위치, 속도, 정확도, 수집시각</li>
+    <li><b>사용목적</b> — 고객사의 도착시간 안내 및 예측</li>
+    <li><b>수집기간</b> — 출근을 켠 동안만. 퇴근해서 종료되면 수집하지 않음</li>
+    <li><b>보관기간</b> — 상세 경로는 30일 뒤 자동 삭제. 이외 정보는 정산 목적으로 기록</li>
+    <li><b>모니터링 권한</b> — 관리자만</li>
+  </ul></div>
   <button class="yes" id="ag-ok">동의하고 시작</button><button class="no" id="ag-no">동의하지 않음</button>
 </div>
 
@@ -262,7 +261,7 @@
   if (!loggedIn()) { $('setup').hidden = false; }
   else { $('main').hidden = false; $('nm').firstChild.textContent = cfg.n; $('nm2').firstChild.textContent = cfg.n; if (isMaster()) { document.querySelector('.tabs button[data-tab=loc]').hidden = true; $('nm2').lastElementChild.textContent = '관리자 계정 — 어떤 차량이든 대신 기록할 수 있어요'; } }
   // 11/6 위치 수집 동의 (한 번) — 동의 기록은 위치 서버에도 남김
-  const AGREE_VER = '2026-11-06';
+  const AGREE_VER = '2026-11-07';   // 11/7 문구 변경 → 다시 동의 받음
   if (loggedIn() && !isMaster() && cfg.agree !== AGREE_VER && !cfg.noAgree) $('agree').hidden = false;
   $('ag-ok').onclick = async () => {
     $('ag-ok').disabled = true;
