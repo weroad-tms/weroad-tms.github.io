@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" href="../driver/icon.svg" type="image/svg+xml">
+<title>위로드 설치</title>
+<style>
+  :root{--ink:#0A0F14;--deep:#0F3D3E;--teal:#2E6F73;--mist:#7FB3B8;--cream:#EADCC8;--orange:#C6601F}
+  *{box-sizing:border-box}
+  body{margin:0;background:#fff;color:var(--ink);font:16px/1.65 "Pretendard","Malgun Gothic","Apple SD Gothic Neo",system-ui,sans-serif}
+  .wrap{max-width:720px;margin:0 auto;padding:32px 16px 56px}
+  .top{display:flex;align-items:center;gap:14px;margin-bottom:6px}
+  .top img{width:52px;height:52px;border-radius:14px}
+  h1{margin:0;font-size:28px;letter-spacing:-.02em}
+  .lead{color:var(--teal);margin:4px 0 26px}
+  .dl{display:inline-flex;align-items:center;gap:10px;background:var(--deep);color:var(--cream);text-decoration:none;font-weight:800;padding:14px 20px;border-radius:14px;font-size:17px}
+  .dl:hover{background:var(--teal)}
+  ol{list-style:none;padding:0;margin:30px 0 0;counter-reset:s}
+  li{counter-increment:s;position:relative;padding:0 0 22px 50px}
+  li::before{content:counter(s);position:absolute;left:0;top:-2px;width:34px;height:34px;border-radius:50%;background:var(--cream);color:var(--deep);font-weight:900;display:grid;place-items:center}
+  li b{display:block;font-size:17px}
+  code{background:#F1F5F5;border:1px solid #DCE7E7;border-radius:6px;padding:1px 6px;font-size:14.5px;user-select:all}
+  .note{border-left:4px solid var(--orange);background:#FBF6F0;padding:12px 14px;border-radius:0 10px 10px 0;margin-top:8px;font-size:15px}
+  h2{font-size:19px;margin:34px 0 8px}
+  p{margin:6px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top"><img src="../driver/icon-192.png" alt=""><h1>위로드 설치</h1></div>
+  <p class="lead">크롬(또는 엣지)에 한 번 설치하면 위펀오피스를 열 때마다 위로드가 자동으로 붙어요. 북마크는 이제 안 눌러도 돼요.</p>
+  <a class="dl" href="weroad-extension.zip" download>⬇ 위로드 내려받기 (zip)</a>
+
+  <ol>
+    <li><b>압축 풀기</b>내려받은 <code>weroad-extension.zip</code>을 오른쪽 클릭 → <b style="display:inline">압축 풀기</b>. <code>weroad</code> 폴더가 생기면 지우지 말고 그대로 두세요(예: 문서 폴더로 옮겨 두기).</li>
+    <li><b>확장 프로그램 화면 열기</b>주소창에 <code>chrome://extensions</code> 입력 (엣지는 <code>edge://extensions</code>).</li>
+    <li><b>개발자 모드 켜기</b>오른쪽 위(엣지는 왼쪽 아래) <b style="display:inline">개발자 모드</b> 스위치를 켜요.</li>
+    <li><b>폴더 불러오기</b><b style="display:inline">압축해제된 확장 프로그램을 로드합니다</b> → 1번의 <code>weroad</code> 폴더 선택.</li>
+    <li><b>위펀오피스 새로고침</b>오른쪽 아래 <b style="display:inline">위로드</b> 버튼이 보이면 끝. 처음 한 번만 로그인하면 다음부터는 자동으로 붙어요.</li>
+  </ol>
+  <div class="note">주소창 오른쪽 퍼즐 모양 → 위로드 📌 고정하면, 아이콘을 눌러 <b>위로드 열기</b>를 바로 할 수 있어요.</div>
+
+  <h2>업데이트는?</h2>
+  <p>따로 안 해도 돼요. 위로드 기능은 열 때마다 최신 버전을 받아 와요.</p>
+  <h2>북마크는?</h2>
+  <p>지워도 되고 그대로 둬도 돼요. 둘 다 같이 써도 문제없어요.</p>
+</div>
+</body>
+</html>
