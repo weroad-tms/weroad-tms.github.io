@@ -104,6 +104,16 @@
   .sh-ovh{display:flex;align-items:center;gap:10px;padding:max(10px,env(safe-area-inset-top)) 14px 10px;background:#1B2A4E}.sh-ovh b{flex:1;font-size:16px}
   .sh-ovh button{border:0;border-radius:12px;padding:10px 14px;font:inherit;font-weight:800;background:#3E6AF2;color:#fff}
   .sh-ov iframe{flex:1;border:0;width:100%;background:#EEF2F7}.sh-ovb{padding:14px;font-size:15px;line-height:1.6;overflow:auto}
+  .sh-top{display:flex;align-items:center;gap:10px;margin-bottom:12px}.sh-top .name{flex:1;margin:0}
+  .sh-lo{border:0;border-radius:12px;padding:9px 14px;font:inherit;font-size:17px;font-weight:800;background:rgba(255,255,255,.14);color:#fff;white-space:nowrap}
+  .sht{width:100%;border-collapse:collapse;font-size:14px}.shtw{overflow-x:auto;margin:0 -4px}
+  .sht th{font-size:12px;font-weight:700;opacity:.65;text-align:left;padding:6px 6px;border-bottom:1px solid rgba(255,255,255,.15);white-space:nowrap}
+  .sht td{padding:9px 6px;border-bottom:1px solid rgba(255,255,255,.08);vertical-align:top}
+  .sht .n{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}.sht .t{font-weight:800;color:#FDE68A}
+  .sht td.cl b{display:block;font-size:15px;line-height:1.35}.sht td.cl .ad{display:block;font-size:12.5px;opacity:.7;margin-top:2px;line-height:1.4}
+  .sht tr.hm td{border-bottom:0}.sht tr.mo td{padding-top:0}.sht td.n{font-size:13.5px}
+  .sht tr.req td{background:rgba(62,106,242,.14)}.sht tfoot td{font-weight:800;border-top:1px solid rgba(255,255,255,.2);border-bottom:0}
+  .sht .sh-tg,.sht .sh-x,.sht .sh-btn{margin-left:0}.sht .sh-btn{width:100%;padding:9px 10px;font-size:14px}
   .dl-lock b{display:block;font-size:17px;margin-bottom:6px}.dl-lock button{margin-top:8px;margin-right:6px;border:0;border-radius:10px;padding:10px 12px;font:inherit;font-weight:800;background:#3E6AF2;color:#fff}
 </style>
 </head>
@@ -135,7 +145,7 @@
   <div class="tabs"><button data-tab="sh">실적표</button><button data-tab="loc">출근</button><button data-tab="lc">상차</button><button data-tab="dl">배송</button><button class="on" data-tab="rec">퇴근</button></div>
   <div id="t-sh" hidden>
     <div class="card">
-      <div class="name">일일실적표<small id="sh-sub">순번 · 거래처 · 주소 · 매출 — 주의 거래처를 먼저 확인하세요</small></div>
+      <div class="sh-top"><div class="name">일일실적표<small id="sh-sub">거래처 · 주소 · 매출(상온·저온·합계)</small></div><button class="sh-lo" id="sh-lo">로그아웃</button></div>
       <div class="lc-bar"><button id="sh-prev">◀</button><span class="d" id="sh-d">—</span><button id="sh-next">▶</button><button id="sh-re">↻</button></div>
       <div class="lc-prog" id="sh-prog"></div>
     </div>
@@ -160,7 +170,7 @@
     <input id="lc-q" placeholder="거래처 이름·로케이션 검색" autocomplete="off">
     <div class="card warn" id="lc-warn" hidden></div>
     <div id="lc-list"></div>
-    <div class="card msg">· 로케이션은 풀필먼트 담당자가 위펀풀필먼트 WEB에 넣은 그대로 보여요.<br>· 상차하면서 ☐를 누르면 풀필먼트에도 상차 체크가 같이 기록돼요.<br>· 출차 처리된 뒤에는 체크를 바꿀 수 없어요 (관리자에게 문의).</div>
+    <div class="card msg"><b>로케이션 사용법</b><br>· 상품을 챙기는 즉시 그 칸의 ☐를 눌러 ✓ 표시하세요 (상온·저온 따로).<br>· 로케이션이 없으면 도크장 앞 파레트를 확인하세요.<br>· ✓ 안 한 상품이 남아 있으면 배송 탭으로 넘어갈 수 없어요.</div>
   </div>
   <div id="t-rec">
     <div class="card f">
@@ -378,6 +388,7 @@
   window.addEventListener('pagehide', () => { if (on && buf.length) { try { fetch(SERVER + '/rest/v1/rpc/push_locations', { method: 'POST', keepalive: true, headers: { 'Content-Type': 'application/json', apikey: KEY }, body: JSON.stringify({ p_name: cfg.n, p_token: cfg.tok, p_rows: rows(buf.slice(-200)) }) }); } catch (e) { /* noop */ } } });
   const _lo = $('logout'); if (APP) _lo.addEventListener('click', () => { try { window.WeRoadApp.stop(); } catch (e) { /* noop */ } });
   $('logout').onclick = (e) => { e.preventDefault(); if (on) stop(); localStorage.removeItem(LS); localStorage.removeItem(LS + '-on'); location.reload(); };
+  $('sh-lo').onclick = () => $('logout').click();
   ui();
   // 지난번에 켜 둔 상태로 닫혔으면 다시 열 때 자동 시작
   if (!$('main').hidden && !isMaster() && localStorage.getItem(LS + '-on') === '1') start();
@@ -595,23 +606,28 @@
   const reqOf = (r) => { const f = fOf(r); return !!(f && f.req); };
   const noLoc = (r) => (r.needA && !r.amb) || (r.needC && !r.chl);
   function shPending() {
-    if (isMaster() || !L.recs.length || !Object.keys(SH.flags).length) return { cards: [], loads: 0 };   // 위로드가 그날 실적표를 올린 날만 잠금 (시험 운영)
-    const cards = L.recs.filter((r) => reqOf(r) && !SH.reads.has(String(r.code)));
+    if (isMaster() || !L.recs.length) return { cards: [], loads: 0 };
+    const cards = Object.keys(SH.flags).length ? L.recs.filter((r) => reqOf(r) && !SH.reads.has(String(r.code))) : [];   // 카드 확인은 위로드가 주의 표시를 올린 날만, 상차 체크는 항상
     const loads = L.recs.reduce((n, r) => n + (r.needA && !r.ckA ? 1 : 0) + (r.needC && !r.ckC ? 1 : 0), 0);
     return { cards, loads };
   }
   function shUi() {
     $('sh-d').textContent = dLbl(L.d);
-    const rs = L.recs, won = (n) => Number(n || 0).toLocaleString('ko-KR');
-    const tot = rs.reduce((a, r) => a + ((fOf(r) || {}).amt || 0), 0), pend = shPending();
-    $('sh-prog').innerHTML = rs.length ? `<div class="kv"><label>거래처</label><b>${rs.length}<i>곳</i></b></div><div class="kv"><label>매출</label><b>${won(tot)}<i>원</i></b></div><div class="kv"><label>카드 확인</label><b>${pend.cards.length ? pend.cards.length + '곳 남음' : '완료'}</b></div>` : '';
-    $('sh-list').innerHTML = rs.map((r) => { const f = fOf(r) || {}, need = !!f.req, rd = SH.reads.has(String(r.code));
+    const rs = L.recs, won = (n) => Number(n || 0).toLocaleString('ko-KR'), pend = shPending();
+    // 매출: 풀필먼트 상온·저온 판매금액 (없으면 위로드가 올린 합계만)
+    const am = (r) => { const f = fOf(r) || {}; const a = Number(r.amtA || 0), c = Number(r.amtC || 0); return a || c ? { a, c, s: a + c } : { a: null, c: null, s: Number(f.amt || 0) }; };
+    const T = rs.reduce((o, r) => { const m = am(r); o.a += m.a || 0; o.c += m.c || 0; o.s += m.s || 0; return o; }, { a: 0, c: 0, s: 0 });
+    const cell = (v) => v == null ? '—' : v ? won(v) : '0';
+    $('sh-prog').innerHTML = rs.length ? `<div class="kv"><label>거래처</label><b>${rs.length}<i>곳</i></b></div><div class="kv"><label>상온</label><b>${won(T.a)}<i>원</i></b></div><div class="kv"><label>저온</label><b>${won(T.c)}<i>원</i></b></div><div class="kv"><label>합계</label><b style="color:#FDE68A">${won(T.s)}<i>원</i></b></div>${pend.cards.length ? `<div class="kv"><label>카드 확인</label><b>${pend.cards.length}곳 남음</b></div>` : ''}` : '';
+    if (!rs.length) { $('sh-list').innerHTML = SH.busy || L.busy ? '<div class="card msg">불러오는 중…</div>' : `<div class="card msg">${dLbl(L.d)} 배정된 거래처가 아직 없어요.</div>`; return; }
+    const body = rs.map((r) => { const f = fOf(r) || {}, need = !!f.req, rd = SH.reads.has(String(r.code)), m = am(r);
       const tg = [f.new ? '<span class="t-new">첫 배송</span>' : '', f.chg ? `<span class="t-chg">담당 변경 (평소 ${esc(f.chg)})</span>` : '', f.voc ? '<span class="t-voc">최근 VOC</span>' : '', f.conf ? '<span class="t-conf">혼동 주의</span>' : '', r.frozen ? '<span class="t-fz">냉동 배송 있음</span>' : '', noLoc(r) ? '<span class="t-nol">로케이션 없음</span>' : ''].join('');
-      const ex = [f.voc ? f.voc.map((v) => `<div><b>VOC ${esc(String(v.d || '').slice(5).replace('-', '/'))}</b> ${esc(v.t)}</div>`).join('') : '', f.conf ? `<div>⚠ 같은 건물에 다른 거래처: ${f.conf.map(esc).join(' · ')} — 층·호 꼭 확인</div>` : '', noLoc(r) ? '<div>📦 로케이션이 없어요 — 수기 피킹·파레트 작업일 수 있으니 <b style="color:#FDE68A">도크장 앞 파레트 확인</b></div>' : '', r.frozen ? '<div>❄ 냉동 상품이 있어요 — 냉동 따로 챙기기</div>' : ''].join('');
-      return `<div class="sh ${need && !rd ? 'req' : ''} ${need && rd ? 'done' : ''}"><div class="sh-h"><span class="sq">${r.seq != null ? esc(r.seq) : '·'}</span><b>${esc(r.name)}</b><span class="sh-m">${f.amt ? won(f.amt) + '원' : ''}</span></div>
-        <div class="sh-a">${esc(r.addr || f.addr || '')}</div>${tg ? `<div class="sh-tg">${tg}</div>` : ''}${ex ? `<div class="sh-x">${ex}</div>` : ''}
-        ${need || f.pub ? `<button class="sh-btn ${rd || !need ? 'ok' : ''}" data-card="${esc(r.code)}">${need ? (rd ? '✓ 카드 확인함 · 다시 보기' : '카드 확인 (필수)') : '거래처 카드 보기'}</button>` : ''}</div>`; }).join('')
-      || (SH.busy || L.busy ? '<div class="card msg">불러오는 중…</div>' : `<div class="card msg">${dLbl(L.d)} 배정된 거래처가 아직 없어요.</div>`);
+      const ex = [f.voc ? f.voc.map((v) => `<div><b>VOC ${esc(String(v.d || '').slice(5).replace('-', '/'))}</b> ${esc(v.t)}</div>`).join('') : '', f.conf ? `<div>⚠ 같은 건물에 다른 거래처: ${f.conf.map(esc).join(' · ')} — 층·호 꼭 확인</div>` : '', noLoc(r) ? '<div>📦 로케이션 없음 — <b style="color:#FDE68A">도크장 앞 파레트 확인</b></div>' : ''].join('');
+      const more = (tg ? `<div class="sh-tg">${tg}</div>` : '') + (ex ? `<div class="sh-x">${ex}</div>` : '') + (need || f.pub ? `<button class="sh-btn ${rd || !need ? 'ok' : ''}" data-card="${esc(r.code)}">${need ? (rd ? '✓ 카드 확인함' : '카드 확인 (필수)') : '거래처 카드'}</button>` : '');
+      const cls = need && !rd ? 'req' : '';
+      return `<tr class="${cls} ${more ? 'hm' : ''}"><td class="cl"><b>${esc(r.name)}</b><span class="ad">${esc(r.addr || f.addr || '')}</span></td><td class="n">${cell(m.a)}</td><td class="n">${cell(m.c)}</td><td class="n t">${won(m.s)}</td></tr>${more ? `<tr class="${cls} mo"><td colspan="4">${more}</td></tr>` : ''}`; }).join('');
+    $('sh-list').innerHTML = `<div class="card"><div class="shtw"><table class="sht"><thead><tr><th>거래처명 · 주소</th><th class="n">상온</th><th class="n">저온</th><th class="n">합계</th></tr></thead><tbody>${body}</tbody>
+      <tfoot><tr><td>합계 ${rs.length}곳</td><td class="n">${won(T.a)}</td><td class="n">${won(T.c)}</td><td class="n t">${won(T.s)}</td></tr></tfoot></table></div></div>`;
   }
   $('sh-prev').onclick = () => { L.d = addDay(L.d, -1); L.auto = false; shLoad(true); };
   $('sh-next').onclick = () => { L.d = addDay(L.d, 1); L.auto = false; shLoad(true); };
