@@ -104,6 +104,15 @@
   .sh-ovh{display:flex;align-items:center;gap:10px;padding:max(10px,env(safe-area-inset-top)) 14px 10px;background:#1B2A4E}.sh-ovh b{flex:1;font-size:16px}
   .sh-ovh button{border:0;border-radius:12px;padding:10px 14px;font:inherit;font-weight:800;background:#3E6AF2;color:#fff}
   .sh-ov iframe{flex:1;border:0;width:100%;background:#EEF2F7}.sh-ovb{padding:14px;font-size:15px;line-height:1.6;overflow:auto}
+  .shl{padding:6px 16px}.shr{padding:calc(14px * var(--z,1)) 0;border-bottom:1px solid rgba(255,255,255,.1)}.shr:last-child{border-bottom:0}
+  .shr.req{background:rgba(62,106,242,.14);margin:0 -16px;padding-left:16px;padding-right:16px}
+  .shn{display:flex;align-items:baseline;gap:8px}.shn i{font-style:normal;font-size:calc(13px * var(--z,1));font-weight:800;opacity:.55;min-width:1.4em}
+  .shn b{font-size:calc(18px * var(--z,1));line-height:1.3;font-weight:800}
+  .sha{font-size:calc(14px * var(--z,1));opacity:.75;line-height:1.4;margin:3px 0 6px calc(1.4em + 8px)}
+  .shm{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-left:calc(1.4em + 8px);font-size:calc(16px * var(--z,1));font-weight:700;font-variant-numeric:tabular-nums}
+  .shm span{display:flex;flex-direction:column}.shm label{font-size:calc(11px * var(--z,1));font-weight:600;opacity:.55}.shm .t{color:#FDE68A}
+  .shr.tot .shm,.shr.tot .shn{margin-left:0}.shr.tot .shm{margin-top:6px}
+  .shr .sh-tg,.shr .sh-x,.shr .sh-btn{margin-left:calc(1.4em + 8px)}.shr .sh-btn{width:calc(100% - 1.4em - 8px);margin-top:8px}
   .sh-top{display:flex;align-items:center;gap:10px;margin-bottom:12px}.sh-top .name{flex:1;margin:0}
   .sh-lo{border:0;border-radius:12px;padding:9px 14px;font:inherit;font-size:17px;font-weight:800;background:rgba(255,255,255,.14);color:#fff;white-space:nowrap}
   .sht{width:100%;border-collapse:collapse;font-size:14px}.shtw{overflow-x:auto;margin:0 -4px}
@@ -145,7 +154,7 @@
   <div class="tabs"><button data-tab="sh">실적표</button><button data-tab="loc">출근</button><button data-tab="lc">상차</button><button data-tab="dl">배송</button><button class="on" data-tab="rec">퇴근</button></div>
   <div id="t-sh" hidden>
     <div class="card">
-      <div class="sh-top"><div class="name">일일실적표<small id="sh-sub">거래처 · 주소 · 매출(상온·저온·합계)</small></div><button class="sh-lo" id="sh-lo">로그아웃</button></div>
+      <div class="sh-top"><div class="name">일일실적표<small id="sh-sub">거래처 · 주소 · 상온/저온/합계 매출</small></div><button class="sh-lo" id="sh-lo">로그아웃</button></div>
       <div class="lc-bar"><button id="sh-prev">◀</button><span class="d" id="sh-d">—</span><button id="sh-next">▶</button><button id="sh-re">↻</button></div>
       <div class="lc-prog" id="sh-prog"></div>
     </div>
@@ -590,15 +599,24 @@
   document.querySelectorAll('button[data-copy]').forEach((b) => { b.onclick = async () => { const t = $(b.dataset.copy).textContent; try { await navigator.clipboard.writeText(t); b.textContent = '복사됨'; setTimeout(() => { b.textContent = '복사'; }, 1500); } catch (e) { prompt('복사해 주세요', t); } }; });
 
   // ---- 11/6 일일실적표 · 카드 필수 확인 · 배송 탭 잠금 (상차 체크 전부 + 카드 확인)
-  const SH = { flags: {}, reads: new Set(), fd: '', busy: false };
+  const SH = { flags: {}, reads: new Set(), fd: '', busy: false, addr: {} };
   async function shFlags(force) {
     if (!force && SH.fd === L.d) return;
     try { const j = await rpc('day_flags_get', { p_name: cfg.n, p_token: cfg.tok, p_date: L.d }); SH.flags = (j && j.flags) || {}; SH.reads = new Set((j && j.reads) || []); SH.fd = L.d; }
     catch (e) { SH.flags = {}; SH.fd = ''; }
   }
+  // 주소: 풀필먼트 주소가 비면 위펀오피스 거래처 주소록(위로드가 올림)에서 점포코드 → 거래처명 순으로 찾음
+  const nk = (s) => 'n:' + String(s || '').replace(/[\s()\[\]·.,\-_/]/g, '').toLowerCase();
+  async function shAddr() {
+    const need = L.recs.filter((r) => !r.addr && !SH.addr[r.code] && !SH.addr[nk(r.name)]);
+    if (!need.length) return;
+    const keys = [...new Set(need.flatMap((r) => [String(r.code), nk(r.name)]))].slice(0, 200);
+    try { const m = await rpc('client_addr_get', { p_name: cfg.n, p_token: cfg.tok, p_keys: keys }); Object.assign(SH.addr, m || {}); } catch (e) { /* 주소 없이 */ }
+  }
+  const addrOf = (r) => r.addr || SH.addr[String(r.code)] || SH.addr[nk(r.name)] || (fOf(r) || {}).addr || '';
   async function shLoad(fresh) {
     if (!loggedIn() || SH.busy) return; SH.busy = true; $('sh-warn').hidden = true; shUi();
-    try { if (fresh || !L.recs.length || L.loadedFor !== L.d) { await lcLoad(fresh); L.loadedFor = L.d; } await shFlags(true); }
+    try { if (fresh || !L.recs.length || L.loadedFor !== L.d) { await lcLoad(fresh); L.loadedFor = L.d; } await shFlags(true); await shAddr(); }
     catch (e) { $('sh-warn').hidden = false; $('sh-warn').textContent = '실적표를 못 불러왔어요: ' + e.message; }
     SH.busy = false; shUi();
   }
@@ -620,14 +638,17 @@
     const cell = (v) => v == null ? '—' : v ? won(v) : '0';
     $('sh-prog').innerHTML = rs.length ? `<div class="kv"><label>거래처</label><b>${rs.length}<i>곳</i></b></div><div class="kv"><label>상온</label><b>${won(T.a)}<i>원</i></b></div><div class="kv"><label>저온</label><b>${won(T.c)}<i>원</i></b></div><div class="kv"><label>합계</label><b style="color:#FDE68A">${won(T.s)}<i>원</i></b></div>${pend.cards.length ? `<div class="kv"><label>카드 확인</label><b>${pend.cards.length}곳 남음</b></div>` : ''}` : '';
     if (!rs.length) { $('sh-list').innerHTML = SH.busy || L.busy ? '<div class="card msg">불러오는 중…</div>' : `<div class="card msg">${dLbl(L.d)} 배정된 거래처가 아직 없어요.</div>`; return; }
-    const body = rs.map((r) => { const f = fOf(r) || {}, need = !!f.req, rd = SH.reads.has(String(r.code)), m = am(r);
+    // 착지 수에 맞춰 글씨 크기 자동 (8곳 이하 크게 → 20곳이면 작게)
+    const n = rs.length, z = n <= 8 ? 1 : n >= 20 ? 0.78 : 1 - (n - 8) * 0.22 / 12;
+    const body = rs.map((r, i) => { const f = fOf(r) || {}, need = !!f.req, rd = SH.reads.has(String(r.code)), m = am(r);
       const tg = [f.new ? '<span class="t-new">첫 배송</span>' : '', f.chg ? `<span class="t-chg">담당 변경 (평소 ${esc(f.chg)})</span>` : '', f.voc ? '<span class="t-voc">최근 VOC</span>' : '', f.conf ? '<span class="t-conf">혼동 주의</span>' : '', r.frozen ? '<span class="t-fz">냉동 배송 있음</span>' : '', noLoc(r) ? '<span class="t-nol">로케이션 없음</span>' : ''].join('');
       const ex = [f.voc ? f.voc.map((v) => `<div><b>VOC ${esc(String(v.d || '').slice(5).replace('-', '/'))}</b> ${esc(v.t)}</div>`).join('') : '', f.conf ? `<div>⚠ 같은 건물에 다른 거래처: ${f.conf.map(esc).join(' · ')} — 층·호 꼭 확인</div>` : '', noLoc(r) ? '<div>📦 로케이션 없음 — <b style="color:#FDE68A">도크장 앞 파레트 확인</b></div>' : ''].join('');
-      const more = (tg ? `<div class="sh-tg">${tg}</div>` : '') + (ex ? `<div class="sh-x">${ex}</div>` : '') + (need || f.pub ? `<button class="sh-btn ${rd || !need ? 'ok' : ''}" data-card="${esc(r.code)}">${need ? (rd ? '✓ 카드 확인함' : '카드 확인 (필수)') : '거래처 카드'}</button>` : '');
-      const cls = need && !rd ? 'req' : '';
-      return `<tr class="${cls} ${more ? 'hm' : ''}"><td class="cl"><b>${esc(r.name)}</b><span class="ad">${esc(r.addr || f.addr || '')}</span></td><td class="n">${cell(m.a)}</td><td class="n">${cell(m.c)}</td><td class="n t">${won(m.s)}</td></tr>${more ? `<tr class="${cls} mo"><td colspan="4">${more}</td></tr>` : ''}`; }).join('');
-    $('sh-list').innerHTML = `<div class="card"><div class="shtw"><table class="sht"><thead><tr><th>거래처명 · 주소</th><th class="n">상온</th><th class="n">저온</th><th class="n">합계</th></tr></thead><tbody>${body}</tbody>
-      <tfoot><tr><td>합계 ${rs.length}곳</td><td class="n">${won(T.a)}</td><td class="n">${won(T.c)}</td><td class="n t">${won(T.s)}</td></tr></tfoot></table></div></div>`;
+      const ad = addrOf(r);
+      return `<div class="shr ${need && !rd ? 'req' : ''}"><div class="shn"><i>${i + 1}</i><b>${esc(r.name)}</b></div>
+        <div class="sha">${ad ? esc(ad) : '<span style="opacity:.5">주소 정보 없음</span>'}</div>
+        <div class="shm"><span><label>상온</label>${cell(m.a)}</span><span><label>저온</label>${cell(m.c)}</span><span class="t"><label>합계</label>${won(m.s)}</span></div>
+        ${tg ? `<div class="sh-tg">${tg}</div>` : ''}${ex ? `<div class="sh-x">${ex}</div>` : ''}${need || f.pub ? `<button class="sh-btn ${rd || !need ? 'ok' : ''}" data-card="${esc(r.code)}">${need ? (rd ? '✓ 카드 확인함' : '카드 확인 (필수)') : '거래처 카드'}</button>` : ''}</div>`; }).join('');
+    $('sh-list').innerHTML = `<div class="card shl" style="--z:${z.toFixed(3)}">${body}<div class="shr tot"><div class="shn"><b>합계 ${n}곳</b></div><div class="shm"><span><label>상온</label>${won(T.a)}</span><span><label>저온</label>${won(T.c)}</span><span class="t"><label>합계</label>${won(T.s)}</span></div></div></div>`;
   }
   $('sh-prev').onclick = () => { L.d = addDay(L.d, -1); L.auto = false; shLoad(true); };
   $('sh-next').onclick = () => { L.d = addDay(L.d, 1); L.auto = false; shLoad(true); };
