@@ -40,7 +40,7 @@
 <div id="and">
   <div class="card">
     <h2><span class="n">1</span>앱 설치</h2>
-    <a class="btn" href="https://evyxvhqerfuqmzwjhkgz.supabase.co/storage/v1/object/public/notify/app/weroad.apk">위로드 앱 내려받기</a>
+    <a class="btn" href="https://ridvdsluzfjxonqlavgm.supabase.co/storage/v1/object/public/notify/app/weroad.apk">위로드 앱 내려받기</a>
     <ol>
       <li>위 버튼을 누르면 <b>weroad.apk</b>가 내려받아져요</li>
       <li>알림창(또는 내 파일 → 다운로드)에서 파일을 열어요</li>
@@ -104,7 +104,7 @@
     <details style="margin-top:10px"><summary style="cursor:pointer;opacity:.8">버튼이 안 되면 직접 입력</summary>
     <p style="margin:8px 0 6px">앱 열고 <b>설정 변경</b> 누른 뒤 아래 값을 넣어요.</p>
     <div class="kv"><label>기기 식별자</label><code>본인 이름 (위펀오피스 등록 이름, 띄어쓰기 없이)</code></div>
-    <div class="kv"><label>서버 URL <button data-copy="srv">복사</button></label><code id="srv">https://evyxvhqerfuqmzwjhkgz.supabase.co/functions/v1/loc</code></div>
+    <div class="kv"><label>서버 URL <button data-copy="srv">복사</button></label><code id="srv">https://ridvdsluzfjxonqlavgm.supabase.co/functions/v1/loc</code></div>
     <div class="kv"><label>위치 정확도</label><code>높음</code></div>
     <div class="kv"><label>거리 (미터)</label><code>100</code></div>
     <div class="kv"><label>전송 간격 (초)</label><code>60</code></div>
@@ -169,7 +169,7 @@
   const show = (o) => { os = o; document.querySelectorAll('.tabs button').forEach((b) => b.classList.toggle('on', b.dataset.os === o)); document.getElementById('and').hidden = o !== 'and'; document.getElementById('ios').hidden = o !== 'ios'; };
   document.querySelectorAll('.tabs button').forEach((b) => { b.onclick = () => show(b.dataset.os); });
   show(os);
-  const LOC = 'https://evyxvhqerfuqmzwjhkgz.supabase.co/functions/v1/loc';
+  const LOC = 'https://ridvdsluzfjxonqlavgm.supabase.co/functions/v1/loc';
   const tcUrl = (n) => 'org.traccar.client://config?' + new URLSearchParams({ url: LOC, id: n, accuracy: 'high', distance: '100', interval: '60', heartbeat: '300', angle: '0', buffer: 'true', stopDetection: 'true', wakeLock: 'true' }).toString();
   const nameEl = document.getElementById('tc-name'), linkEl = document.getElementById('tc-link');
   let qr = null;

@@ -172,7 +172,7 @@
     <div class="card warn dl-lock" id="dl-lock" hidden></div>
     <div class="dl-bar"><span>배송매니저 (출발·도착·배송사진 → 위펀오피스)</span><a href="https://delivery-manager.wefun.kr/" target="_blank" rel="noopener">새 창 ↗</a></div>
     <div class="dlw" id="dl-w"></div>
-    <div class="card msg" id="dl-app" hidden style="margin-top:10px">· 사진 첨부가 안 되면 위로드 앱을 새 버전으로 업데이트해 주세요: <a href="https://evyxvhqerfuqmzwjhkgz.supabase.co/storage/v1/object/public/notify/app/weroad.apk" style="color:#9CB4FF;font-weight:700">위로드 앱 최신 버전 내려받기</a></div>
+    <div class="card msg" id="dl-app" hidden style="margin-top:10px">· 사진 첨부가 안 되면 위로드 앱을 새 버전으로 업데이트해 주세요: <a href="https://ridvdsluzfjxonqlavgm.supabase.co/storage/v1/object/public/notify/app/weroad.apk" style="color:#9CB4FF;font-weight:700">위로드 앱 최신 버전 내려받기</a></div>
   </div>
   <div id="t-lc" hidden>
     <div class="card">
@@ -239,7 +239,7 @@
   </div>
   <div class="card msg" id="apk-help" hidden>
     <b>안드로이드 폰이네요 — 위로드 앱을 설치하면 화면을 꺼도 위치가 가요</b>
-    <div style="margin-top:6px;line-height:1.8">1. <a href="https://evyxvhqerfuqmzwjhkgz.supabase.co/storage/v1/object/public/notify/app/weroad.apk" style="color:#9CB4FF;font-weight:700">위로드 앱 내려받기 (weroad.apk)</a><br>2. 내려받은 파일 열기 → "출처를 알 수 없는 앱" 허용 → 설치<br>3. 앱 열고 같은 이름·번호로 로그인 → 출근</div>
+    <div style="margin-top:6px;line-height:1.8">1. <a href="https://ridvdsluzfjxonqlavgm.supabase.co/storage/v1/object/public/notify/app/weroad.apk" style="color:#9CB4FF;font-weight:700">위로드 앱 내려받기 (weroad.apk)</a><br>2. 내려받은 파일 열기 → "출처를 알 수 없는 앱" 허용 → 설치<br>3. 앱 열고 같은 이름·번호로 로그인 → 출근</div>
   </div>
   <details class="card msg" id="tc-help">
     <summary><b>위치 앱(Traccar Client) 설정 — 아이폰 · 처음 한 번만</b></summary>
@@ -279,7 +279,7 @@
   'use strict';
   const $ = (id) => document.getElementById(id);
   const LS = 'wr-driver';
-  const SERVER = 'https://evyxvhqerfuqmzwjhkgz.supabase.co', KEY = 'sb_publishable_DNESzKpu1WcxT9sx15D5fw_jVan14DH';   // 공개용 키 — 위치 쓰기는 로그인 토큰이 있어야 함
+  const SERVER = 'https://ridvdsluzfjxonqlavgm.supabase.co', KEY = 'sb_publishable_iP4DgQBqKFE_u7V929BCjw_CO4dxjWS';   // 공개용 키 — 위치 쓰기는 로그인 토큰이 있어야 함
   const SEND_MOVING = 120, SEND_IDLE = 300, REC_SEC = 30, REC_M = 40;   // 전송 주기(초)·기록 간격(초/미터)
   let cfg = {}; try { cfg = JSON.parse(localStorage.getItem(LS) || '{}'); } catch (e) { cfg = {}; }
   const q = new URLSearchParams(location.search);
