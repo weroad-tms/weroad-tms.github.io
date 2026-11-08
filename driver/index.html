@@ -124,6 +124,11 @@
   .sht tr.req td{background:rgba(62,106,242,.14)}.sht tfoot td{font-weight:800;border-top:1px solid rgba(255,255,255,.2);border-bottom:0}
   .sht .sh-tg,.sht .sh-x,.sht .sh-btn{margin-left:0}.sht .sh-btn{width:100%;padding:9px 10px;font-size:14px}
   .dl-lock b{display:block;font-size:17px;margin-bottom:6px}.dl-lock button{margin-top:8px;margin-right:6px;border:0;border-radius:10px;padding:10px 12px;font:inherit;font-weight:800;background:#3E6AF2;color:#fff}
+  .dg{padding:16px 18px}.dg h3{margin:0 0 10px;font-size:17px;font-weight:800}
+  .dg ol{list-style:none;margin:0;padding:0;counter-reset:s}.dg li{counter-increment:s;display:flex;gap:12px;align-items:flex-start;padding:10px 0;border-top:1px solid rgba(255,255,255,.08)}.dg li:first-child{border-top:0}
+  .dg li::before{content:counter(s);flex:0 0 30px;height:30px;border-radius:50%;background:#3E6AF2;color:#fff;font-weight:800;font-size:16px;display:flex;align-items:center;justify-content:center}
+  .dg li b{display:block;font-size:16px;font-weight:800;margin-bottom:2px}.dg li span{display:block;font-size:14px;line-height:1.5;opacity:.8}.dg li.me::before{background:#FDE68A;color:#1B2A4E}
+  .dg [hidden]{display:none}.dg .tip{margin-top:10px;font-size:13.5px;line-height:1.6;opacity:.75}
 </style>
 </head>
 <body>
@@ -212,13 +217,24 @@
   </div>
   <button class="big" id="a-in">출근</button>
   <button class="big stop" id="a-out" hidden>퇴근</button>
-  <div style="text-align:right;margin:-6px 0 10px"><a href="guide.html" style="color:#9CB4FF;font-size:14px;font-weight:700">📖 사용 가이드</a></div>
   <div class="card ok" id="a-ok" hidden></div>
   <div class="card warn" id="a-warn" hidden></div>
+  <div class="card dg">
+    <h3>하루 순서 — 위 탭 왼쪽부터 차례대로</h3>
+    <ol>
+      <li><div><b>실적표</b><span>오늘 갈 거래처·주소·매출 확인<br>'카드 확인' 붙은 곳은 카드를 눌러 꼭 읽기</span></div></li>
+      <li class="me"><div><b>출근 (지금 화면)</b><span>[출근] 버튼 한 번 → 위치는 앱이 알아서 보내요</span></div></li>
+      <li><div><b>상차</b><span>로케이션 보고 상품을 챙기는 즉시 ☐ 눌러 ✓<br>✓ 안 한 상품이 있으면 배송 탭이 안 열려요</span></div></li>
+      <li><div><b>배송</b><span>거래처마다 출발 → 도착 → 배송사진</span></div></li>
+      <li><div><b>퇴근</b><span>이 화면에서 [퇴근] 누르기 (위치 전송 꺼짐)</span><span id="dg-rec" hidden>퇴근 탭에 계기판 km·주유 금액 적고 저장</span></div></li>
+    </ol>
+    <div class="tip">헷갈리면 <a href="guide.html" style="color:#9CB4FF;font-weight:700">📖 사진으로 보는 사용 가이드</a></div>
+  </div>
   <div class="card msg" id="app-help" hidden>
     <b>위로드 앱 상태</b>
     <div style="margin-top:6px;line-height:1.8" id="app-st">—</div>
-    <div style="margin-top:6px">· 출근 버튼을 누르면 위치 전송이 켜지고 상단 알림에 "출근 중"이 떠요. 화면 꺼도, 네비·사진 찍어도 계속 보내요.<br>· 퇴근하면 자동으로 꺼져요.<br>· 처음엔 위치 권한 <b>"항상 허용"</b>, 알림 허용, 배터리 <b>"제한 없음"</b>을 물어요 — 모두 허용해 주세요.</div>
+    <div style="margin-top:8px;line-height:1.8"><b>처음 한 번만 — 물어보면 모두 허용</b><br>① 위치 권한 → <b>"항상 허용"</b><br>② 알림 → <b>허용</b><br>③ 배터리 → <b>"제한 없음"</b> (아래 버튼)</div>
+    <div style="margin-top:6px">· 출근하면 상단 알림에 "출근 중"이 떠요. 화면을 꺼도, 네비·사진을 써도 계속 보내요.<br>· 퇴근을 누르면 자동으로 꺼져요.</div>
     <div style="margin-top:8px"><button class="sm" id="app-batt">배터리 제한 없음 설정</button> <button class="sm" id="app-perm">앱 권한 설정 열기</button></div>
   </div>
   <div class="card msg" id="apk-help" hidden>
@@ -256,7 +272,7 @@
   <div class="log" id="log"></div>
   </div>
 </div>
-<div class="foot">위로드 WeRoad · 위펀 운송관리 · <span id="ver">v17</span></div>
+<div class="foot">위로드 WeRoad · 위펀 운송관리 · <span id="ver">v18</span></div>
 
 <script>
 (function () {
@@ -423,7 +439,7 @@
   }
   function applyType(first) {
     const corp = isCorp();
-    tabBtn('rec').hidden = !corp; tabBtn('loc').hidden = isMaster(); tabBtn('dl').hidden = isMaster(); tabBtn('sh').hidden = isMaster();
+    tabBtn('rec').hidden = !corp; $('dg-rec').hidden = !corp; tabBtn('loc').hidden = isMaster(); tabBtn('dl').hidden = isMaster(); tabBtn('sh').hidden = isMaster();
     try { localStorage.setItem(LS + '-type', corp ? 'corp' : 'jiip'); } catch (e) { /* noop */ }
     const cur = document.querySelector('.tabs button.on');
     if (first) { let t = ''; try { t = sessionStorage.getItem('wr-tab') || ''; } catch (e) { /* noop */ } if (!t || tabBtn(t).hidden) t = isMaster() ? 'lc' : (localStorage.getItem(LS + '-on') === '1') ? 'lc' : (!corp || new Date().getHours() < 14) ? 'sh' : 'rec'; showTab(t); }
