@@ -16,7 +16,7 @@
   html,body{margin:0;height:100%;background:#0F1A33;color:#EAF0FF;font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",sans-serif}
   body{display:flex;flex-direction:column;min-height:100%;padding:max(16px,env(safe-area-inset-top)) 18px max(20px,env(safe-area-inset-bottom))}
   .brand{display:flex;align-items:center;gap:10px;margin-bottom:18px}
-  .brand .lg{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,#3E6AF2,#14B8A6);display:grid;place-items:center;font-weight:900;font-size:18px;color:#fff}
+  .brand .lg{width:34px;height:34px;border-radius:10px;overflow:hidden;display:block;flex:none;box-shadow:0 0 0 1px rgba(255,255,255,.12)}.brand .lg svg{display:block}
   .brand b{font-size:17px}.brand small{opacity:.6;margin-left:4px}
   .card{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:18px;margin-bottom:14px}
   .name{font-size:26px;font-weight:800;letter-spacing:-.02em}
@@ -132,7 +132,7 @@
 </style>
 </head>
 <body>
-<div class="brand"><span class="lg">W</span><b>위로드</b><small>배송기사웹</small></div>
+<div class="brand"><span class="lg"><svg viewBox="0 0 120 120" width="34" height="34" aria-hidden="true"><rect width="120" height="120" rx="28" fill="#141416"/><polyline points="14,34 33,86 52,34" fill="none" stroke="#E6E8EC" stroke-width="15" stroke-linejoin="miter" stroke-miterlimit="4"/><polyline points="68,34 87,86 106,34" fill="none" stroke="#8A2BFF" stroke-width="15" stroke-linejoin="miter" stroke-miterlimit="4"/></svg></span><b>위로드</b><small>배송기사웹</small></div>
 
 <div id="setup" class="card setup" hidden>
   <div class="name">로그인<small>이름과 휴대폰번호만 넣으면 됩니다</small></div>
@@ -143,7 +143,7 @@
 </div>
 
 <div id="agree" class="agree" hidden>
-  <div class="brand"><span class="lg">W</span><b>위로드</b><small>배송기사웹</small></div>
+  <div class="brand"><span class="lg"><svg viewBox="0 0 120 120" width="34" height="34" aria-hidden="true"><rect width="120" height="120" rx="28" fill="#141416"/><polyline points="14,34 33,86 52,34" fill="none" stroke="#E6E8EC" stroke-width="15" stroke-linejoin="miter" stroke-miterlimit="4"/><polyline points="68,34 87,86 106,34" fill="none" stroke="#8A2BFF" stroke-width="15" stroke-linejoin="miter" stroke-miterlimit="4"/></svg></span><b>위로드</b><small>배송기사웹</small></div>
   <h2>위로드앱 위치정보수집동의</h2>
   <div class="card"><ul>
     <li><b>수집정보</b> — 위치, 속도, 정확도, 수집시각</li>
@@ -272,7 +272,7 @@
   <div class="log" id="log"></div>
   </div>
 </div>
-<div class="foot">위로드 WeRoad · 위펀 운송관리 · <span id="ver">v19</span></div>
+<div class="foot">위로드 WeRoad · 위펀 운송관리 · <span id="ver">v20</span></div>
 
 <script>
 (function () {
