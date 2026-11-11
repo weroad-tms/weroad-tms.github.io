@@ -51,6 +51,18 @@
   .f .two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
   .seg2{display:flex;gap:8px}.seg2 button{flex:1;border:1px solid rgba(255,255,255,.2);background:rgba(0,0,0,.2);color:#fff;border-radius:12px;padding:12px;font:inherit;font-size:16px;font-weight:700}
   .seg2 button.on{background:#fff;color:#0F1A33;border-color:#fff}
+  .tmseg{display:flex;gap:8px;margin:6px 0 4px}.tmseg button{flex:1;border:1px solid rgba(255,255,255,.2);background:rgba(0,0,0,.2);color:#fff;border-radius:14px;padding:16px 10px;font:inherit;font-size:18px;font-weight:800}
+  .tmseg button.on{background:#3E6AF2;border-color:#3E6AF2}.tmseg button small{display:block;font-size:12px;font-weight:500;opacity:.75;margin-top:3px}
+  .tmchip{display:inline-block;margin-left:8px;padding:3px 9px;border-radius:999px;background:#3E6AF2;color:#fff;font-size:12px;font-weight:800;vertical-align:middle}
+  .cs-st{padding:14px 16px}.cs-st b{display:block;font-size:16px;line-height:1.35}.cs-st .ad{display:block;font-size:13px;opacity:.75;margin-top:3px;line-height:1.45}
+  .cs-st .tel{display:inline-block;margin-top:6px;color:#9CB4FF;font-weight:700;font-size:14px;text-decoration:none}
+  .cs-am{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-top:10px}.cs-am .kv{padding:8px 10px}.cs-am .kv b{font-size:14.5px}
+  .cs-sq{display:inline-flex;width:26px;height:26px;border-radius:50%;background:#334155;align-items:center;justify-content:center;font-size:13px;font-weight:800;margin-right:8px;vertical-align:middle}
+  .cs-tg{display:inline-block;margin-left:6px;padding:1px 7px;border-radius:6px;font-size:11.5px;font-weight:800;background:#334155;color:#E2E8F0;vertical-align:middle}
+  .cs-ph{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;align-items:center}.cs-ph img{width:64px;height:64px;object-fit:cover;border-radius:10px;border:1px solid rgba(255,255,255,.2)}
+  .cs-ph label.pbtn{display:inline-flex;align-items:center;gap:6px;border-radius:12px;padding:11px 14px;font-weight:800;font-size:15px;background:#3E6AF2;color:#fff}.cs-ph label.pbtn.done{background:rgba(34,197,94,.2);color:#86EFAC}
+  .cs-ph input{display:none}.cs-st.ok{border-color:rgba(34,197,94,.45)}
+  textarea.cw-note{width:100%;min-height:90px;border-radius:12px;border:1px solid rgba(255,255,255,.2);background:rgba(0,0,0,.25);color:#fff;font:inherit;font-size:16px;padding:12px}
   .hint{font-size:12.5px;opacity:.65;margin-top:6px;line-height:1.5}.hint b{color:#FDE68A}
   .hist{font-size:14px;line-height:1.7}.hist div{display:flex;justify-content:space-between;gap:8px;border-top:1px solid rgba(255,255,255,.08);padding:6px 0}.hist div:first-child{border-top:0}.hist span:last-child{font-variant-numeric:tabular-nums;font-weight:700}
   button.sm{border:1px solid rgba(255,255,255,.3);background:transparent;color:#fff;border-radius:8px;padding:3px 9px;font:inherit;font-size:12px}
@@ -135,7 +147,8 @@
 <div class="brand"><span class="lg"><svg viewBox="0 0 120 120" width="34" height="34" aria-hidden="true"><rect width="120" height="120" rx="28" fill="#141416"/><polyline points="14,34 33,86 52,34" fill="none" stroke="#E6E8EC" stroke-width="15" stroke-linejoin="miter" stroke-miterlimit="4"/><polyline points="68,34 87,86 106,34" fill="none" stroke="#8A2BFF" stroke-width="15" stroke-linejoin="miter" stroke-miterlimit="4"/></svg></span><b>위로드</b><small>배송기사웹</small></div>
 
 <div id="setup" class="card setup" hidden>
-  <div class="name">로그인<small>이름과 휴대폰번호만 넣으면 됩니다</small></div>
+  <div class="name">로그인<small>팀을 고르고 이름과 휴대폰번호를 넣으면 됩니다</small></div>
+  <label>팀 선택</label><div class="tmseg" id="s-team"><button data-tm="snack">스낵<small>스낵24 · 간식 배송</small></button><button data-tm="cvs">편의점<small>편의점 배송</small></button></div>
   <label>이름 (물류팀에 등록된 기사 이름)</label><input id="s-n" placeholder="홍길동" autocomplete="off">
   <label>비밀번호 (휴대폰번호, 숫자만)</label><input id="s-p" type="tel" inputmode="numeric" placeholder="01012345678" autocomplete="off">
   <button id="s-ok">시작하기</button>
@@ -157,7 +170,33 @@
 
 <div id="main" hidden>
   <div id="pd" hidden></div>
-  <div class="tabs"><button data-tab="sh">실적표</button><button data-tab="loc">출근</button><button data-tab="lc">상차</button><button data-tab="dl">배송</button><button class="on" data-tab="rec">퇴근</button></div>
+  <div class="tabs"><button data-tab="cs" hidden>실적표</button><button data-tab="cw" hidden>업무</button><button data-tab="sh">실적표</button><button data-tab="loc">출근</button><button data-tab="lc">상차</button><button data-tab="dl">배송</button><button class="on" data-tab="rec">퇴근</button></div>
+  <div id="t-cs" hidden>
+    <div class="card">
+      <div class="sh-top"><div class="name"><span id="cs-nm">—</span><span class="tmchip">편의점</span><small id="cs-sub">일일실적표 · 거래처 정보 · 상온/저온/합계 매출</small></div><button class="sh-lo" id="cs-lo">팀 바꾸기</button></div>
+      <div class="lc-bar"><button id="cs-prev">◀</button><span class="d" id="cs-d">—</span><button id="cs-next">▶</button><button id="cs-re">↻</button></div>
+      <div class="lc-prog" id="cs-prog"></div>
+    </div>
+    <div class="card warn" id="cs-warn" hidden></div>
+    <div id="cs-list"></div>
+  </div>
+  <div id="t-cw" hidden>
+    <div class="card">
+      <div class="name"><span id="cw-nm">—</span><span class="tmchip">편의점</span><small id="cw-sub">업무시작 → 점포마다 배송완료사진 → 특이사항 → 업무종료</small></div>
+      <div class="lc-bar"><span class="d" id="cw-d">—</span></div>
+      <div class="grid" style="margin-top:12px"><div class="kv"><label>업무시작</label><b id="cw-s">—</b></div><div class="kv"><label>업무종료</label><b id="cw-e">—</b></div><div class="kv"><label>배송완료사진</label><b id="cw-p">—</b></div><div class="kv"><label>위치 전송</label><b id="cw-l">—</b></div></div>
+    </div>
+    <button class="big" id="cw-start">업무시작</button>
+    <div class="card ok" id="cw-ok" hidden></div>
+    <div class="card warn" id="cw-warn" hidden></div>
+    <div id="cw-list"></div>
+    <div class="card f" id="cw-fin">
+      <label>오늘의 특이사항 (없으면 "없음")</label><textarea class="cw-note" id="cw-note" placeholder="예: OO점 셔터 닫힘 — 문 앞 보관, 반품 2박스 회수">없음</textarea>
+    </div>
+    <button class="big stop" id="cw-end">업무종료</button>
+    <div class="card msg" id="cw-rec" hidden>· 위펀풀필먼트 정직원은 <b>퇴근</b> 탭에서 계기판 km·주유 금액도 적어 주세요.</div>
+    <div class="card msg">· 업무시작을 누르면 위치 전송이 켜지고, 업무종료를 누르면 꺼져요.<br>· 사진은 점포마다 배송을 마친 뒤 바로 찍어 올려 주세요 (여러 장 가능).<br>· <a href="#" id="cw-lo" style="color:#9CB4FF">팀 바꾸기 / 다른 이름으로 로그인</a></div>
+  </div>
   <div id="t-sh" hidden>
     <div class="card">
       <div class="sh-top"><div class="name">일일실적표<small id="sh-sub">거래처 · 주소 · 상온/저온/합계 매출</small></div><button class="sh-lo" id="sh-lo">로그아웃</button></div>
@@ -273,7 +312,7 @@
   <div class="log" id="log"></div>
   </div>
 </div>
-<div class="foot">위로드 WeRoad · 위펀 운송관리 · <span id="ver">v20</span></div>
+<div class="foot">위로드 WeRoad · 위펀 운송관리 · <span id="ver">v21</span></div>
 
 <script>
 (function () {
@@ -294,6 +333,11 @@
   const IS_ANDROID = /Android/i.test(navigator.userAgent);   // Traccar Client 서버 주소 (Supabase Edge Function 'loc')
   const MASTERS = ['이상진', '김태영'];   // 관리자 계정: 위치 전송 없음(기사·차량으로 세지 않음), 어떤 차든 퇴근 기록 대신 입력 가능
   const isMaster = () => MASTERS.includes(String(cfg.n || '').replace(/\s/g, ''));
+  // 11/11 팀 선택 (스낵 / 편의점) — 아이디·비밀번호는 같고, 로그인 앞에서 팀을 골라 화면이 달라짐 (투잡 기사)
+  const TEAM = cfg.team === 'cvs' ? 'cvs' : 'snack', CVS = () => TEAM === 'cvs' && loggedIn();
+  let selTeam = cfg.team === 'cvs' ? 'cvs' : (cfg.team === 'snack' ? 'snack' : '');
+  const tmUi = () => document.querySelectorAll('#s-team button').forEach((b) => b.classList.toggle('on', b.dataset.tm === selTeam));
+  document.querySelectorAll('#s-team button').forEach((b) => { b.onclick = () => { selTeam = b.dataset.tm; tmUi(); }; }); tmUi();
   if (!loggedIn()) { $('setup').hidden = false; }
   else { $('main').hidden = false; $('nm').firstChild.textContent = cfg.n; $('nm2').firstChild.textContent = cfg.n; if (isMaster()) { document.querySelector('.tabs button[data-tab=loc]').hidden = true; $('nm2').lastElementChild.textContent = '관리자 계정 — 어떤 차량이든 대신 기록할 수 있어요'; } }
   // 11/6 위치 수집 동의 (한 번) — 동의 기록은 위치 서버에도 남김
@@ -320,12 +364,13 @@
   };
   $('s-ok').onclick = async () => {
     const n = $('s-n').value.trim(), pw = $('s-p').value.replace(/[^0-9]/g, '');
+    if (!selTeam) return alert('팀(스낵 / 편의점)을 먼저 골라 주세요');
     if (!n || !pw) return alert('이름과 휴대폰번호를 넣어 주세요');
     $('s-ok').disabled = true; $('s-ok').textContent = '확인 중…';
     try {
       const tok = await rpc('driver_login', { p_name: n, p_pw: pw });
       if (!tok) throw new Error('이름 또는 휴대폰번호가 맞지 않습니다. 물류팀에 등록된 이름·번호인지 확인해 주세요.');
-      cfg = { n, tok, v: cfg.v || '' }; localStorage.setItem(LS, JSON.stringify(cfg)); if (APP) { try { if (window.WeRoadApp.setAuth) window.WeRoadApp.setAuth(n, tok); else window.WeRoadApp.setDriver(n); } catch (e) { /* noop */ } } location.reload();
+      cfg = { n, tok, v: cfg.v || '', team: selTeam }; localStorage.setItem(LS, JSON.stringify(cfg)); if (APP) { try { if (window.WeRoadApp.setAuth) window.WeRoadApp.setAuth(n, tok); else window.WeRoadApp.setDriver(n); } catch (e) { /* noop */ } } location.reload();
     } catch (e) { $('s-ok').disabled = false; $('s-ok').textContent = '시작하기'; alert(e.message); }
   };
   // ---- 상태
@@ -413,7 +458,7 @@
   document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && on) { keepAwake(); flush(true); } });
   window.addEventListener('pagehide', () => { if (on && buf.length) { try { fetch(SERVER + '/rest/v1/rpc/push_locations', { method: 'POST', keepalive: true, headers: { 'Content-Type': 'application/json', apikey: KEY }, body: JSON.stringify({ p_name: cfg.n, p_token: cfg.tok, p_rows: rows(buf.slice(-200)) }) }); } catch (e) { /* noop */ } } });
   const _lo = $('logout'); if (APP) _lo.addEventListener('click', () => { try { window.WeRoadApp.stop(); } catch (e) { /* noop */ } });
-  $('logout').onclick = (e) => { e.preventDefault(); if (on) stop(); localStorage.removeItem(LS); localStorage.removeItem(LS + '-on'); location.reload(); };
+  $('logout').onclick = (e) => { e.preventDefault(); if (on) stop(); localStorage.setItem(LS, JSON.stringify({ n: cfg.n || '' })); localStorage.removeItem(LS + '-on'); location.reload(); };
   $('sh-lo').onclick = () => $('logout').click();
   ui();
   // 지난번에 켜 둔 상태로 닫혔으면 다시 열 때 자동 시작
@@ -430,7 +475,7 @@
   //                     지입기사(운송사)  = 그 외 → 출근(퇴근 버튼 포함)·로케이션만
   const tabBtn = (t) => document.querySelector('.tabs button[data-tab=' + t + ']');
   const isCorp = () => isMaster() || (R.mine || []).length > 0;
-  function showTab(t) { document.querySelectorAll('.tabs button').forEach((x) => x.classList.toggle('on', x.dataset.tab === t)); $('t-rec').hidden = t !== 'rec'; $('t-loc').hidden = t !== 'loc'; $('t-lc').hidden = t !== 'lc'; $('t-dl').hidden = t !== 'dl'; $('t-sh').hidden = t !== 'sh'; if (t === 'lc') setTimeout(lcLoad, 0); if (t === 'sh') setTimeout(shLoad, 0); if (t === 'dl') setTimeout(dlGate, 0); try { sessionStorage.setItem('wr-tab', t); } catch (e) { /* noop */ } }
+  function showTab(t) { document.querySelectorAll('.tabs button').forEach((x) => x.classList.toggle('on', x.dataset.tab === t)); $('t-rec').hidden = t !== 'rec'; $('t-loc').hidden = t !== 'loc'; $('t-lc').hidden = t !== 'lc'; $('t-dl').hidden = t !== 'dl'; $('t-sh').hidden = t !== 'sh'; $('t-cs').hidden = t !== 'cs'; $('t-cw').hidden = t !== 'cw'; if (t === 'cs' || t === 'cw') setTimeout(() => csLoad(false), 0); if (t === 'lc') setTimeout(lcLoad, 0); if (t === 'sh') setTimeout(shLoad, 0); if (t === 'dl') setTimeout(dlGate, 0); try { sessionStorage.setItem('wr-tab', t); } catch (e) { /* noop */ } }
   document.querySelectorAll('.tabs button').forEach((b) => { b.onclick = () => showTab(b.dataset.tab); });
   // 배송 탭: 개발팀 딜리버리웹(배송매니저)을 그대로 띄움 — 출발·도착·사진은 딜리버리웹이 위펀오피스로 직접 보냄 (위로드는 화면만)
   function dlOpen() {
@@ -439,6 +484,7 @@
     $('dl-w').appendChild(f); $('dl-app').hidden = !APP;
   }
   function applyType(first) {
+    if (CVS()) { setTimeout(() => csApply(first), 0); return; }   // 편의점 팀 화면 (아래 모듈이 다 읽힌 뒤)
     const corp = isCorp();
     tabBtn('rec').hidden = !corp; $('dg-rec').hidden = !corp; tabBtn('loc').hidden = isMaster(); tabBtn('dl').hidden = isMaster(); tabBtn('sh').hidden = isMaster();
     try { localStorage.setItem(LS + '-type', corp ? 'corp' : 'jiip'); } catch (e) { /* noop */ }
@@ -505,7 +551,7 @@
     $('r-save').disabled = false; $('r-save').textContent = '퇴근 기록 저장';
     rUi();
     if (R.pend.length) { w.hidden = false; w.textContent = '지금은 서버에 못 보냈어요. 기록은 폰에 저장됐고, 다음에 이 화면을 열면 자동으로 보내요.'; }
-    else { punch('out').then(aUi).catch(() => { /* noop */ }); if (APP) { try { window.WeRoadApp.stop(); } catch (e) { /* noop */ } } ok.hidden = false; ok.innerHTML = `<b>저장됐어요.</b> ${row.date.slice(5).replace('-', '/')} ${row.shift} · ${vehicle} · ${won(km)} km${fuel ? ' · 주유 ' + won(fuel) + '원' : ''}`; $('r-km').value = ''; $('r-fuel').value = ''; $('r-note').value = ''; }
+    else { if (!CVS()) punch('out').then(aUi).catch(() => { /* noop */ }); if (APP && !CVS()) { try { window.WeRoadApp.stop(); } catch (e) { /* noop */ } } ok.hidden = false; ok.innerHTML = `<b>저장됐어요.</b> ${row.date.slice(5).replace('-', '/')} ${row.shift} · ${vehicle} · ${won(km)} km${fuel ? ' · 주유 ' + won(fuel) + '원' : ''}`; $('r-km').value = ''; $('r-fuel').value = ''; $('r-note').value = ''; }
   };
   // 10/30: 계기판 km·주유 금액은 입력하면서 1,234,567 처럼 쉼표 표시 (저장할 때는 숫자만)
   ['r-km', 'r-fuel'].forEach((id) => { const el = $(id); el.addEventListener('input', () => { const d = el.value.replace(/[^\d]/g, ''); el.value = d ? Number(d).toLocaleString('ko-KR') : ''; }); });
@@ -719,6 +765,130 @@
   }
   $('dl-lock').onclick = (ev) => { const b = ev.target.closest('button[data-go]'); if (b) showTab(b.dataset.go); };
   if (!$('main').hidden) { aUi(); aLoad(); }
+  // ===== 11/11 편의점 팀 — 일일실적표(내 점포·매출) → 업무시작 → 점포별 배송완료사진 → 특이사항 → 업무종료 · 위풀 정직원은 퇴근 탭(주행거리)
+  const CS = { d: '', j: null, busy: false, up: {} };
+  const csDK = (d) => (d && (d.kind === '저온' || d.kind === '야간') ? '야간' : '주간');
+  const CS_HD = [['강남', '현대 강남사옥'], ['양재', '현대 양재사옥'], ['에셋', '현대 더에셋'], ['선릉', '현대 선릉사옥']];
+  const csHd = (lab) => { const L = String(lab || ''); if (!/현대|^H_/.test(L)) return ''; const h = CS_HD.find(([k]) => L.includes(k)); return h ? h[1] : ''; };
+  const csCarry = (kind, lab) => kind === '저온' && /\(상\)/.test(String(lab || ''));
+  function csDrvOf(cfg, kind, lab) {   // 위로드 관리화면 cvDrvOf 와 같은 규칙
+    const L = String(lab || '').replace(/\s+/g, ''), labels = cfg.labels || {};
+    const mapped = labels[kind + '|' + L] || labels['*|' + L]; if (mapped) return mapped;
+    const hd = csHd(L); if (hd) return hd;
+    const list = (cfg.list || []).filter((d) => d.on !== false);
+    if (csCarry(kind, L)) { const base = L.replace(/^[A-Z]*\(상\)/, '').replace(/\[\d+\]$/, '').replace(/\d+[AB]?$/, ''); const d = list.find((x) => csDK(x) === '주간' && x.name === base) || list.find((x) => x.name === base); return d ? d.name : ''; }
+    const want = kind === '상온' ? '주간' : '야간';
+    if (kind === '저온') { const m = L.match(/\[(\d+)\]/); if (m) { const d = list.find((x) => csDK(x) === '야간' && x.code && String(+x.code) === String(+m[1])); if (d) return d.name; } }
+    const base = kind === '상온' ? L.replace(/^[^)]*\)/, '').replace(/\d+[AB]?$/, '').replace(/[AB]$/, '') : L.replace(/^(A|B|DY|D|F)(?=[가-힣])/, '').replace(/\[\d+\]$/, '');
+    const d = list.find((x) => csDK(x) === want && x.name === base) || list.find((x) => x.name === base);
+    return d ? d.name : '';
+  }
+  function csStops(j) {   // 내 점포만 · 같은 점포 상온+저온 합침 · (상)은 매출만(착지 아님) · 순서는 관리자가 바꾼 순번 → 판매실적표 순서
+    const me = String(cfg.n || '').replace(/\s/g, ''), cfg2 = j.cfg || {}, M = new Map();
+    for (const kind of ['상온', '저온']) (j.rows[kind] || []).forEach((r, i) => {
+      const key = kind + '|' + r.c, fix = (cfg2.fix || {})[key], auto = fix || csDrvOf(cfg2, kind, r.lab), to = (j.asg || {})[key] || auto || r.lab;
+      if (String(to || '').replace(/\s/g, '') !== me || (j.skip || {})[key]) return;
+      let st = M.get(r.c); const carry = csCarry(kind, r.lab) && !(j.asg || {})[key];
+      if (!st) { st = { c: r.c, n: r.n, a: { 상온: 0, 저온: 0 }, kinds: [], keys: [], carry, i: i + (kind === '저온' ? 1e5 : 0), o: (j.ord || {})[key], x: {} }; M.set(r.c, st); }
+      else { st.carry = st.carry && carry; if (st.o == null && (j.ord || {})[key] != null) st.o = j.ord[key]; }
+      st.a[kind] += r.a || 0; if (!st.kinds.includes(kind)) st.kinds.push(kind); st.keys.push(key); Object.assign(st.x, r.x || {});
+    });
+    const out = [...M.values()].sort((a, b) => (a.o == null ? 1e6 + a.i : a.o) - (b.o == null ? 1e6 + b.i : b.o));
+    out.forEach((st) => { const c = (j.cust || {})[st.keys.find((k) => (j.cust || {})[k])] || null; st.nm = st.n || (c && c[0]) || ''; st.addr = c ? c[1] : ''; st.tel = c ? c[2] : ''; st.tot = st.a.상온 + st.a.저온; });
+    return out;
+  }
+  const csWefun = () => /위풀|위펀/.test(String(((CS.j || {}).me || {}).aff || ''));
+  const csNight = () => csDK((CS.j || {}).me || (() => { try { return JSON.parse(localStorage.getItem(LS + '-csme') || 'null'); } catch (e) { return null; } })()) === '야간';
+  function csApply(first) {
+    ['sh', 'loc', 'lc', 'dl'].forEach((t) => { tabBtn(t).hidden = true; });
+    tabBtn('cs').hidden = false; tabBtn('cw').hidden = false; tabBtn('rec').hidden = !csWefun(); $('dg-rec').hidden = true; $('cw-rec').hidden = !csWefun();
+    const cur = document.querySelector('.tabs button.on');
+    if (first) { let t = ''; try { t = sessionStorage.getItem('wr-tab') || ''; } catch (e) { /* noop */ } if (!['cs', 'cw', 'rec'].includes(t) || tabBtn(t).hidden) t = 'cs'; showTab(t); }
+    else if (!cur || cur.hidden) showTab('cs');
+  }
+  const csHm = (x) => x ? new Date(x).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' }) : '—';
+  const csPhotos = (code) => ((CS.j || {}).photos || []).filter((p) => p.code === code);
+  const csUrl = (p) => SERVER + '/storage/v1/object/public/notify/' + p.path;
+  function csUi() {
+    const j = CS.j, d = CS.d;
+    $('cs-nm').textContent = cfg.n || '—'; $('cw-nm').textContent = cfg.n || '—';
+    $('cs-d').textContent = dLbl(d); $('cw-d').textContent = dLbl(d) + ' 업무';
+    const sts = j ? csStops(j) : [], n = sts.filter((x) => !x.carry).length, sum = (k) => sts.reduce((a, x) => a + (k ? x.a[k] : x.tot), 0);
+    $('cs-sub').textContent = j && j.me ? `${csDK(j.me)} · ${j.me.aff || ''}${j.me.plate ? ' · ' + j.me.plate : ''} · 거래처 정보 · 상온/저온/합계 매출` : '일일실적표 · 거래처 정보 · 상온/저온/합계 매출';
+    $('cs-prog').innerHTML = j ? `<div class="kv"><label>착지</label><b>${n}<i>곳</i></b></div><div class="kv"><label>상온 매출</label><b>${won(sum('상온'))}</b></div><div class="kv"><label>저온 매출</label><b>${won(sum('저온'))}</b></div>` : '';
+    const none = !j ? (CS.busy ? '불러오는 중…' : '') : !(j.has || {}).상온 && !(j.has || {}).저온 ? `${dLbl(d)} 판매실적표가 아직 안 들어왔어요 (매일 오후 3시쯤 들어와요).` : !sts.length ? `${dLbl(d)} 나한테 배정된 점포가 없어요. ◀ ▶ 로 다른 날을 보세요.` : '';
+    $('cs-list').innerHTML = none ? `<div class="card msg">${esc(none)}</div>` : sts.map((x, i) => `<div class="card cs-st"><b><span class="cs-sq">${i + 1}</span>${esc(x.nm)}${x.kinds.length > 1 ? '<span class="cs-tg">상온·저온</span>' : `<span class="cs-tg">${esc(x.kinds[0])}</span>`}${x.carry ? '<span class="cs-tg" style="background:#7C3AED">합적재 · 매출만</span>' : ''}</b>
+        <span class="ad">${x.addr ? esc(x.addr) : '주소록에 주소가 없어요'} · 코드 ${esc(x.c)}</span>${x.tel ? `<a class="tel" href="tel:${esc(x.tel.replace(/[^\d]/g, ''))}">📞 ${esc(x.tel)}</a>` : ''}
+        <div class="cs-am"><div class="kv"><label>상온</label><b>${won(x.a.상온)}</b></div><div class="kv"><label>저온</label><b>${won(x.a.저온)}</b></div><div class="kv"><label>합계</label><b style="color:#FDE68A">${won(x.tot)}</b></div></div></div>`).join('')
+      + (sts.length ? `<div class="card"><div class="cs-am"><div class="kv"><label>상온 합계</label><b>${won(sum('상온'))}</b></div><div class="kv"><label>저온 합계</label><b>${won(sum('저온'))}</b></div><div class="kv"><label>전체 합계</label><b style="color:#FDE68A">${won(sum())}</b></div></div></div>` : '');
+    // 업무 탭
+    const w = (j && j.work) || {}, need = sts.filter((x) => !x.carry), got = need.filter((x) => csPhotos(x.c).length).length;
+    $('cw-s').textContent = csHm(w.start_at); $('cw-e').textContent = csHm(w.end_at); $('cw-p').textContent = need.length ? `${got}/${need.length}` : '—';
+    $('cw-l').textContent = APP ? (((A || {}).app || {}).running ? '켜짐' : '꺼짐') : (on ? '켜짐 (이 화면)' : '꺼짐');
+    $('cw-start').textContent = w.start_at ? `업무시작 ${csHm(w.start_at)} ✓` : '업무시작'; $('cw-start').disabled = !!w.start_at && !w.end_at && false;
+    $('cw-end').textContent = w.end_at ? `업무종료 ${csHm(w.end_at)} ✓ (다시 누르면 시각·특이사항 고침)` : '업무종료';
+    if (w.note && document.activeElement !== $('cw-note') && !CS.noteTouched) $('cw-note').value = w.note;
+    $('cw-list').innerHTML = !w.start_at ? (need.length ? `<div class="card msg">업무시작을 누르면 점포마다 배송완료사진을 올릴 수 있어요. (오늘 ${need.length}곳)</div>` : '')
+      : need.map((x, i) => { const ps = csPhotos(x.c), busy = CS.up[x.c];
+        return `<div class="card cs-st ${ps.length ? 'ok' : ''}"><b><span class="cs-sq">${i + 1}</span>${esc(x.nm)}</b><span class="ad">${esc(x.addr || '')}</span>
+          <div class="cs-ph">${ps.map((p) => `<a href="${csUrl(p)}" target="_blank" rel="noopener"><img src="${csUrl(p)}" alt="배송사진"></a>`).join('')}
+          <label class="pbtn ${ps.length ? 'done' : ''}">${busy ? '올리는 중…' : ps.length ? '✓ 사진 추가' : '📷 배송완료사진'}<input type="file" accept="image/*" capture="environment" data-code="${esc(x.c)}" ${busy ? 'disabled' : ''}></label></div></div>`; }).join('');
+    $('cw-list').querySelectorAll('input[type=file]').forEach((el) => { el.onchange = () => { const f = el.files && el.files[0]; if (f) csUpload(el.dataset.code, f); el.value = ''; }; });
+  }
+  async function csLoad(force) {
+    if (!CVS() || CS.busy) return;
+    if (!CS.d) CS.d = csNight() && new Date().getHours() >= 15 ? addDay(today(), 1) : today();   // 야간은 오후 3시 이후면 내일 실적표
+    if (CS.j && CS.j._d === CS.d && !force && Date.now() - CS.j._at < 60e3) return csUi();
+    CS.busy = true; $('cs-warn').hidden = true; csUi();
+    try { const j = await rpc('cvs_my_day', { p_name: cfg.n, p_token: cfg.tok, p_d: CS.d }); j._d = CS.d; j._at = Date.now(); CS.j = j; try { localStorage.setItem(LS + '-csme', JSON.stringify(j.me || null)); } catch (e) { /* noop */ } }
+    catch (e) { CS.j = null; $('cs-warn').hidden = false; $('cs-warn').textContent = /로그인/.test(e.message) ? '로그인이 만료됐어요. [팀 바꾸기]를 눌러 다시 로그인해 주세요.' : e.message; }
+    CS.busy = false; csUi(); csApply(false);
+  }
+  async function csShrink(f) {   // 사진을 긴 변 1600px JPEG로 줄여서 올림 (데이터 절약)
+    try { const img = await new Promise((ok, no) => { const i = new Image(); i.onload = () => ok(i); i.onerror = no; i.src = URL.createObjectURL(f); });
+      const k = Math.min(1, 1600 / Math.max(img.width, img.height)), c = document.createElement('canvas'); c.width = Math.round(img.width * k); c.height = Math.round(img.height * k);
+      c.getContext('2d').drawImage(img, 0, 0, c.width, c.height); const b = await new Promise((ok) => c.toBlob(ok, 'image/jpeg', 0.82)); return b || f; } catch (e) { return f; }
+  }
+  async function csUpload(code, f) {
+    CS.up[code] = true; csUi();
+    try { const b = await csShrink(f), fd = new FormData(); fd.append('name', cfg.n); fd.append('token', cfg.tok); fd.append('d', CS.d); fd.append('code', code); fd.append('file', b, code + '.jpg');
+      const r = await fetch(SERVER + '/functions/v1/cvsphoto', { method: 'POST', headers: { apikey: KEY }, body: fd }), j = await r.json().catch(() => ({}));
+      if (!j.ok) throw new Error(j.error || 'HTTP ' + r.status);
+      (CS.j.photos = CS.j.photos || []).push({ code, path: j.path, at: new Date().toISOString() }); }
+    catch (e) { alert('사진을 못 올렸어요: ' + e.message + '\n잠시 뒤 다시 눌러 주세요.'); }
+    delete CS.up[code]; csUi();
+  }
+  async function csWork(kind) {
+    const ok = $('cw-ok'), w = $('cw-warn'); ok.hidden = true; w.hidden = true;
+    try { const r = await rpc('cvs_work_put', { p_name: cfg.n, p_token: cfg.tok, p_d: CS.d, p_kind: kind, p_note: kind === 'end' ? ($('cw-note').value.trim() || '없음') : null }); if (CS.j) CS.j.work = r; return r; }
+    catch (e) { w.hidden = false; w.textContent = (kind === 'start' ? '업무시작' : '업무종료') + ' 기록 실패: ' + e.message; throw e; }
+  }
+  $('cw-note').addEventListener('input', () => { CS.noteTouched = true; });
+  $('cw-start').onclick = async () => {
+    if (!CS.j) await csLoad(true); if (!CS.j) return;
+    $('cw-start').disabled = true;
+    if (APP) { try { if (window.WeRoadApp.setAuth && cfg.tok) window.WeRoadApp.setAuth(cfg.n, cfg.tok); else window.WeRoadApp.setDriver(cfg.n); window.WeRoadApp.start(); } catch (e) { /* noop */ } }
+    else if (!on) start();
+    try { const r = await csWork('start'); $('cw-ok').hidden = false; $('cw-ok').innerHTML = `<b>업무시작 ${csHm(r.start_at)}</b> — 점포마다 배송을 마치면 아래에서 사진을 올려 주세요.`; } catch (e) { /* 위에 표시 */ }
+    $('cw-start').disabled = false; csUi();
+  };
+  $('cw-end').onclick = async () => {
+    if (!CS.j) return;
+    const w = CS.j.work || {}; if (!w.start_at) return alert('업무시작을 먼저 눌러 주세요.');
+    const need = csStops(CS.j).filter((x) => !x.carry), miss = need.filter((x) => !csPhotos(x.c).length);
+    if (miss.length && !confirm(`배송완료사진이 없는 점포가 ${miss.length}곳 있어요:\n${miss.slice(0, 8).map((x) => '· ' + x.nm).join('\n')}${miss.length > 8 ? '\n…' : ''}\n\n그래도 업무종료할까요?`)) return;
+    if (w.end_at && !confirm('이미 업무종료했어요. 종료 시각과 특이사항을 지금 것으로 고칠까요?')) return;
+    $('cw-end').disabled = true;
+    try { const r = await csWork('end'); CS.noteTouched = false; if (APP) { try { window.WeRoadApp.stop(); } catch (e) { /* noop */ } } if (on) stop();
+      $('cw-ok').hidden = false; $('cw-ok').innerHTML = `<b>업무종료 ${csHm(r.end_at)}</b> — 오늘도 수고하셨어요! 위치 전송도 꺼졌어요.${csWefun() ? '<br>퇴근 탭에서 계기판 km도 적어 주세요.' : ''}`; } catch (e) { /* 위에 표시 */ }
+    $('cw-end').disabled = false; csUi();
+  };
+  $('cs-prev').onclick = () => { CS.d = addDay(CS.d, -1); csLoad(true); };
+  $('cs-next').onclick = () => { CS.d = addDay(CS.d, 1); csLoad(true); };
+  $('cs-re').onclick = () => csLoad(true);
+  const csOut = (e) => { if (e) e.preventDefault(); if (APP) { try { window.WeRoadApp.stop(); } catch (x) { /* noop */ } } if (on) stop(); localStorage.setItem(LS, JSON.stringify({ n: cfg.n, v: cfg.v || '' })); localStorage.removeItem(LS + '-on'); localStorage.removeItem(LS + '-csme'); try { sessionStorage.removeItem('wr-tab'); } catch (x) { /* noop */ } location.reload(); };
+  $('cs-lo').onclick = csOut; $('cw-lo').onclick = csOut;
+  if (CVS() && !$('main').hidden) { csApply(true); csLoad(false); }
   document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') { rFlush(); aLoad(); } });
 })();
 </script>
