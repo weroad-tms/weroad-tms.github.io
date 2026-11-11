@@ -156,6 +156,7 @@
 </div>
 
 <div id="main" hidden>
+  <div id="pd" hidden></div>
   <div class="tabs"><button data-tab="sh">실적표</button><button data-tab="loc">출근</button><button data-tab="lc">상차</button><button data-tab="dl">배송</button><button class="on" data-tab="rec">퇴근</button></div>
   <div id="t-sh" hidden>
     <div class="card">
@@ -508,6 +509,28 @@
   };
   // 10/30: 계기판 km·주유 금액은 입력하면서 1,234,567 처럼 쉼표 표시 (저장할 때는 숫자만)
   ['r-km', 'r-fuel'].forEach((id) => { const el = $(id); el.addEventListener('input', () => { const d = el.value.replace(/[^\d]/g, ''); el.value = d ? Number(d).toLocaleString('ko-KR') : ''; }); });
+  // ---- 11/11 소모품 교체 알림: 위로드 차량관리에서 교체 시기가 지난 내 차 소모품 → [교체 완료] + 계기판 km → 위로드로 돌아감
+  const PDS = { rows: [], open: '' };
+  function pdUi() {
+    const box = $('pd'); if (!box) return;
+    box.hidden = !PDS.rows.length;
+    box.innerHTML = PDS.rows.map((r, i) => { const id = r.plate + '|' + r.part + '|' + r.due_km, op = PDS.open === id;
+      return `<div class="card warn f pd-c"><div><b>🔧 ${r.label} 교체할 때가 됐어요</b><br><span style="font-size:13px">${r.plate} · 교체 기준 ${won(r.due_km)} km${r.est_km ? ' · 지금 약 ' + won(r.est_km) + ' km' : ''}</span><br><span style="font-size:12px;opacity:.85">지정 정비업체(오토대안·HJ모터스)에서 교체한 뒤 아래 버튼을 눌러 주세요.</span></div>`
+        + (op ? `<label style="display:block;margin-top:8px;font-size:13px">교체할 때 계기판 km</label><input class="num pd-km" inputmode="numeric" placeholder="예: 246,720" value="${r.est_km ? won(r.est_km) : ''}" style="width:100%"><input class="pd-note" placeholder="메모 (선택) · 정비업체 등" style="width:100%;margin-top:6px"><div style="display:flex;gap:8px;margin-top:8px"><button class="big save pd-ok" data-i="${i}" style="flex:1">교체 완료 보내기</button><button class="sh-lo pd-x" style="flex:0 0 72px">취소</button></div>`
+          : `<button class="big save pd-go" data-id="${id}" style="margin-top:8px;width:100%">교체 완료</button>`) + '</div>'; }).join('');
+    box.querySelectorAll('.pd-go').forEach((b) => { b.onclick = () => { PDS.open = b.dataset.id; pdUi(); }; });
+    box.querySelectorAll('.pd-x').forEach((b) => { b.onclick = () => { PDS.open = ''; pdUi(); }; });
+    box.querySelectorAll('.pd-km').forEach((el) => el.addEventListener('input', () => { const d = el.value.replace(/[^\d]/g, ''); el.value = d ? Number(d).toLocaleString('ko-KR') : ''; }));
+    box.querySelectorAll('.pd-ok').forEach((b) => { b.onclick = async () => {
+      const r = PDS.rows[+b.dataset.i], c = b.closest('.pd-c'), km = Number(String(c.querySelector('.pd-km').value).replace(/[^\d]/g, '')), note = c.querySelector('.pd-note').value.trim();
+      if (!km || km < 1000) return alert('교체할 때 계기판 누적 km를 넣어 주세요 (예: 246720)');
+      b.disabled = true; b.textContent = '보내는 중…';
+      try { await rpc('part_due_done', { p_name: cfg.n, p_token: cfg.tok, p_plate: r.plate, p_part: r.part, p_due_km: r.due_km, p_km: km, p_note: note || null }); PDS.rows = PDS.rows.filter((x) => x !== r); PDS.open = ''; pdUi(); alert('보냈어요. 위로드 차량관리에 교체 완료로 기록됐어요.'); }
+      catch (e) { b.disabled = false; b.textContent = '교체 완료 보내기'; alert('못 보냈어요: ' + e.message); }
+    }; });
+  }
+  async function pdLoad() { if (!loggedIn() || isMaster()) return; try { const r = await rpc('my_part_due', { p_name: cfg.n, p_token: cfg.tok }); PDS.rows = Array.isArray(r) ? r : []; pdUi(); } catch (e) { log('소모품 알림 조회 실패 ' + e.message); } }
+  if (!$('main').hidden) { pdLoad(); setInterval(pdLoad, 30 * 60e3); document.addEventListener('visibilitychange', () => { if (!document.hidden) pdLoad(); }); }
   var A = null;
   if (!$('main').hidden) { applyType(true); rUi(); rLoadVeh(); rFlush().then(rLoadHist); }
   // ---- 출근 체크 + 위치 앱(Traccar) 수신 확인 (v9)
