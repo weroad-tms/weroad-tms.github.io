@@ -52,7 +52,9 @@
 <div id="and">
   <div class="card">
     <h2><span class="n">1</span>앱 설치</h2>
-    <a class="btn" href="https://ridvdsluzfjxonqlavgm.supabase.co/storage/v1/object/public/notify/app/weroad.apk">위로드 앱 내려받기</a>
+    <div class="card lock" id="ios-warn" hidden style="margin:0 0 12px"><b>지금 폰은 아이폰이에요.</b> 안드로이드 앱은 아이폰에 설치할 수 없어요. 위의 <b>아이폰</b> 탭을 눌러 주세요.</div>
+    <a class="btn" id="apk" href="https://ridvdsluzfjxonqlavgm.supabase.co/storage/v1/object/public/notify/app/weroad.apk?download=weroad.apk">위로드 앱 내려받기</a>
+    <div class="tip" id="kakao-tip" hidden>카카오톡에서 열었다면 내려받기가 안 될 수 있어요. 오른쪽 아래 <b>⋮ → 다른 브라우저로 열기</b>(크롬·삼성 인터넷)로 연 다음 다시 눌러 주세요.</div>
     <ol>
       <li>위 버튼을 누르면 <b>weroad.apk</b>가 내려받아져요</li>
       <li>알림창(또는 내 파일 → 다운로드)에서 파일을 열어요</li>
@@ -254,8 +256,12 @@
 
 <script>
   const q = new URLSearchParams(location.search), ua = navigator.userAgent;
-  let os = q.get('os') || (/iPhone|iPad/i.test(ua) ? 'ios' : 'and');
-  const show = (o) => { os = o; document.querySelectorAll('.tabs button').forEach((b) => b.classList.toggle('on', b.dataset.os === o)); document.getElementById('and').hidden = o !== 'and'; document.getElementById('ios').hidden = o !== 'ios'; };
+  // 11/13: 아이폰이면 링크가 안드로이드여도 아이폰 가이드부터 (아이폰에서 apk를 누르면 깨진 글자 화면이 나옴)
+  const IOS = /iPhone|iPad|iPod/i.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1);
+  let os = IOS ? 'ios' : (q.get('os') || 'and');
+  const show = (o) => { os = o; document.querySelectorAll('.tabs button').forEach((b) => b.classList.toggle('on', b.dataset.os === o)); document.getElementById('and').hidden = o !== 'and'; document.getElementById('ios').hidden = o !== 'ios'; document.getElementById('ios-warn').hidden = !(IOS && o === 'and'); };
+  document.getElementById('apk').onclick = (e) => { if (IOS) { e.preventDefault(); show('ios'); window.scrollTo(0, 0); alert('아이폰에는 안드로이드 앱을 설치할 수 없어요. 아이폰 가이드를 보여 드릴게요.'); } };
+  if (/KAKAOTALK/i.test(ua) && !IOS) document.getElementById('kakao-tip').hidden = false;
   document.querySelectorAll('.tabs button').forEach((b) => { b.onclick = () => show(b.dataset.os); });
   show(os);
   // 11/13 v22: 팀(?t=snack / ?t=cvs)에 맞는 하루 순서 · 배송기사웹 링크도 같은 팀 링크로
