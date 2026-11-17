@@ -278,7 +278,8 @@
   <div class="card msg" id="app-help" hidden>
     <b>위로드 앱 상태</b>
     <div style="margin-top:6px;line-height:1.8" id="app-st">—</div>
-    <div style="margin-top:8px;line-height:1.8"><b>처음 한 번만 — 물어보면 모두 허용</b><br>① 위치 권한 → <b>"항상 허용"</b><br>② 알림 → <b>허용</b><br>③ 배터리 → <b>"제한 없음"</b> (아래 버튼)</div>
+    <div id="app-old" hidden style="margin-top:8px;padding:10px 12px;border-radius:12px;background:rgba(250,204,21,.15);border:1px solid rgba(250,204,21,.5);line-height:1.6"><b>새 위로드 앱이 나왔어요</b><br>지금 앱을 <b>삭제</b>하고 새로 설치해 주세요. 위치 권한은 "앱 사용 중에만 허용"만 물어요.<br><a href="guide.html?os=and" style="color:#FDE68A;font-weight:800">설치 가이드 보기 →</a></div>
+    <div style="margin-top:8px;line-height:1.8"><b>처음 한 번만 — 물어보면 모두 허용</b><br>① 위치 권한 → <b>"앱 사용 중에만 허용"</b><br>② 알림 → <b>허용</b><br>③ 배터리 → <b>"제한 없음"</b> (아래 버튼)</div>
     <div style="margin-top:6px">· 출근하면 상단 알림에 "출근 중"이 떠요. 화면을 꺼도, 네비·사진을 써도 계속 보내요.<br>· 퇴근을 누르면 자동으로 꺼져요.</div>
     <div style="margin-top:8px"><button class="sm" id="app-batt">배터리 제한 없음 설정</button> <button class="sm" id="app-perm">앱 권한 설정 열기</button></div>
   </div>
@@ -295,7 +296,7 @@
       4. 위치 정확도 <b>높음</b> · 주기 <b>60</b>초 · 거리 <b>100</b> · 각도 0<br>
       5. 맨 위 <b>서비스 상태</b> 켜기 → 이 화면에서 "마지막 위치 수신"이 몇 분 안으로 뜨면 성공<br>
       · 안드로이드: 앱 정보 → 배터리 → <b>제한 없음</b> (안 하면 밤에 멈춰요)<br>
-      · 아이폰: 설정 → Traccar → 위치 → <b>항상</b><br>
+      · 아이폰: 설정 → Traccar → 위치 → <b>앱을 사용하는 동안</b><br>
       · 이후엔 앱을 건드릴 필요 없어요. 화면 꺼도, 네비·사진 찍어도 계속 보내요.
     </div>
   </details>
@@ -623,11 +624,12 @@
       $('a-app').style.color = a.running && good ? '#86EFAC' : a.running ? '#FDE68A' : '#EAF0FF';
       $('stt').textContent = a.running ? '출근 중 · 위로드 앱이 위치 전송 중' + (good ? '' : ' (' + (a.status || '대기') + ')') : '출근 버튼을 누르면 위치 전송이 시작돼요';
       $('st').classList.toggle('on', !!a.running);
-      $('app-st').innerHTML = `위치 서비스: <b>${a.running ? '켜짐' : '꺼짐'}</b> · ${a.status || ''}<br>권한: 위치 ${a.fine ? '✓' : '✗'} · 항상 허용 ${a.bg ? '✓' : '<b style="color:#FDE68A">✗ 설정 필요</b>'} · 배터리 제한 없음 ${a.battOk ? '✓' : '<b style="color:#FDE68A">✗</b>'}`;
+      $('app-st').innerHTML = `위치 서비스: <b>${a.running ? '켜짐' : '꺼짐'}</b> · ${a.status || ''}<br>권한: 위치(앱 사용 중) ${a.fine ? '✓' : '<b style="color:#FDE68A">✗ 설정 필요</b>'} · 배터리 제한 없음 ${a.battOk ? '✓' : '<b style="color:#FDE68A">✗</b>'}`;
     }
   }
   window.onWeRoadApp = (st) => { A.app = st || {}; aUi(); };
-  if (APP) { try { A.app = JSON.parse(window.WeRoadApp.status() || '{}'); if (cfg.n && window.WeRoadApp.setAuth && cfg.tok) window.WeRoadApp.setAuth(cfg.n, cfg.tok); else if (cfg.n && A.app.driver !== cfg.n) window.WeRoadApp.setDriver(cfg.n); if (loggedIn() && (!A.app.fine || !A.app.bg) && !sessionStorage.getItem('wr-prep')) { sessionStorage.setItem('wr-prep', '1'); if (window.WeRoadApp.prepare) setTimeout(() => window.WeRoadApp.prepare(), 600); } } catch (e) { /* noop */ } }
+  if (APP) { try { A.app = JSON.parse(window.WeRoadApp.status() || '{}'); if (cfg.n && window.WeRoadApp.setAuth && cfg.tok) window.WeRoadApp.setAuth(cfg.n, cfg.tok); else if (cfg.n && A.app.driver !== cfg.n) window.WeRoadApp.setDriver(cfg.n); if (loggedIn() && !A.app.fine && !sessionStorage.getItem('wr-prep')) { sessionStorage.setItem('wr-prep', '1'); if (window.WeRoadApp.prepare) setTimeout(() => window.WeRoadApp.prepare(), 600); } } catch (e) { /* noop */ } }
+  try { if (APP && window.WeRoadApp.version && window.WeRoadApp.version() < '1.3') $('app-old').hidden = false; } catch (e) { /* noop */ }   // 11/17 예전 앱(1.2) 안내
   $('app-batt').onclick = () => { try { window.WeRoadApp.battery(); } catch (e) { /* noop */ } };
   $('app-perm').onclick = () => { try { window.WeRoadApp.openSettings(); } catch (e) { /* noop */ } };
   async function aLoad() { if (!loggedIn()) return; try { A.st = await rpc('my_status', { p_name: cfg.n, p_token: cfg.tok }); aUi(); } catch (e) { log('출근 상태 조회 실패 ' + e.message); } }
