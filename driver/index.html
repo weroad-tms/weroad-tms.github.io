@@ -16,6 +16,7 @@
   html,body{margin:0;height:100%;background:#0F1A33;color:#EAF0FF;font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",sans-serif}
   body{display:flex;flex-direction:column;min-height:100%;padding:max(16px,env(safe-area-inset-top)) 18px max(20px,env(safe-area-inset-bottom))}
   .brand{display:flex;align-items:center;gap:10px;margin-bottom:18px}
+  .cs-st>b{display:flex;align-items:center;flex-wrap:wrap;gap:4px 6px}.cs-ord{margin-left:auto;display:inline-flex;gap:6px;flex:none}.cs-ord button{border:0;border-radius:9px;width:38px;height:34px;font:inherit;font-size:15px;font-weight:800;background:rgba(255,255,255,.14);color:#fff}.cs-ord button:disabled{opacity:.25}.cs-ordh i{font-style:normal;color:#FDE68A}
   .top-lo{position:fixed;top:max(12px,env(safe-area-inset-top));right:12px;z-index:39;border:0;border-radius:12px;padding:8px 13px;font:inherit;font-size:15px;font-weight:800;background:rgba(255,255,255,.16);color:#fff;box-shadow:0 2px 8px rgba(0,0,0,.25);backdrop-filter:blur(6px)}.top-lo[hidden]{display:none}
   .brand .lg{width:34px;height:34px;border-radius:10px;overflow:hidden;display:block;flex:none;box-shadow:0 0 0 1px rgba(255,255,255,.12)}.brand .lg svg{display:block}
   .brand b{font-size:17px}.brand small{opacity:.6;margin-left:4px}
@@ -842,10 +843,12 @@
     $('cs-sub').textContent = j && j.me ? `${csDK(j.me)} · ${j.me.aff || ''}${j.me.plate ? ' · ' + j.me.plate : ''} · 거래처 정보 · 상온/저온/합계 매출` : '일일실적표 · 거래처 정보 · 상온/저온/합계 매출';
     $('cs-prog').innerHTML = j ? `<div class="kv"><label>착지</label><b>${n}<i>곳</i></b></div><div class="kv"><label>상온 매출</label><b>${won(sum('상온'))}</b></div><div class="kv"><label>저온 매출</label><b>${won(sum('저온'))}</b></div>` : '';
     const none = !j ? (CS.busy ? '불러오는 중…' : '') : !(j.has || {}).상온 && !(j.has || {}).저온 ? `${dLbl(d)} 판매실적표가 아직 안 들어왔어요 (매일 오후 3시쯤 들어와요).` : !sts.length ? `${dLbl(d)} 나한테 배정된 점포가 없어요. ◀ ▶ 로 다른 날을 보세요.` : '';
-    $('cs-list').innerHTML = none ? `<div class="card msg">${esc(none)}</div>` : sts.map((x, i) => `<div class="card cs-st"><b><span class="cs-sq">${i + 1}</span>${esc(x.nm)}${x.kinds.length > 1 ? '<span class="cs-tg">상온·저온</span>' : `<span class="cs-tg">${esc(x.kinds[0])}</span>`}${x.carry ? '<span class="cs-tg" style="background:#7C3AED">합적재 · 매출만</span>' : ''}</b>
+    const canOrd = !!j && sts.length > 1;
+    $('cs-list').innerHTML = none ? `<div class="card msg">${esc(none)}</div>` : (canOrd ? `<div class="card msg cs-ordh">· <b>▲ ▼</b>로 방문 순서를 바꿀 수 있어요. 바꾼 순서는 물류팀 관제 지도에도 그대로 번호로 보여요.${CS.ordBusy ? ' <i>저장 중…</i>' : ''}</div>` : '') + sts.map((x, i) => `<div class="card cs-st"><b><span class="cs-sq">${i + 1}</span>${esc(x.nm)}${x.kinds.length > 1 ? '<span class="cs-tg">상온·저온</span>' : `<span class="cs-tg">${esc(x.kinds[0])}</span>`}${x.carry ? '<span class="cs-tg" style="background:#7C3AED">합적재 · 매출만</span>' : ''}${canOrd ? `<span class="cs-ord"><button type="button" data-ord="${esc(x.c)}" data-dir="-1" ${i === 0 || CS.ordBusy ? 'disabled' : ''} aria-label="위로">▲</button><button type="button" data-ord="${esc(x.c)}" data-dir="1" ${i === sts.length - 1 || CS.ordBusy ? 'disabled' : ''} aria-label="아래로">▼</button></span>` : ''}</b>
         <span class="ad">${x.addr ? esc(x.addr) : '주소록에 주소가 없어요'} · 코드 ${esc(x.c)}</span>${x.tel ? `<a class="tel" href="tel:${esc(x.tel.replace(/[^\d]/g, ''))}">📞 ${esc(x.tel)}</a>` : ''}
         <div class="cs-am"><div class="kv"><label>상온</label><b>${won(x.a.상온)}</b></div><div class="kv"><label>저온</label><b>${won(x.a.저온)}</b></div><div class="kv"><label>합계</label><b style="color:#FDE68A">${won(x.tot)}</b></div></div></div>`).join('')
       + (sts.length ? `<div class="card"><div class="cs-am"><div class="kv"><label>상온 합계</label><b>${won(sum('상온'))}</b></div><div class="kv"><label>저온 합계</label><b>${won(sum('저온'))}</b></div><div class="kv"><label>전체 합계</label><b style="color:#FDE68A">${won(sum())}</b></div></div></div>` : '');
+    $('cs-list').querySelectorAll('[data-ord]').forEach((el) => { el.onclick = () => csReorder(el.dataset.ord, +el.dataset.dir); });
     // 업무 탭
     const w = (j && j.work) || {}, need = sts.filter((x) => !x.carry), got = need.filter((x) => csPhotos(x.c).length).length;
     $('cw-s').textContent = csHm(w.start_at); $('cw-e').textContent = csHm(w.end_at); $('cw-p').textContent = need.length ? `${got}/${need.length}` : '—';
@@ -859,6 +862,17 @@
           <div class="cs-ph">${ps.map((p) => `<a href="${csUrl(p)}" target="_blank" rel="noopener"><img src="${csUrl(p)}" alt="배송사진"></a>`).join('')}
           <label class="pbtn ${ps.length ? 'done' : ''}">${busy ? '올리는 중…' : ps.length ? '✓ 사진 추가' : '📷 배송완료사진'}<input type="file" accept="image/*" capture="environment" data-code="${esc(x.c)}" ${busy ? 'disabled' : ''}></label></div></div>`; }).join('');
     $('cw-list').querySelectorAll('input[type=file]').forEach((el) => { el.onchange = () => { const f = el.files && el.files[0]; if (f) csUpload(el.dataset.code, f); el.value = ''; }; });
+  }
+  // 11/19 방문 순서 바꾸기 (▲▼) → 서버 그날 배차 기록의 순번(ord)에 저장 → 관제 지도 번호도 같이 바뀜
+  async function csReorder(code, dir) {
+    if (!CS.j || CS.ordBusy) return;
+    const sts = csStops(CS.j), i = sts.findIndex((x) => x.c === code), k = i + dir; if (i < 0 || k < 0 || k >= sts.length) return;
+    const arr = sts.slice(); [arr[i], arr[k]] = [arr[k], arr[i]];
+    const ord = Object.assign({}, CS.j.ord || {}); arr.forEach((x, n) => x.keys.forEach((key) => { ord[key] = n + 1; }));
+    const prev = CS.j.ord; CS.j.ord = ord; CS.ordBusy = true; csUi();
+    try { const r = await rpc('cvs_my_order', { p_name: cfg.n, p_token: cfg.tok, p_d: CS.d, p_codes: arr.map((x) => x.c) }); if (r && typeof r === 'object') CS.j.ord = r; }
+    catch (e) { CS.j.ord = prev; alert('순서를 저장하지 못했어요: ' + e.message); }
+    CS.ordBusy = false; csUi();
   }
   async function csLoad(force) {
     if (!CVS() || CS.busy) return;
