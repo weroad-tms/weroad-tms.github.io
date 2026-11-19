@@ -16,6 +16,7 @@
   html,body{margin:0;height:100%;background:#0F1A33;color:#EAF0FF;font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",sans-serif}
   body{display:flex;flex-direction:column;min-height:100%;padding:max(16px,env(safe-area-inset-top)) 18px max(20px,env(safe-area-inset-bottom))}
   .brand{display:flex;align-items:center;gap:10px;margin-bottom:18px}
+  .top-lo{position:fixed;top:max(12px,env(safe-area-inset-top));right:12px;z-index:39;border:0;border-radius:12px;padding:8px 13px;font:inherit;font-size:15px;font-weight:800;background:rgba(255,255,255,.16);color:#fff;box-shadow:0 2px 8px rgba(0,0,0,.25);backdrop-filter:blur(6px)}.top-lo[hidden]{display:none}
   .brand .lg{width:34px;height:34px;border-radius:10px;overflow:hidden;display:block;flex:none;box-shadow:0 0 0 1px rgba(255,255,255,.12)}.brand .lg svg{display:block}
   .brand b{font-size:17px}.brand small{opacity:.6;margin-left:4px}
   .card{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:18px;margin-bottom:14px}
@@ -172,6 +173,7 @@
   <button class="yes" id="ag-ok">동의하고 시작</button><button class="no" id="ag-no">동의하지 않음</button>
 </div>
 
+<button class="top-lo" id="top-lo" hidden>로그아웃</button>
 <div id="main" hidden>
   <div id="pd" hidden></div>
   <div class="tabs"><button data-tab="cs" hidden>실적표</button><button data-tab="cw" hidden>업무</button><button data-tab="sh">실적표</button><button data-tab="loc">출근</button><button data-tab="lc">상차</button><button data-tab="dl">배송</button><button class="on" data-tab="rec">퇴근</button></div>
@@ -911,6 +913,9 @@
   $('cs-re').onclick = () => csLoad(true);
   const csOut = (e) => { if (e) e.preventDefault(); if (APP) { try { window.WeRoadApp.stop(); } catch (x) { /* noop */ } } if (on) stop(); localStorage.setItem(LS, JSON.stringify({ n: cfg.n, v: cfg.v || '' })); localStorage.removeItem(LS + '-on'); localStorage.removeItem(LS + '-csme'); try { sessionStorage.removeItem('wr-tab'); } catch (x) { /* noop */ } location.reload(); };
   $('cs-lo').onclick = csOut; $('cw-lo').onclick = csOut;
+  // 11/19 모든 화면 오른쪽 위 로그아웃 (스낵↔편의점 운행 바꿀 때 다시 로그인)
+  $('top-lo').hidden = $('main').hidden;
+  $('top-lo').onclick = (e) => { if (confirm('정말 로그아웃을 하시겠어요?')) csOut(e); };
   if (CVS() && !$('main').hidden) { csApply(true); csLoad(false); }
   document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') { rFlush(); aLoad(); } });
 })();
