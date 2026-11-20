@@ -1,0 +1,1066 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#16181B">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="WeRoad">
+<link rel="manifest" href="manifest.json?v=2">
+<link rel="icon" href="icon.svg?v=6" type="image/svg+xml">
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png?v=6">
+<title>위로드 배송기사웹</title>
+<style>
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;height:100%;background:#16181B;color:#EAF0FF;font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",sans-serif}
+  body{display:flex;flex-direction:column;min-height:100%;padding:max(16px,env(safe-area-inset-top)) 18px max(20px,env(safe-area-inset-bottom))}
+  .brand{display:flex;align-items:center;gap:10px;margin-bottom:18px}
+  .cs-st>b{display:flex;align-items:center;flex-wrap:wrap;gap:4px 6px}.cs-ord{margin-left:auto;display:inline-flex;gap:6px;flex:none}.cs-ord button{border:0;border-radius:9px;width:38px;height:34px;font:inherit;font-size:15px;font-weight:800;background:rgba(255,255,255,.14);color:#fff}.cs-ord button:disabled{opacity:.25}.cs-ordh i{font-style:normal;color:#FDE68A}
+  .top-lo{position:fixed;top:max(12px,env(safe-area-inset-top));right:12px;z-index:39;border:0;border-radius:12px;padding:8px 13px;font:inherit;font-size:15px;font-weight:800;background:rgba(255,255,255,.16);color:#fff;box-shadow:0 2px 8px rgba(0,0,0,.25);backdrop-filter:blur(6px)}.top-lo[hidden]{display:none}
+  .brand .lg{width:34px;height:34px;border-radius:10px;overflow:hidden;display:block;flex:none;box-shadow:0 0 0 1px rgba(255,255,255,.12)}.brand .lg svg{display:block}
+  .brand b{font-size:17px}.brand small{opacity:.6;margin-left:4px}
+  .card{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:18px;margin-bottom:14px}
+  .name{font-size:26px;font-weight:800;letter-spacing:-.02em}
+  .name small{display:block;font-size:13px;font-weight:500;opacity:.6;margin-top:4px}
+  .st{display:flex;align-items:center;gap:10px;margin-top:14px;font-size:15px}
+  .dot{width:12px;height:12px;border-radius:50%;background:#64748B;flex:none}
+  .on .dot{background:#22C55E;box-shadow:0 0 0 6px rgba(34,197,94,.2);animation:p 1.6s infinite}
+  .err .dot{background:#EF4444}
+  @keyframes p{0%{box-shadow:0 0 0 0 rgba(34,197,94,.35)}100%{box-shadow:0 0 0 12px rgba(34,197,94,0)}}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .kv{background:rgba(0,0,0,.18);border-radius:14px;padding:12px 14px}
+  .kv label{display:block;font-size:12px;opacity:.6;margin-bottom:4px}
+  .kv b{font-size:19px;font-weight:800}
+  .kv b i{font-style:normal;font-size:12px;font-weight:500;opacity:.7;margin-left:3px}
+  button.big{width:100%;border:0;border-radius:18px;padding:22px;font-size:22px;font-weight:800;color:#fff;background:linear-gradient(135deg,#22C55E,#14B8A6);box-shadow:0 10px 30px rgba(20,184,166,.35);margin:6px 0 14px;font-family:inherit}
+  button.big.stop{background:linear-gradient(135deg,#EF4444,#F97316);box-shadow:0 10px 30px rgba(239,68,68,.3)}
+  button.big:disabled{opacity:.5;box-shadow:none}
+  .msg{font-size:13.5px;line-height:1.6;opacity:.75}
+  .msg b{color:#FDE68A}
+  .warn{background:rgba(239,68,68,.15);border-color:rgba(239,68,68,.4);color:#FECACA}
+  .setup label{display:block;font-size:13px;opacity:.7;margin:10px 0 4px}
+  .setup input{width:100%;border:1px solid rgba(255,255,255,.2);background:rgba(0,0,0,.25);color:#fff;border-radius:12px;padding:12px;font-size:16px;font-family:inherit}
+  .adv{margin-top:16px}.adv summary{font-size:12px;opacity:.5;cursor:pointer}
+  .setup button{margin-top:14px;width:100%;border:0;border-radius:14px;padding:14px;font-size:16px;font-weight:700;color:#fff;background:#3E6AF2;font-family:inherit}
+  .foot{margin-top:auto;font-size:11.5px;opacity:.4;text-align:center;padding-top:10px}
+  .tabs{display:flex;background:rgba(255,255,255,.08);border-radius:14px;padding:4px;margin-bottom:14px}
+  .tabs button{flex:1;border:0;background:transparent;color:#EAF0FF;opacity:.6;font:inherit;font-size:15px;font-weight:700;padding:11px;border-radius:11px}
+  .tabs button.on{background:#3E6AF2;opacity:1}
+  .f label{display:block;font-size:13px;opacity:.7;margin:12px 0 5px}
+  .f input,.f select{width:100%;border:1px solid rgba(255,255,255,.2);background:rgba(0,0,0,.25);color:#fff;border-radius:12px;padding:13px;font-size:18px;font-weight:700;font-family:inherit}
+  .f input.num{text-align:right;font-variant-numeric:tabular-nums}
+  .f .two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .seg2{display:flex;gap:8px}.seg2 button{flex:1;border:1px solid rgba(255,255,255,.2);background:rgba(0,0,0,.2);color:#fff;border-radius:12px;padding:12px;font:inherit;font-size:16px;font-weight:700}
+  .seg2 button.on{background:#fff;color:#0F1A33;border-color:#fff}
+  .tmseg{display:flex;gap:8px;margin:6px 0 4px}.tmseg button{flex:1;border:1px solid rgba(255,255,255,.2);background:rgba(0,0,0,.2);color:#fff;border-radius:14px;padding:16px 10px;font:inherit;font-size:18px;font-weight:800}
+  .gd{margin-top:14px}.gd-main{display:block;text-align:center;font-size:16px;font-weight:800;color:#fff;background:rgba(62,106,242,.28);border:1px solid rgba(156,180,255,.55);border-radius:14px;padding:14px 10px;text-decoration:none}
+  .gd-l{font-size:14px;opacity:.75;margin:10px 0 6px;text-align:center}.gd-os{display:grid;grid-template-columns:1fr 1fr;gap:8px}.gd-os a{display:block;text-align:center;font-size:16px;font-weight:800;color:#EAF0FF;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);border-radius:14px;padding:14px 6px;text-decoration:none}
+  .tmlock{border-radius:14px;padding:14px;background:#3E6AF2;font-size:18px;font-weight:800;text-align:center;margin:6px 0 4px}.tmlock small{display:block;font-size:12px;font-weight:500;opacity:.8;margin-top:3px}
+  .tmseg button.on{background:#3E6AF2;border-color:#3E6AF2}.tmseg button small{display:block;font-size:12px;font-weight:500;opacity:.75;margin-top:3px}
+  .tmchip{display:inline-block;margin-left:8px;padding:3px 9px;border-radius:999px;background:#3E6AF2;color:#fff;font-size:12px;font-weight:800;vertical-align:middle}
+  .cs-st{padding:14px 16px}.cs-st b{display:block;font-size:16px;line-height:1.35}.cs-st .ad{display:block;font-size:13px;opacity:.75;margin-top:3px;line-height:1.45}
+  .cs-st .tel{display:inline-block;margin-top:6px;color:#9CB4FF;font-weight:700;font-size:14px;text-decoration:none}
+  .cs-am{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-top:10px}.cs-am .kv{padding:8px 10px}.cs-am .kv b{font-size:14.5px}
+  .cs-sq{display:inline-flex;width:26px;height:26px;border-radius:50%;background:#334155;align-items:center;justify-content:center;font-size:13px;font-weight:800;margin-right:8px;vertical-align:middle}
+  .cs-liq{display:inline-block;margin-top:8px;padding:6px 12px;border:0;border-radius:8px;background:#2F9E5B;color:#fff;font:inherit;font-size:14px;font-weight:800;cursor:pointer}.cs-liq.bad{background:#EF4444;color:#fff}
+  .lq-ov{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9999;display:flex;align-items:flex-end;justify-content:center}.lq-bx{background:#111827;color:#F3F4F6;width:100%;max-width:560px;max-height:85vh;overflow:auto;border-radius:16px 16px 0 0;padding:16px 16px 24px}
+  .lq-h{display:flex;align-items:center;gap:8px;margin-bottom:10px}.lq-h b{font-size:17px;flex:1}.lq-h button{border:0;background:#374151;color:#fff;border-radius:8px;padding:6px 12px;font:inherit;font-weight:700}
+  .lq-r{display:flex;align-items:center;gap:10px;padding:10px 4px;border-top:1px solid #374151;font-size:15px}.lq-r span{flex:1;line-height:1.35}.lq-r em{font-style:normal;font-weight:800;white-space:nowrap}.lq-r.bad span,.lq-r.bad em{color:#FCA5A5}.lq-r.bad em small{display:block;font-size:12px;font-weight:700}.lq-n{font-size:12.5px;opacity:.7;margin-top:10px;line-height:1.5}
+  .cs-tg{display:inline-block;margin-left:6px;padding:1px 7px;border-radius:6px;font-size:11.5px;font-weight:800;background:#334155;color:#E2E8F0;vertical-align:middle}
+  .cs-ph{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;align-items:center}.cs-ph img{width:64px;height:64px;object-fit:cover;border-radius:10px;border:1px solid rgba(255,255,255,.2)}
+  .cs-ph label.pbtn{display:inline-flex;align-items:center;gap:6px;border-radius:12px;padding:11px 14px;font-weight:800;font-size:15px;background:#3E6AF2;color:#fff}.cs-ph label.pbtn.done{background:rgba(34,197,94,.2);color:#86EFAC}
+  .cs-ph input{display:none}.cs-st.ok{border-color:rgba(34,197,94,.45)}
+  textarea.cw-note{width:100%;min-height:90px;border-radius:12px;border:1px solid rgba(255,255,255,.2);background:rgba(0,0,0,.25);color:#fff;font:inherit;font-size:16px;padding:12px}
+  .hint{font-size:12.5px;opacity:.65;margin-top:6px;line-height:1.5}.hint b{color:#FDE68A}
+  .hist{font-size:14px;line-height:1.7}.hist div{display:flex;justify-content:space-between;gap:8px;border-top:1px solid rgba(255,255,255,.08);padding:6px 0}.hist div:first-child{border-top:0}.hist span:last-child{font-variant-numeric:tabular-nums;font-weight:700}
+  button.sm{border:1px solid rgba(255,255,255,.3);background:transparent;color:#fff;border-radius:8px;padding:3px 9px;font:inherit;font-size:12px}
+  details summary{cursor:pointer}
+  .ok{background:rgba(34,197,94,.15);border-color:rgba(34,197,94,.4);color:#BBF7D0}
+  [hidden]{display:none!important}
+  .lc-bar{display:flex;gap:8px;align-items:center;margin-top:12px}
+  .lc-bar button{border:1px solid rgba(255,255,255,.25);background:rgba(0,0,0,.2);color:#fff;border-radius:10px;padding:9px 12px;font:inherit;font-size:15px;font-weight:700}
+  .lc-bar .d{flex:1;text-align:center;font-size:17px;font-weight:800}
+  .lc-bar select{flex:1;border:1px solid rgba(255,255,255,.2);background:rgba(0,0,0,.25);color:#fff;border-radius:10px;padding:9px;font:inherit;font-size:15px;font-weight:700}
+  .lc-prog{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:12px}
+  .lc-prog .kv b{font-size:17px}
+  #lc-q{width:100%;border:1px solid rgba(255,255,255,.2);background:rgba(0,0,0,.25);color:#fff;border-radius:12px;padding:12px;font-size:16px;font-family:inherit;margin-bottom:12px}
+  .lc{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:12px 14px;margin-bottom:10px}
+  .lc.done{opacity:.55}
+  .lc-h{display:flex;align-items:center;gap:8px}
+  .lc-h .sq{min-width:30px;height:30px;border-radius:9px;background:#3E6AF2;display:grid;place-items:center;font-weight:900;font-size:14px;flex:none}
+  .lc-h b{font-size:16.5px;flex:1;line-height:1.3}
+  .lc-tg{font-size:11.5px;font-weight:800;border-radius:999px;padding:2px 8px}
+  .lc-tg.fz{background:#f5c4b3;color:#4a1b0c}.lc-tg.ic{background:#b5d4f4;color:#042c53}
+  .lc-r{display:flex;align-items:center;gap:10px;border-radius:12px;padding:9px 10px;margin-top:8px}
+  .lc-r.a{background:rgba(251,191,36,.12)}.lc-r.c{background:rgba(56,189,248,.13)}
+  .lc-r label{font-size:12.5px;font-weight:800;opacity:.8;width:30px;flex:none}
+  .lc-r .loc{flex:1;font-size:21px;font-weight:900;letter-spacing:.02em;font-variant-numeric:tabular-nums}
+  .lc-r .loc.none{font-size:14px;font-weight:600;opacity:.5}
+  .lc-r.ck .loc{text-decoration:line-through;opacity:.5}
+  .lc-r .cb{width:38px;height:38px;border-radius:10px;border:2px solid rgba(255,255,255,.4);background:transparent;color:#fff;font-size:20px;font-weight:900;flex:none}
+  .lc-r.ck .cb{background:#22C55E;border-color:#22C55E}
+  .lc-r .cb:disabled{opacity:.35}
+  #t-dl .dlw{border-radius:16px;overflow:hidden;background:#fff;height:calc(100dvh - 190px);min-height:520px}
+  #t-dl iframe{width:100%;height:100%;border:0;display:block}
+  .dl-bar{display:flex;justify-content:space-between;align-items:center;font-size:13px;opacity:.8;margin:2px 2px 8px}
+  .dl-bar a{color:#9CB4FF;font-weight:700}
+  .lc-nt{font-size:12.5px;opacity:.7;margin-top:6px}
+  button.big.save{background:linear-gradient(135deg,#3E6AF2,#8B5CF6);box-shadow:0 10px 30px rgba(62,106,242,.35);font-size:20px;padding:18px}
+  .log{font-size:11.5px;opacity:.55;max-height:90px;overflow:auto;white-space:pre-wrap;word-break:break-all;margin-top:10px}
+  .agree{position:fixed;inset:0;z-index:50;background:#0F1A33;overflow:auto;padding:max(18px,env(safe-area-inset-top)) 18px max(24px,env(safe-area-inset-bottom))}
+  .agree h2{margin:6px 0 10px;font-size:22px}.agree ul{margin:0;padding-left:18px;line-height:1.65;font-size:15.5px}.agree li{margin-bottom:6px}.agree b{color:#fff}
+  .agree .note{opacity:.75;font-size:13.5px;line-height:1.6;margin-top:10px}
+  .agree button{display:block;width:100%;border:0;border-radius:16px;padding:18px;font:inherit;font-size:19px;font-weight:800;margin-top:12px}
+  .agree .yes{background:#3E6AF2;color:#fff}.agree .no{background:rgba(255,255,255,.1);color:#EAF0FF}
+  .sh{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:12px 14px;margin-bottom:10px}
+  .sh.req{border-color:#3E6AF2;box-shadow:0 0 0 1px #3E6AF2 inset}.sh.done{opacity:.75}
+  .sh-h{display:flex;align-items:center;gap:8px}.sh-h .sq{min-width:28px;height:28px;border-radius:9px;background:#3E6AF2;display:grid;place-items:center;font-weight:800}
+  .sh-h b{flex:1;font-size:16.5px;line-height:1.35}.sh-a{font-size:13.5px;opacity:.75;margin:4px 0 0 36px}.sh-m{font-size:15px;font-weight:800;color:#FDE68A;white-space:nowrap}
+  .sh-tg{display:flex;flex-wrap:wrap;gap:5px;margin:7px 0 0 36px}.sh-tg span{font-size:12px;font-weight:800;border-radius:999px;padding:3px 9px}
+  .t-new{background:#EA580C;color:#fff}.t-chg{background:#7C3AED;color:#fff}.t-voc{background:#B42318;color:#fff}.t-conf{background:#B54708;color:#fff}.t-fz{background:#0EA5E9;color:#fff}.t-nol{background:#FACC15;color:#1F2937}
+  .sh-x{margin:7px 0 0 36px;font-size:13.5px;line-height:1.5;background:rgba(0,0,0,.18);border-radius:10px;padding:7px 10px}.sh-x b{color:#FCA5A5}
+  .sh-btn{margin:9px 0 0 36px;border:0;border-radius:12px;padding:11px 14px;font:inherit;font-size:15px;font-weight:800;background:#3E6AF2;color:#fff;width:calc(100% - 36px)}.sh-btn.ok{background:rgba(20,184,166,.22);color:#CCFBF1}
+  .sh-ov{position:fixed;inset:0;z-index:40;background:#0A0F14;display:flex;flex-direction:column}.sh-ov[hidden]{display:none}
+  .sh-ovh{display:flex;align-items:center;gap:10px;padding:max(10px,env(safe-area-inset-top)) 14px 10px;background:#1B2A4E}.sh-ovh b{flex:1;font-size:16px}
+  .sh-ovh button{border:0;border-radius:12px;padding:10px 14px;font:inherit;font-weight:800;background:#3E6AF2;color:#fff}
+  .sh-ov iframe{flex:1;border:0;width:100%;background:#EEF2F7}.sh-ovb{padding:14px;font-size:15px;line-height:1.6;overflow:auto}
+  .shl{padding:6px 16px}.shr{padding:calc(14px * var(--z,1)) 0;border-bottom:1px solid rgba(255,255,255,.1)}.shr:last-child{border-bottom:0}
+  .shr.req{background:rgba(62,106,242,.14);margin:0 -16px;padding-left:16px;padding-right:16px}
+  .shn{display:flex;align-items:baseline;gap:8px}.shn i{font-style:normal;font-size:calc(13px * var(--z,1));font-weight:800;opacity:.55;min-width:1.4em}
+  .shn b{font-size:calc(18px * var(--z,1));line-height:1.3;font-weight:800}
+  .sha{font-size:calc(14px * var(--z,1));opacity:.75;line-height:1.4;margin:3px 0 6px calc(1.4em + 8px)}
+  .shm{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-left:calc(1.4em + 8px);font-size:calc(16px * var(--z,1));font-weight:700;font-variant-numeric:tabular-nums}
+  .shm span{display:flex;flex-direction:column}.shm label{font-size:calc(11px * var(--z,1));font-weight:600;opacity:.55}.shm .t{color:#FDE68A}
+  .shr.tot .shm,.shr.tot .shn{margin-left:0}.shr.tot .shm{margin-top:6px}
+  .shr .sh-tg,.shr .sh-x,.shr .sh-btn{margin-left:calc(1.4em + 8px)}.shr .sh-btn{width:calc(100% - 1.4em - 8px);margin-top:8px}
+  .sh-top{display:flex;align-items:center;gap:10px;margin-bottom:12px}.sh-top .name{flex:1;margin:0}
+  .sh-lo{border:0;border-radius:12px;padding:9px 14px;font:inherit;font-size:17px;font-weight:800;background:rgba(255,255,255,.14);color:#fff;white-space:nowrap}
+  .sht{width:100%;border-collapse:collapse;font-size:14px}.shtw{overflow-x:auto;margin:0 -4px}
+  .sht th{font-size:12px;font-weight:700;opacity:.65;text-align:left;padding:6px 6px;border-bottom:1px solid rgba(255,255,255,.15);white-space:nowrap}
+  .sht td{padding:9px 6px;border-bottom:1px solid rgba(255,255,255,.08);vertical-align:top}
+  .sht .n{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}.sht .t{font-weight:800;color:#FDE68A}
+  .sht td.cl b{display:block;font-size:15px;line-height:1.35}.sht td.cl .ad{display:block;font-size:12.5px;opacity:.7;margin-top:2px;line-height:1.4}
+  .sht tr.hm td{border-bottom:0}.sht tr.mo td{padding-top:0}.sht td.n{font-size:13.5px}
+  .sht tr.req td{background:rgba(62,106,242,.14)}.sht tfoot td{font-weight:800;border-top:1px solid rgba(255,255,255,.2);border-bottom:0}
+  .sht .sh-tg,.sht .sh-x,.sht .sh-btn{margin-left:0}.sht .sh-btn{width:100%;padding:9px 10px;font-size:14px}
+  .dl-lock b{display:block;font-size:17px;margin-bottom:6px}.dl-lock button{margin-top:8px;margin-right:6px;border:0;border-radius:10px;padding:10px 12px;font:inherit;font-weight:800;background:#3E6AF2;color:#fff}
+  .dg{padding:16px 18px}.dg h3{margin:0 0 10px;font-size:17px;font-weight:800}
+  .dg ol{list-style:none;margin:0;padding:0;counter-reset:s}.dg li{counter-increment:s;display:flex;gap:12px;align-items:flex-start;padding:10px 0;border-top:1px solid rgba(255,255,255,.08)}.dg li:first-child{border-top:0}
+  .dg li::before{content:counter(s);flex:0 0 30px;height:30px;border-radius:50%;background:#3E6AF2;color:#fff;font-weight:800;font-size:16px;display:flex;align-items:center;justify-content:center}
+  .dg li b{display:block;font-size:16px;font-weight:800;margin-bottom:2px}.dg li span{display:block;font-size:14px;line-height:1.5;opacity:.8}.dg li.me::before{background:#FDE68A;color:#1B2A4E}
+  .dg [hidden]{display:none}.dg .tip{margin-top:10px;font-size:13.5px;line-height:1.6;opacity:.75}
+
+  /* 11/20 테슬라앱식 홈: 차량 + 메뉴 목록 → 누르면 전체 화면 */
+  #main>.tabs{display:none}
+  #home,#hbk{display:none}
+  body.hm #home{display:block} body.hm #main>[id^="t-"]{display:none!important}
+    body:not(.hm) #hbk{display:flex}
+  #hbk{align-items:center;gap:6px;margin:-4px 0 12px}
+  #hbk button{width:44px;height:44px;border:0;background:none;color:#EDEFF1;display:grid;place-items:center;margin-left:-10px}
+  #hbk b{font-size:20px;font-weight:800}
+  .hm-nm{font-size:30px;font-weight:800;letter-spacing:-.02em;color:#fff}
+  .hm-sub{font-size:15px;color:#9AA0A6;margin-top:6px}
+  .hm-st{display:flex;align-items:center;gap:8px;font-size:15px;color:#9AA0A6;margin-top:8px}
+  .hm-st i{width:9px;height:9px;border-radius:50%;background:#6B7178}.hm-st.on i{background:#34C27A}
+  .hm-car{display:flex;justify-content:center;margin:26px -8px 0}.hm-car svg{width:100%;max-width:360px;height:auto;display:block}
+  .hm-chg{display:block;margin:6px auto 14px;border:0;background:none;color:#8D939A;font:inherit;font-size:14px;text-decoration:underline;padding:10px}
+  .hm-rows{margin:0 -18px}
+  .hm-row{display:flex;align-items:center;gap:20px;width:100%;border:0;background:none;color:#EDEFF1;font:inherit;text-align:left;padding:16px 26px;min-height:64px;cursor:pointer}
+  .hm-row:active{background:rgba(255,255,255,.05)}
+  .hm-row span{flex:1;min-width:0}.hm-row b{display:block;font-size:20px;font-weight:600}.hm-row small{display:block;font-size:14px;color:#8D939A;margin-top:3px}
+  .car-ov{position:fixed;inset:0;z-index:60;background:#16181B;overflow:auto;padding:max(14px,env(safe-area-inset-top)) 16px max(20px,env(safe-area-inset-bottom))}.car-ov[hidden]{display:none}
+  .car-h{display:flex;align-items:center}.car-h button{width:44px;height:44px;border:0;background:none;display:grid;place-items:center}.car-h b{flex:1;text-align:center;font-size:20px;font-weight:800;margin-right:44px}
+  .car-hero svg{width:100%;max-width:340px;height:auto;display:block;margin:10px auto 0}
+  .car-g{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:18px}
+  .car-g button{background:#202327;border:2px solid #202327;border-radius:16px;padding:12px 6px 12px;display:flex;flex-direction:column;align-items:center;gap:6px;color:#EDEFF1;font:inherit;font-size:15px;font-weight:700;cursor:pointer}
+  .car-g button svg{width:100%;max-width:150px;height:auto;display:block}
+  .car-g button.on{border-color:#34C27A}
+  .car-ok{width:100%;height:54px;border-radius:14px;border:0;background:#34C27A;color:#0E1A13;font:inherit;font-size:18px;font-weight:800;margin-top:22px}
+  .upd{position:fixed;left:12px;right:12px;bottom:max(14px,env(safe-area-inset-bottom));z-index:70;display:flex;align-items:center;gap:12px;background:#2F9E5B;color:#fff;border-radius:14px;padding:12px 14px;font-size:15px;font-weight:700;box-shadow:0 6px 20px rgba(0,0,0,.4)}.upd[hidden]{display:none}
+  .upd span{flex:1}.upd button{border:0;border-radius:10px;background:#fff;color:#1F6F4A;font:inherit;font-size:15px;font-weight:800;padding:10px 14px}
+</style>
+</head>
+<body>
+<div class="brand"><span class="lg"><img src="icon.svg?v=6" width="34" height="34" alt="" style="display:block"></span><b>위로드</b><small>배송기사웹</small></div>
+
+<div id="setup" class="card setup" hidden>
+  <div class="name">로그인<small>팀을 고르고 이름과 휴대폰번호를 넣으면 됩니다</small></div>
+  <label id="s-tl">팀 선택</label><div class="tmlock" id="s-tlock" hidden></div><div class="tmseg" id="s-team"><button data-tm="snack">스낵<small>스낵24 · 간식 배송</small></button><button data-tm="cvs">편의점<small>편의점 배송</small></button></div>
+  <label>이름 (물류팀에 등록된 기사 이름)</label><input id="s-n" placeholder="홍길동" autocomplete="off">
+  <label>비밀번호 (휴대폰번호, 숫자만)</label><input id="s-p" type="tel" inputmode="numeric" placeholder="01012345678" autocomplete="off">
+  <button id="s-ok">시작하기</button>
+  <p class="msg" style="margin-top:12px">로그인이 안 되면 관리자에게 "위로드 기사 등록"을 요청해 주세요.</p>
+  <div class="gd"><a class="gd-main" href="guide.html">📖 설치·사용 가이드 보기</a><div class="gd-l">내 폰을 고르면 그 폰에 맞는 가이드가 열려요</div><div class="gd-os"><a data-os="and" href="guide.html?os=and">안드로이드 (갤럭시)</a><a data-os="ios" href="guide.html?os=ios">아이폰</a></div></div>
+</div>
+
+<div id="agree" class="agree" hidden>
+  <div class="brand"><span class="lg"><img src="icon.svg?v=6" width="34" height="34" alt="" style="display:block"></span><b>위로드</b><small>배송기사웹</small></div>
+  <h2>위로드앱 위치정보수집동의</h2>
+  <div class="card"><ul>
+    <li><b>수집정보</b> — 위치, 속도, 정확도, 수집시각</li>
+    <li><b>사용목적</b> — 고객사의 도착시간 안내 및 예측</li>
+    <li><b>수집기간</b> — 출근을 켠 동안만. 퇴근해서 종료되면 수집하지 않음</li>
+    <li><b>보관기간</b> — 상세 경로는 30일 뒤 자동 삭제. 이외 정보는 정산 목적으로 기록</li>
+    <li><b>모니터링 권한</b> — 관리자만</li>
+  </ul></div>
+  <button class="yes" id="ag-ok">동의하고 시작</button><button class="no" id="ag-no">동의하지 않음</button>
+</div>
+
+<div id="car-ov" class="car-ov" hidden><div class="car-h"><button id="car-x" aria-label="닫기"><svg width="26" height="26" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" stroke="#EDEFF1" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></button><b>내 차 고르기</b></div><div class="car-hero" id="car-hero"></div><div style="text-align:center;font-size:14px;color:#9AA0A6;margin-top:4px">홈 화면에 보일 차 색을 골라요</div><div class="car-g" id="car-g"></div><button class="car-ok" id="car-ok">이 차로 하기</button></div>
+<div class="upd" id="upd" hidden><span>새 버전이 나왔어요</span><button id="upd-b">업데이트</button></div>
+<button class="top-lo" id="top-lo" hidden>로그아웃</button>
+<div id="main" hidden>
+  <div id="pd" hidden></div>
+  <div id="home"><div class="hm-nm" id="hm-nm">—</div><div class="hm-sub" id="hm-sub"></div><div class="hm-st" id="hm-st"><i></i><span id="hm-stt">—</span></div><div class="hm-car" id="hm-car"></div><button class="hm-chg" id="hm-chg">내 차 바꾸기</button><div class="hm-rows" id="hm-rows"></div></div>
+  <div id="hbk"><button id="hbk-b" aria-label="홈으로"><svg width="26" height="26" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" stroke="#EDEFF1" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></button><b id="hbk-t"></b></div>
+  <div class="tabs"><button data-tab="cs" hidden>실적표</button><button data-tab="cw" hidden>업무</button><button data-tab="sh">실적표</button><button data-tab="loc">출근</button><button data-tab="lc">상차</button><button data-tab="dl">배송</button><button class="on" data-tab="rec">퇴근</button></div>
+  <div id="t-cs" hidden>
+    <div class="card">
+      <div class="sh-top"><div class="name"><span id="cs-nm">—</span><span class="tmchip">편의점</span><small id="cs-sub">일일실적표 · 거래처 정보 · 상온/저온/합계 매출</small></div><button class="sh-lo" id="cs-lo">팀 바꾸기</button></div>
+      <div class="lc-bar"><button id="cs-prev">◀</button><span class="d" id="cs-d">—</span><button id="cs-next">▶</button><button id="cs-re">↻</button></div>
+      <div class="lc-prog" id="cs-prog"></div>
+    </div>
+    <div class="card warn" id="cs-warn" hidden></div>
+    <div id="cs-list"></div>
+  </div>
+  <div id="t-cw" hidden>
+    <div class="card">
+      <div class="name"><span id="cw-nm">—</span><span class="tmchip">편의점</span><small id="cw-sub">업무시작 → 점포마다 배송완료사진 → 특이사항 → 업무종료</small></div>
+      <div class="lc-bar"><span class="d" id="cw-d">—</span></div>
+      <div class="grid" style="margin-top:12px"><div class="kv"><label>업무시작</label><b id="cw-s">—</b></div><div class="kv"><label>업무종료</label><b id="cw-e">—</b></div><div class="kv"><label>배송완료사진</label><b id="cw-p">—</b></div><div class="kv"><label>위치 전송</label><b id="cw-l">—</b></div></div>
+    </div>
+    <button class="big" id="cw-start">업무시작</button>
+    <div class="card ok" id="cw-ok" hidden></div>
+    <div class="card warn" id="cw-warn" hidden></div>
+    <div id="cw-list"></div>
+    <div class="card f" id="cw-fin">
+      <label>오늘의 특이사항 (없으면 "없음")</label><textarea class="cw-note" id="cw-note" placeholder="예: OO점 셔터 닫힘 — 문 앞 보관, 반품 2박스 회수">없음</textarea>
+    </div>
+    <button class="big stop" id="cw-end">업무종료</button>
+    <div class="card msg" id="cw-rec" hidden>· 위펀풀필먼트 정직원은 <b>퇴근</b> 탭에서 계기판 km·주유 금액도 적어 주세요.</div>
+    <div class="card msg">· 업무시작을 누르면 위치 전송이 켜지고, 업무종료를 누르면 꺼져요.<br>· 사진은 점포마다 배송을 마친 뒤 바로 찍어 올려 주세요 (여러 장 가능).<br>· <a href="#" id="cw-lo" style="color:#9CB4FF">팀 바꾸기 / 다른 이름으로 로그인</a></div>
+    <div class="card"><div class="gd"><a class="gd-main" href="guide.html">📖 설치·사용 가이드 보기</a><div class="gd-l">내 폰을 고르면 그 폰에 맞는 가이드가 열려요</div><div class="gd-os"><a data-os="and" href="guide.html?os=and">안드로이드 (갤럭시)</a><a data-os="ios" href="guide.html?os=ios">아이폰</a></div></div></div>
+  </div>
+  <div id="t-sh" hidden>
+    <div class="card">
+      <div class="sh-top"><div class="name">일일실적표<small id="sh-sub">거래처 · 주소 · 상온/저온/합계 매출</small></div><button class="sh-lo" id="sh-lo">로그아웃</button></div>
+      <div class="lc-bar"><button id="sh-prev">◀</button><span class="d" id="sh-d">—</span><button id="sh-next">▶</button><button id="sh-re">↻</button></div>
+      <div class="lc-prog" id="sh-prog"></div>
+    </div>
+    <div class="card warn" id="sh-warn" hidden></div>
+    <div id="sh-list"></div>
+    <div class="card msg">· <b>카드 확인 (필수)</b>는 물류팀이 요약카드에 주의사항을 적어 둔 거래처예요. 카드를 열어 봐야 배송 탭으로 넘어갈 수 있어요.<br>· 배송 탭은 상차 탭의 체크를 모두 끝내야 열려요.</div>
+  </div>
+  <div id="sh-ov" class="sh-ov" hidden><div class="sh-ovh"><b id="sh-ovt">거래처 카드</b><button id="sh-ovx">확인했어요 ✕</button></div><iframe id="sh-ovf" title="거래처 요약카드"></iframe><div id="sh-ovb" class="sh-ovb"></div></div>
+  <div id="t-dl" hidden>
+    <div class="card warn dl-lock" id="dl-lock" hidden></div>
+    <div class="dl-bar"><span>배송매니저 (출발·도착·배송사진 → 위펀오피스)</span><a href="https://delivery-manager.wefun.kr/" target="_blank" rel="noopener">새 창 ↗</a></div>
+    <div class="dlw" id="dl-w"></div>
+    <div class="card msg" id="dl-app" hidden style="margin-top:10px">· 사진 첨부가 안 되면 위로드 앱을 새 버전으로 업데이트해 주세요: <a href="https://ridvdsluzfjxonqlavgm.supabase.co/storage/v1/object/public/notify/app/weroad.apk" style="color:#9CB4FF;font-weight:700">위로드 앱 최신 버전 내려받기</a></div>
+  </div>
+  <div id="t-lc" hidden>
+    <div class="card">
+      <div class="name">로케이션<small id="lc-sub">풀필먼트 로케이션 · 배송 순번대로</small></div>
+      <div class="lc-bar"><button id="lc-prev">◀</button><span class="d" id="lc-d">—</span><button id="lc-next">▶</button><button id="lc-re">↻</button></div>
+      <div class="lc-bar" id="lc-mb" hidden><select id="lc-drv"><option value="">기사 선택</option></select></div>
+      <div class="lc-prog" id="lc-prog"></div>
+    </div>
+    <input id="lc-q" placeholder="거래처 이름·로케이션 검색" autocomplete="off">
+    <div class="card warn" id="lc-warn" hidden></div>
+    <div id="lc-list"></div>
+    <div class="card msg"><b>로케이션 사용법</b><br>· 상품을 챙기는 즉시 그 칸의 ☐를 눌러 ✓ 표시하세요 (상온·저온 따로).<br>· 로케이션이 없으면 도크장 앞 파레트를 확인하세요.<br>· ✓ 안 한 상품이 남아 있으면 배송 탭으로 넘어갈 수 없어요.</div>
+  </div>
+  <div id="t-rec">
+    <div class="card f">
+      <div class="name" id="nm2">—<small>오늘 운행 마치고 적어 주세요</small></div>
+      <label>차량번호</label><select id="r-v"></select>
+      <label>근무</label><div class="seg2"><button data-sh="주간">주간</button><button data-sh="야간">야간</button></div>
+      <label>퇴근 때 계기판 km (누적)</label><input id="r-km" class="num" inputmode="numeric" placeholder="예: 246,720">
+      <div class="hint" id="r-hint"></div>
+      <label>주유·충전 금액 (원)</label><input id="r-fuel" class="num" inputmode="numeric" placeholder="없으면 비움">
+      <label>특이사항 (선택)</label><input id="r-note" placeholder="경고등, 소음, 사고 등">
+    </div>
+    <button class="big save" id="r-save">퇴근 기록 저장</button>
+    <div class="card ok" id="r-ok" hidden></div>
+    <div class="card warn" id="r-warn" hidden></div>
+    <div class="card"><div class="kv" style="background:none;padding:0"><label>최근 기록</label></div><div class="hist" id="r-hist">—</div></div>
+    <div class="card msg">· 계기판 숫자는 <b>누적 km 전체</b>를 적어요 (예: 246720). 지난 기록보다 작으면 저장이 안 돼요.<br>· 저장이 안 되면 기록은 폰에 남아 있다가 다음에 열 때 다시 보내요.<br>· 주유 영수증은 사진으로 따로 보관해 주세요.<br>· <a href="guide.html" style="color:#9CB4FF">📖 사용 가이드</a></div>
+  </div>
+  <div id="t-loc" hidden>
+  <div class="card">
+    <div class="name" id="nm">—<small id="sub">출근 버튼 한 번이면 돼요 · 위치는 앱이 알아서 보내요</small></div>
+    <div class="st" id="st"><span class="dot"></span><span id="stt">위치 앱 확인 중…</span></div>
+  </div>
+  <div class="card">
+    <div class="grid">
+      <div class="kv"><label>오늘 출근</label><b id="a-in-t">—</b></div>
+      <div class="kv"><label>퇴근</label><b id="a-out-t">—</b></div>
+      <div class="kv"><label>마지막 위치 수신</label><b id="a-last">—</b></div>
+      <div class="kv"><label>위치 앱</label><b id="a-app">—</b></div>
+    </div>
+  </div>
+  <button class="big" id="a-in">출근</button>
+  <button class="big stop" id="a-out" hidden>퇴근</button>
+  <div class="card ok" id="a-ok" hidden></div>
+  <div class="card warn" id="a-warn" hidden></div>
+  <div class="card dg">
+    <h3>하루 순서 — 위 탭 왼쪽부터 차례대로</h3>
+    <ol>
+      <li><div><b>실적표</b><span>오늘 갈 거래처·주소·매출 확인<br>'카드 확인' 붙은 곳은 카드를 눌러 꼭 읽기</span></div></li>
+      <li class="me"><div><b>출근 (지금 화면)</b><span>[출근] 누르면 위치는 앱이 알아서 보내요</span></div></li>
+      <li><div><b>상차</b><span>로케이션 보고 챙기는 즉시 <b style="display:inline;font-size:inherit;white-space:nowrap">☐ → ✓</b><br>✓ 안 한 상품이 있으면 배송 탭이 안 열려요</span></div></li>
+      <li><div><b>배송</b><span>거래처마다 출발 → 도착 → 배송사진</span></div></li>
+      <li><div><b>퇴근</b><span>이 화면에서 [퇴근] 누르기 (위치 전송 꺼짐)</span><span id="dg-rec" hidden>퇴근 탭에 계기판 km·주유 금액 적고 저장</span></div></li>
+    </ol>
+    <div class="gd"><a class="gd-main" href="guide.html">📖 설치·사용 가이드 보기</a><div class="gd-l">내 폰을 고르면 그 폰에 맞는 가이드가 열려요</div><div class="gd-os"><a data-os="and" href="guide.html?os=and">안드로이드 (갤럭시)</a><a data-os="ios" href="guide.html?os=ios">아이폰</a></div></div>
+  </div>
+  <div class="card msg" id="app-help" hidden>
+    <b>위로드 앱 상태</b>
+    <div style="margin-top:6px;line-height:1.8" id="app-st">—</div>
+    <div id="app-old" hidden style="margin-top:8px;padding:10px 12px;border-radius:12px;background:rgba(250,204,21,.15);border:1px solid rgba(250,204,21,.5);line-height:1.6"><b>새 위로드 앱이 나왔어요</b><br>지금 앱을 <b>삭제</b>하고 새로 설치해 주세요. 위치 권한은 "앱 사용 중에만 허용"만 물어요.<br><a href="guide.html?os=and" style="color:#FDE68A;font-weight:800">설치 가이드 보기 →</a></div>
+    <div style="margin-top:8px;line-height:1.8"><b>처음 한 번만 — 물어보면 모두 허용</b><br>① 위치 권한 → <b>"앱 사용 중에만 허용"</b><br>② 알림 → <b>허용</b><br>③ 배터리 → <b>"제한 없음"</b> (아래 버튼)</div>
+    <div style="margin-top:6px">· 출근하면 상단 알림에 "출근 중"이 떠요. 화면을 꺼도, 네비·사진을 써도 계속 보내요.<br>· 퇴근을 누르면 자동으로 꺼져요.</div>
+    <div style="margin-top:8px"><button class="sm" id="app-batt">배터리 제한 없음 설정</button> <button class="sm" id="app-perm">앱 권한 설정 열기</button></div>
+  </div>
+  <div class="card msg" id="apk-help" hidden>
+    <b>안드로이드 폰이네요 — 위로드 앱을 설치하면 화면을 꺼도 위치가 가요</b>
+    <div style="margin-top:6px;line-height:1.8">1. <a href="https://ridvdsluzfjxonqlavgm.supabase.co/storage/v1/object/public/notify/app/weroad.apk" style="color:#9CB4FF;font-weight:700">위로드 앱 내려받기 (weroad.apk)</a><br>2. 내려받은 파일 열기 → "출처를 알 수 없는 앱" 허용 → 설치<br>3. 앱 열고 같은 이름·번호로 로그인 → 출근</div>
+  </div>
+  <details class="card msg" id="tc-help">
+    <summary><b>위치 앱(Traccar Client) 설정 — 아이폰 · 처음 한 번만</b></summary>
+    <div style="margin-top:8px;line-height:1.8">
+      1. 앱 설치: <b>Traccar Client</b> (Play 스토어 · App Store, 무료)<br>
+      2. 기기 식별자(Device identifier): <b id="tc-id">—</b> <button class="sm" data-copy="tc-id">복사</button><br>
+      3. 서버 주소(Server URL): <b id="tc-url" style="word-break:break-all">—</b> <button class="sm" data-copy="tc-url">복사</button><br>
+      4. 위치 정확도 <b>높음</b> · 주기 <b>60</b>초 · 거리 <b>100</b> · 각도 0<br>
+      5. 맨 위 <b>서비스 상태</b> 켜기 → 이 화면에서 "마지막 위치 수신"이 몇 분 안으로 뜨면 성공<br>
+      · 안드로이드: 앱 정보 → 배터리 → <b>제한 없음</b> (안 하면 밤에 멈춰요)<br>
+      · 아이폰: 설정 → Traccar → 위치 → <b>앱을 사용하는 동안</b><br>
+      · 이후엔 앱을 건드릴 필요 없어요. 화면 꺼도, 네비·사진 찍어도 계속 보내요.
+    </div>
+  </details>
+  <details class="card msg" id="tmp-help">
+    <summary>앱이 아직 없을 때 임시로 — 이 화면에서 보내기</summary>
+    <div style="margin-top:8px">
+      <button class="big" id="btn" style="margin:8px 0">임시 위치 전송 시작</button>
+      <div class="grid">
+        <div class="kv"><label>마지막 전송</label><b id="k-last">—</b></div>
+        <div class="kv"><label>오늘 전송</label><b id="k-n">0<i>회</i></b></div>
+        <div class="kv"><label>GPS 정확도</label><b id="k-acc">—</b></div>
+        <div class="kv"><label>속도</label><b id="k-spd">—</b></div>
+      </div>
+      <div id="help" style="margin-top:8px">· 이 화면을 <b>켜 둔 동안만</b> 보내요. 화면을 끄거나 다른 앱으로 가면 멈춰요 — 그래서 위 앱을 꼭 설치해 주세요.</div>
+    </div>
+  </details>
+  <div class="card msg">· <a href="#" id="logout" style="color:#9CB4FF">다른 이름으로 로그인</a></div>
+  <div class="card warn" id="warn" hidden></div>
+  <div class="log" id="log"></div>
+  </div>
+</div>
+<div class="foot">위로드 WeRoad · 위펀 운송관리 · <span id="ver">v22</span></div>
+
+<script>
+(function () {
+  'use strict';
+  const $ = (id) => document.getElementById(id);
+  const LS = 'wr-driver';
+  const SERVER = 'https://ridvdsluzfjxonqlavgm.supabase.co', KEY = 'sb_publishable_iP4DgQBqKFE_u7V929BCjw_CO4dxjWS';   // 공개용 키 — 위치 쓰기는 로그인 토큰이 있어야 함
+  const SEND_MOVING = 120, SEND_IDLE = 300, REC_SEC = 30, REC_M = 40;   // 전송 주기(초)·기록 간격(초/미터)
+  let cfg = {}; try { cfg = JSON.parse(localStorage.getItem(LS) || '{}'); } catch (e) { cfg = {}; }
+  const q = new URLSearchParams(location.search);
+  // 링크 변수: n=기사이름 (이름만 미리 채움 · 로그인은 본인이)
+  if (q.get('n') || q.get('v')) { if (q.get('n')) cfg.n = q.get('n'); if (q.get('v')) cfg.v = q.get('v'); try { localStorage.setItem(LS, JSON.stringify(cfg)); } catch (e) { /* noop */ } history.replaceState(null, '', location.pathname); }
+  const log = (s) => { const el = $('log'); el.textContent = (new Date().toTimeString().slice(0, 8) + ' ' + s + '\n' + el.textContent).slice(0, 1500); };
+
+  const loggedIn = () => cfg.n && cfg.tok;
+  const TRACCAR_URL = SERVER + '/functions/v1/loc';
+  const APP = !!window.WeRoadApp;   // 위로드 안드로이드 앱 안에서 열렸는지
+  const IS_ANDROID = /Android/i.test(navigator.userAgent);   // Traccar Client 서버 주소 (Supabase Edge Function 'loc')
+  const MASTERS = ['이상진', '김태영'];   // 관리자 계정: 위치 전송 없음(기사·차량으로 세지 않음), 어떤 차든 퇴근 기록 대신 입력 가능
+  const isMaster = () => MASTERS.includes(String(cfg.n || '').replace(/\s/g, ''));
+  // 11/11 팀 선택 (스낵 / 편의점) — 아이디·비밀번호는 같고, 로그인 앞에서 팀을 골라 화면이 달라짐 (투잡 기사)
+  // 11/13 v22: 팀별 링크 — ?t=snack(스낵) / ?t=cvs(편의점). 링크로 들어오면 팀이 고정되고 그 팀 계정만 로그인됨 (앱을 다시 열어도 유지)
+  let LINK_T = ['snack', 'cvs'].includes(q.get('t')) ? q.get('t') : '';
+  try { if (LINK_T) localStorage.setItem(LS + '-tl', LINK_T); else LINK_T = ['snack', 'cvs'].includes(localStorage.getItem(LS + '-tl')) ? localStorage.getItem(LS + '-tl') : ''; } catch (e) { /* noop */ }
+  if (q.get('t')) history.replaceState(null, '', location.pathname);
+  if (LINK_T && cfg.tok && cfg.team && cfg.team !== LINK_T) { cfg = { n: cfg.n, v: cfg.v || '' }; try { localStorage.setItem(LS, JSON.stringify(cfg)); localStorage.removeItem(LS + '-csme'); sessionStorage.removeItem('wr-tab'); } catch (e) { /* noop */ } }   // 다른 팀 링크로 들어오면 다시 로그인
+  const TEAM = cfg.team === 'cvs' ? 'cvs' : 'snack', CVS = () => TEAM === 'cvs' && loggedIn();
+  let selTeam = LINK_T || (cfg.team === 'cvs' ? 'cvs' : (cfg.team === 'snack' ? 'snack' : ''));
+  const TNAME = { snack: '스낵', cvs: '편의점' };
+  if (LINK_T) { $('s-team').hidden = true; $('s-tl').textContent = '팀'; document.querySelector('#setup .name small').textContent = '이름과 휴대폰번호를 넣으면 됩니다'; $('s-tlock').hidden = false; $('s-tlock').innerHTML = TNAME[LINK_T] + ' 기사 로그인<small>' + (LINK_T === 'cvs' ? '편의점 배송 기사만 로그인돼요' : '스낵24 · 간식 배송 기사만 로그인돼요') + '</small>'; }
+  // 11/13 가이드 링크: 기기(안드로이드/아이폰) + 팀을 같이 넘김
+  const gdTeam = () => (loggedIn() ? TEAM : selTeam) || '';
+  const gdLinks = () => document.querySelectorAll('a[href^="guide.html"]').forEach((a) => { const os = a.dataset.os || (/iPhone|iPad/i.test(navigator.userAgent) ? 'ios' : 'and'); const t = gdTeam(); a.href = 'guide.html?os=' + os + (t ? '&t=' + t : '') + (cfg.n ? '&n=' + encodeURIComponent(cfg.n) : ''); });
+  const tmUi = () => document.querySelectorAll('#s-team button').forEach((b) => b.classList.toggle('on', b.dataset.tm === selTeam));
+  document.querySelectorAll('#s-team button').forEach((b) => { b.onclick = () => { selTeam = b.dataset.tm; tmUi(); gdLinks(); }; }); tmUi(); gdLinks();
+  if (!loggedIn()) { $('setup').hidden = false; }
+  else { $('main').hidden = false; $('nm').firstChild.textContent = cfg.n; $('nm2').firstChild.textContent = cfg.n; if (isMaster()) { document.querySelector('.tabs button[data-tab=loc]').hidden = true; $('nm2').lastElementChild.textContent = '관리자 계정 — 어떤 차량이든 대신 기록할 수 있어요'; } }
+  // 11/6 위치 수집 동의 (한 번) — 동의 기록은 위치 서버에도 남김
+  const AGREE_VER = '2026-11-07';   // 11/7 문구 변경 → 다시 동의 받음
+  if (loggedIn() && !isMaster() && cfg.agree !== AGREE_VER && !cfg.noAgree) $('agree').hidden = false;
+  $('ag-ok').onclick = async () => {
+    $('ag-ok').disabled = true;
+    try { await rpc('driver_consent', { p_name: cfg.n, p_token: cfg.tok, p_ver: AGREE_VER, p_ok: true }); } catch (e) { /* 기록 실패해도 진행 · 다음에 다시 기록 */ }
+    cfg.agree = AGREE_VER; delete cfg.noAgree; localStorage.setItem(LS, JSON.stringify(cfg)); $('agree').hidden = true;
+  };
+  $('ag-no').onclick = async () => {
+    try { await rpc('driver_consent', { p_name: cfg.n, p_token: cfg.tok, p_ver: AGREE_VER, p_ok: false }); } catch (e) { /* noop */ }
+    cfg.noAgree = true; localStorage.setItem(LS, JSON.stringify(cfg)); $('agree').hidden = true;
+    const t = document.querySelector('.tabs button[data-tab=loc]'); if (t) t.hidden = true;
+    const r = document.querySelector('.tabs button[data-tab=rec]'); if (r) r.click();
+  };
+  if (cfg.noAgree) { const t = document.querySelector('.tabs button[data-tab=loc]'); if (t) t.hidden = true; }
+  $('s-n').value = cfg.n || '';
+  const rpc = async (fn, body) => {
+    const r = await fetch(SERVER + '/rest/v1/rpc/' + fn, { method: 'POST', headers: { 'Content-Type': 'application/json', apikey: KEY }, body: JSON.stringify(body) });
+    const t = await r.text();
+    if (!r.ok) { let m = t; try { m = JSON.parse(t).message || t; } catch (e) { /* noop */ } throw new Error(m.slice(0, 120)); }
+    return t ? JSON.parse(t) : null;
+  };
+  $('s-ok').onclick = async () => {
+    const n = $('s-n').value.trim(), pw = $('s-p').value.replace(/[^0-9]/g, '');
+    if (!selTeam) return alert('팀(스낵 / 편의점)을 먼저 골라 주세요');
+    if (!n || !pw) return alert('이름과 휴대폰번호를 넣어 주세요');
+    $('s-ok').disabled = true; $('s-ok').textContent = '확인 중…';
+    try {
+      let tok;
+      try { tok = await rpc('driver_login_team', { p_name: n, p_pw: pw, p_team: selTeam }); }
+      catch (e) { if (/driver_login_team|function|schema cache/i.test(e.message) && !/기사/.test(e.message)) tok = await rpc('driver_login', { p_name: n, p_pw: pw }); else throw e; }
+      if (!tok) throw new Error('이름 또는 휴대폰번호가 맞지 않습니다. 물류팀에 등록된 이름·번호인지 확인해 주세요.');
+      cfg = { n, tok, v: cfg.v || '', team: selTeam }; localStorage.setItem(LS, JSON.stringify(cfg)); if (APP) { try { if (window.WeRoadApp.setAuth) window.WeRoadApp.setAuth(n, tok); else window.WeRoadApp.setDriver(n); } catch (e) { /* noop */ } } location.reload();
+    } catch (e) { $('s-ok').disabled = false; $('s-ok').textContent = '시작하기'; alert(e.message); }
+  };
+  // ---- 상태
+  let on = false, watchId = null, wake = null, buf = [], lastRec = null, lastSent = 0, nToday = 0, sending = false, timer = null, lastPos = null;
+  try { const b = JSON.parse(localStorage.getItem(LS + '-buf') || '[]'); if (Array.isArray(b)) buf = b.slice(-300); } catch (e) { /* noop */ }
+  try { const c = JSON.parse(localStorage.getItem(LS + '-cnt') || '{}'); if (c.d === today()) nToday = c.n || 0; } catch (e) { /* noop */ }
+  function today() { return new Date().toLocaleDateString('sv-SE'); }
+  function saveBuf() { try { localStorage.setItem(LS + '-buf', JSON.stringify(buf.slice(-300))); } catch (e) { /* noop */ } }
+  function dist(a, b) { return Math.hypot((a.lng - b.lng) * 88400, (a.lat - b.lat) * 111000); }
+  function ui() {
+    const st = $('st'); st.className = 'st ' + (on ? 'on' : '');
+    if (on) $('stt').textContent = sending ? '임시 전송 중…' : '임시 전송 중 (화면 켜 둔 동안)';
+    
+    const b = $('btn'); b.textContent = on ? '임시 위치 전송 멈춤' : '임시 위치 전송 시작'; b.className = 'big' + (on ? ' stop' : '');
+    $('k-n').innerHTML = nToday + '<i>회</i>';
+    $('k-last').textContent = lastSent ? new Date(lastSent).toTimeString().slice(0, 5) : '—';
+    $('k-acc').innerHTML = lastPos ? Math.round(lastPos.acc) + '<i>m</i>' : '—';
+    $('k-spd').innerHTML = lastPos && lastPos.spd != null ? Math.round(lastPos.spd) + '<i>km/h</i>' : '—';
+  }
+  function warn(s) { const w = $('warn'); w.hidden = !s; w.textContent = s || ''; }
+
+  // ---- 위치 수집
+  function onPos(p) {
+    const c = p.coords, t = p.timestamp || Date.now();
+    lastPos = { lat: c.latitude, lng: c.longitude, acc: c.accuracy || 0, spd: c.speed != null && c.speed >= 0 ? c.speed * 3.6 : null, t };
+    if (c.accuracy > 300) { ui(); return; }                      // 너무 부정확한 점은 버림
+    const moved = !lastRec || dist(lastRec, lastPos) >= REC_M;
+    const due = !lastRec || t - lastRec.t >= REC_SEC * 1000;
+    if (moved && due) { lastRec = lastPos; buf.push([t, +c.latitude.toFixed(6), +c.longitude.toFixed(6), Math.round(c.accuracy || 0), Math.round(lastPos.spd || 0)]); saveBuf(); }
+    warn('');
+    ui();
+  }
+  function onErr(e) {
+    warn(e.code === 1 ? '위치 권한이 꺼져 있습니다. 브라우저 설정에서 이 사이트의 위치 권한을 "허용"으로 바꿔 주세요.' : '위치를 가져오지 못했습니다 (' + e.message + '). 잠시 후 다시 시도합니다.');
+    log('GPS 오류 ' + e.code + ' ' + e.message);
+  }
+  const rows = (pts) => pts.map((p) => ({ t: new Date(p[0]).toISOString(), lat: p[1], lng: p[2], acc: p[3], spd: p[4], vehicle: cfg.v || null }));
+  // 서버로 보내기 (로그인 토큰 확인) — 토큰이 죽었으면 로그인 화면으로
+  async function send(pts) {
+    try { await rpc('push_locations', { p_name: cfg.n, p_token: cfg.tok, p_rows: rows(pts) }); }
+    catch (e) { if (/로그인/.test(e.message)) { stop(); cfg = { n: cfg.n, v: cfg.v }; localStorage.setItem(LS, JSON.stringify(cfg)); alert('다시 로그인해 주세요'); location.reload(); } throw e; }
+  }
+  async function flush(force) {
+    if (!on || sending) return;
+    const idle = lastPos && (lastPos.spd || 0) < 3;
+    const every = (idle ? SEND_IDLE : SEND_MOVING) * 1000;
+    if (!force && Date.now() - lastSent < every) return;
+    let pts = buf.slice();
+    if (!pts.length) { if (!lastPos) return; pts = [[Date.now(), +lastPos.lat.toFixed(6), +lastPos.lng.toFixed(6), Math.round(lastPos.acc), Math.round(lastPos.spd || 0)]]; }  // 안 움직여도 살아있음 알림
+    sending = true; ui();
+    try {
+      await send(pts.slice(-200));
+      buf = buf.filter((p) => !pts.includes(p)); saveBuf();
+      lastSent = Date.now(); nToday++;
+      try { localStorage.setItem(LS + '-cnt', JSON.stringify({ d: today(), n: nToday })); } catch (e) { /* noop */ }
+      warn('');
+      log('전송 ' + pts.length + '점');
+    } catch (e) {
+      warn('서버로 보내지 못했습니다 (' + e.message + '). 위치는 저장해 두었다가 다음에 함께 보냅니다.');
+      log('전송 실패 ' + e.message);
+    }
+    sending = false; ui();
+  }
+  async function keepAwake() {
+    try { if ('wakeLock' in navigator && !wake) { wake = await navigator.wakeLock.request('screen'); wake.addEventListener('release', () => { wake = null; }); } } catch (e) { /* 미지원 */ }
+  }
+  function start() {
+    if (!navigator.geolocation) return warn('이 브라우저는 위치 기능을 지원하지 않습니다.');
+    on = true; ui(); keepAwake();
+    watchId = navigator.geolocation.watchPosition(onPos, onErr, { enableHighAccuracy: true, maximumAge: 5000, timeout: 30000 });
+    timer = setInterval(() => flush(false), 15000);
+    setTimeout(() => flush(true), 8000);          // 시작 직후 한 번
+    try { localStorage.setItem(LS + '-on', '1'); } catch (e) { /* noop */ }
+    log('시작');
+  }
+  function stop() {
+    on = false; ui();
+    if (watchId != null) navigator.geolocation.clearWatch(watchId); watchId = null;
+    clearInterval(timer); timer = null;
+    if (wake) { try { wake.release(); } catch (e) { /* noop */ } wake = null; }
+    try { localStorage.setItem(LS + '-on', '0'); } catch (e) { /* noop */ }
+    log('중지');
+  }
+  $('btn').onclick = () => (on ? stop() : start());
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && on) { keepAwake(); flush(true); } });
+  window.addEventListener('pagehide', () => { if (on && buf.length) { try { fetch(SERVER + '/rest/v1/rpc/push_locations', { method: 'POST', keepalive: true, headers: { 'Content-Type': 'application/json', apikey: KEY }, body: JSON.stringify({ p_name: cfg.n, p_token: cfg.tok, p_rows: rows(buf.slice(-200)) }) }); } catch (e) { /* noop */ } } });
+  const _lo = $('logout'); if (APP) _lo.addEventListener('click', () => { try { window.WeRoadApp.stop(); } catch (e) { /* noop */ } });
+  $('logout').onclick = (e) => { e.preventDefault(); if (on) stop(); localStorage.setItem(LS, JSON.stringify({ n: cfg.n || '' })); localStorage.removeItem(LS + '-on'); location.reload(); };
+  $('sh-lo').onclick = () => $('logout').click();
+  ui();
+  // 지난번에 켜 둔 상태로 닫혔으면 다시 열 때 자동 시작
+  if (!$('main').hidden && !isMaster() && localStorage.getItem(LS + '-on') === '1') start();
+
+  // ---- 퇴근 기록 (v5): 계기판 km · 주유비 → 서버 함수 push_trip_log(로그인 토큰 확인) → trip_logs. 위로드 차량관리가 읽음
+  const R = { shift: new Date().getHours() < 12 ? '야간' : '주간', hist: [], pend: [], mine: [], all: [] };   // 오전 퇴근 = 야간 근무
+  try { Object.assign(R, JSON.parse(localStorage.getItem(LS + '-veh') || '{}')); } catch (e) { /* noop */ }
+  try { R.pend = JSON.parse(localStorage.getItem(LS + '-pend') || '[]'); } catch (e) { R.pend = []; }
+  try { R.hist = JSON.parse(localStorage.getItem(LS + '-hist') || '[]'); } catch (e) { R.hist = []; }
+  const vlist = () => String(cfg.v || '').split(/[,\s]+/).map((x) => x.trim()).filter(Boolean);
+  const won = (n) => Number(n || 0).toLocaleString('ko-KR');
+  // 10/31: 기사 구분 — 법인기사(핫픽스) = 위로드 차량관리에 탑승자로 등록된 기사 → 출근·로케이션·퇴근 기록(주행거리·주유비)
+  //                     지입기사(운송사)  = 그 외 → 출근(퇴근 버튼 포함)·로케이션만
+  const tabBtn = (t) => document.querySelector('.tabs button[data-tab=' + t + ']');
+  const isCorp = () => isMaster() || (R.mine || []).length > 0;
+  function showTab(t) { hmOff(t); document.querySelectorAll('.tabs button').forEach((x) => x.classList.toggle('on', x.dataset.tab === t)); $('t-rec').hidden = t !== 'rec'; $('t-loc').hidden = t !== 'loc'; $('t-lc').hidden = t !== 'lc'; $('t-dl').hidden = t !== 'dl'; $('t-sh').hidden = t !== 'sh'; $('t-cs').hidden = t !== 'cs'; $('t-cw').hidden = t !== 'cw'; if (t === 'cs' || t === 'cw') setTimeout(() => csLoad(false), 0); if (t === 'lc') setTimeout(lcLoad, 0); if (t === 'sh') setTimeout(shLoad, 0); if (t === 'dl') setTimeout(dlGate, 0); try { sessionStorage.setItem('wr-tab', t); } catch (e) { /* noop */ } }
+  document.querySelectorAll('.tabs button').forEach((b) => { b.onclick = () => showTab(b.dataset.tab); });
+
+
+  // 11/20 앱 안 업데이트: 서버의 새 index.html 빌드 번호가 다르면 [업데이트] 버튼 → 새로 불러오기 (홈 화면에 다시 추가할 필요 없음)
+  const BUILD = '20261120-4';
+  async function updCheck() {
+    try {
+      const r = await fetch('app.html?chk=' + Date.now(), { cache: 'no-store' }); if (!r.ok) return;
+      const m = (await r.text()).match(/const BUILD = '([^']+)'/);
+      if (m && m[1] !== BUILD) {
+        // 홈·로그인 화면이고 입력 중이 아니면 바로 새로 불러옴, 아니면 [업데이트] 버튼
+        const idle = (document.body.classList.contains('hm') || $('main').hidden) && !/INPUT|TEXTAREA|SELECT/.test((document.activeElement || {}).tagName || '') && $('car-ov').hidden;
+        if (idle) { location.reload(); return; }
+        $('upd').hidden = false;
+      }
+    } catch (e) { /* 오프라인이면 다음에 */ }
+  }
+  $('upd-b').onclick = () => location.reload();
+  setTimeout(updCheck, 4000); setInterval(updCheck, 60 * 1000);
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') updCheck(); });
+  // ── 11/20 홈 화면 (테슬라앱식) ──
+  const CARS = {"옐로우": "<svg viewBox=\"0 0 360 290\" aria-hidden=\"true\" style=\"display: block\"><defs><radialGradient id=\"wrCUsh\" cx=\"50%\" cy=\"50%\" r=\"50%\"><stop offset=\"0\" stop-color=\"#000\" stop-opacity=\"0.8\"></stop><stop offset=\"0.6\" stop-color=\"#000\" stop-opacity=\"0.35\"></stop><stop offset=\"1\" stop-color=\"#000\" stop-opacity=\"0\"></stop></radialGradient><linearGradient id=\"wrCUfm\" x1=\"193.51999999999998\" y1=\"203.6\" x2=\"207.32\" y2=\"246.83999999999997\" gradientUnits=\"userSpaceOnUse\"><stop offset=\"0\" stop-color=\"#fff\" stop-opacity=\"0.55\"></stop><stop offset=\"1\" stop-color=\"#fff\" stop-opacity=\"0\"></stop></linearGradient><linearGradient id=\"wrCUbs\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\"><stop offset=\"0\" stop-color=\"#F0CC5B\"></stop><stop offset=\"0.1\" stop-color=\"#EDC138\"></stop><stop offset=\"0.16\" stop-color=\"#E8BA2D\"></stop><stop offset=\"0.7\" stop-color=\"#D5AB29\"></stop><stop offset=\"1\" stop-color=\"#9C7D1E\"></stop></linearGradient><linearGradient id=\"wrCUbl\" x1=\"0\" y1=\"0\" x2=\"1\" y2=\"0\"><stop offset=\"0\" stop-color=\"#fff\" stop-opacity=\"0.0\"></stop><stop offset=\"0.55\" stop-color=\"#000\" stop-opacity=\"0.0\"></stop><stop offset=\"1\" stop-color=\"#000\" stop-opacity=\"0.22\"></stop></linearGradient><linearGradient id=\"wrCUbf\" x1=\"1\" y1=\"0\" x2=\"0\" y2=\"0\"><stop offset=\"0\" stop-color=\"#92751C\"></stop><stop offset=\"1\" stop-color=\"#BD9824\"></stop></linearGradient><linearGradient id=\"wrCUbt\" x1=\"0\" y1=\"1\" x2=\"1\" y2=\"0\"><stop offset=\"0\" stop-color=\"#F1CE62\"></stop><stop offset=\"1\" stop-color=\"#EDC138\"></stop></linearGradient><linearGradient id=\"wrCUcs\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\"><stop offset=\"0\" stop-color=\"#FFFFFF\"></stop><stop offset=\"0.18\" stop-color=\"#F7F7F7\"></stop><stop offset=\"0.22\" stop-color=\"#E5E5E5\"></stop><stop offset=\"1\" stop-color=\"#BCBCBC\"></stop></linearGradient><linearGradient id=\"wrCUcf\" x1=\"1\" y1=\"0\" x2=\"0\" y2=\"0\"><stop offset=\"0\" stop-color=\"#B2B2B2\"></stop><stop offset=\"1\" stop-color=\"#DBDBDB\"></stop></linearGradient><linearGradient id=\"wrCUgl\" x1=\"0\" y1=\"0\" x2=\"1\" y2=\"1\"><stop offset=\"0\" stop-color=\"#4B5866\"></stop><stop offset=\"0.4\" stop-color=\"#1A2028\"></stop><stop offset=\"0.46\" stop-color=\"#5A6876\"></stop><stop offset=\"0.52\" stop-color=\"#1A2028\"></stop><stop offset=\"1\" stop-color=\"#0D1014\"></stop></linearGradient><linearGradient id=\"wrCUtr\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\"><stop offset=\"0\" stop-color=\"#2A2E33\"></stop><stop offset=\"0.5\" stop-color=\"#121417\"></stop><stop offset=\"1\" stop-color=\"#060708\"></stop></linearGradient><radialGradient id=\"wrCUrim\" cx=\"38%\" cy=\"32%\" r=\"75%\"><stop offset=\"0\" stop-color=\"#F4F6F8\"></stop><stop offset=\"0.55\" stop-color=\"#B4BCC4\"></stop><stop offset=\"1\" stop-color=\"#5E666E\"></stop></radialGradient><radialGradient id=\"wrCUhl\" cx=\"50%\" cy=\"50%\" r=\"50%\"><stop offset=\"0\" stop-color=\"#FFF8D8\" stop-opacity=\"0.9\"></stop><stop offset=\"1\" stop-color=\"#FFF8D8\" stop-opacity=\"0\"></stop></radialGradient><mask id=\"wrCUm\" maskUnits=\"userSpaceOnUse\" x=\"0\" y=\"0\" width=\"360\" height=\"290\"><rect x=\"0\" y=\"0\" width=\"360\" height=\"290\" fill=\"url(#wrCUfm)\"></rect></mask><g id=\"wrCUbody\"><ellipse cx=\"79.4\" cy=\"191.8\" rx=\"17\" ry=\"24\" fill=\"#08090B\"></ellipse><ellipse cx=\"222.2\" cy=\"146.2\" rx=\"17\" ry=\"24\" fill=\"#08090B\"></ellipse><path d=\"M95.8 228.8 L308.2 161.0 L308.2 149.0 L95.8 216.8 Z\" fill=\"#1E2227\"></path><path d=\"M163.4 195.2 L310.1 148.4 L310.1 154.4 L163.4 201.2 Z\" fill=\"#15181B\"></path><path d=\"M111.4 165.2 L163.4 195.2 L163.4 87.2 L111.4 57.2 Z\" fill=\"url(#wrCUbf)\"></path><path d=\"M163.4 195.2 L310.1 148.4 L310.1 40.4 L163.4 87.2 Z\" fill=\"url(#wrCUbs)\"></path><path d=\"M163.4 195.2 L310.1 148.4 L310.1 40.4 L163.4 87.2 Z\" fill=\"url(#wrCUbl)\"></path><path d=\"M163.4 87.2 L310.1 40.4 L258.1 10.4 L111.4 57.2 Z\" fill=\"url(#wrCUbt)\"></path><path d=\"M305.4 149.9 L310.1 148.4 L310.1 40.4 L305.4 41.9 Z\" fill=\"#AA8821\"></path><path d=\"M163.4 195.2 L310.1 148.4 L310.1 141.4 L163.4 188.2 Z\" fill=\"#8E721B\"></path><path d=\"M164.4 87.4 L309.1 41.2\" stroke=\"#FFFFFF\" stroke-opacity=\"0.75\" stroke-width=\"1.6\" stroke-linecap=\"round\" fill=\"none\"></path><path d=\"M164.0 193.0 L164.0 88.0\" stroke=\"#FFFFFF\" stroke-opacity=\"0.55\" stroke-width=\"1.4\" stroke-linecap=\"round\" fill=\"none\"></path><path d=\"M111.4 57.2 L163.4 87.2\" stroke=\"#FFFFFF\" stroke-opacity=\"0.5\" stroke-width=\"1.2\" stroke-linecap=\"round\" fill=\"none\"></path><path d=\"M206.7 181.4 L257.4 91.2 L308.2 149.0 Z\" fill=\"#FFFFFF\" fill-opacity=\"0.96\"></path><text transform=\"matrix(0.94 -0.3 0 1 174.7 105.6)\" font-family=\"Noto Sans KR, sans-serif\" font-size=\"18\" font-weight=\"800\" fill=\"#2B2F33\" letter-spacing=\"0.3\">snack24</text><path d=\"M40.0 192.0 L92.0 222.0 L92.0 186.0 L40.0 156.0 Z\" fill=\"url(#wrCUcf)\"></path><path d=\"M40.0 156.0 L92.0 186.0 L112.7 141.4 L60.7 111.4 Z\" fill=\"url(#wrCUgl)\"></path><path d=\"M92.0 222.0 L159.7 200.4 L159.7 126.4 L112.7 141.4 L92.0 186.0 Z\" fill=\"url(#wrCUcs)\"></path><path d=\"M112.7 141.4 L159.7 126.4 L107.7 96.4 L60.7 111.4 Z\" fill=\"#FFFFFF\"></path><path d=\"M112.7 141.4 L159.7 126.4\" stroke=\"#FFFFFF\" stroke-opacity=\"0.9\" stroke-width=\"1.4\" stroke-linecap=\"round\" fill=\"none\"></path><path d=\"M92.0 186.0 L112.7 141.4\" stroke=\"#FFFFFF\" stroke-opacity=\"0.7\" stroke-width=\"1.2\" stroke-linecap=\"round\" fill=\"none\"></path><path d=\"M92.5 217.8 L92.5 185.8\" stroke=\"#FFFFFF\" stroke-opacity=\"0.6\" stroke-width=\"1.2\" stroke-linecap=\"round\" fill=\"none\"></path><path d=\"M102.3 178.7 L115.5 146.5 L148.4 136.0 L148.4 164.0 Z\" fill=\"url(#wrCUgl)\"></path><path d=\"M150.3 199.4 L150.3 135.4\" stroke=\"#000\" stroke-opacity=\"0.18\" stroke-width=\"1.3\" stroke-linecap=\"round\" fill=\"none\"></path><path d=\"M101.4 215.0 L101.4 183.0\" stroke=\"#000\" stroke-opacity=\"0.12\" stroke-width=\"1.0\" stroke-linecap=\"round\" fill=\"none\"></path><path d=\"M135.2 178.2 L142.8 175.8 L142.8 173.3 L135.2 175.7 Z\" fill=\"#2B3036\"></path><path d=\"M38.1 194.6 L90.1 224.6 L90.1 212.6 L38.1 182.6 Z\" fill=\"#23272C\"></path><path d=\"M90.1 224.6 L107.0 219.2 L107.0 207.2 L90.1 212.6 Z\" fill=\"#2B3035\"></path><path d=\"M76.5 199.9 L53.6 186.7 L53.6 170.7 L76.5 183.9 Z\" fill=\"#1F2328\"></path><path d=\"M75.3 195.4 L54.5 183.4\" stroke=\"#4A5159\" stroke-opacity=\"1\" stroke-width=\"1\" stroke-linecap=\"round\" fill=\"none\"></path><path d=\"M75.3 190.9 L54.5 178.9\" stroke=\"#4A5159\" stroke-opacity=\"1\" stroke-width=\"1\" stroke-linecap=\"round\" fill=\"none\"></path><path d=\"M75.3 186.4 L54.5 174.4\" stroke=\"#4A5159\" stroke-opacity=\"1\" stroke-width=\"1\" stroke-linecap=\"round\" fill=\"none\"></path><path d=\"M109.4 227.5 A 24 30 0 0 1 157.4 212.1 Z\" fill=\"#0A0B0D\" transform=\"rotate(-17.7 133.4 221.8)\"></path><ellipse cx=\"87.4\" cy=\"193.8\" rx=\"12\" ry=\"9\" fill=\"url(#wrCUhl)\"></ellipse><ellipse cx=\"87.4\" cy=\"193.8\" rx=\"5.2\" ry=\"3.6\" fill=\"#FFFBEA\" stroke=\"#9AA3AC\" stroke-width=\"0.8\"></ellipse><ellipse cx=\"43.7\" cy=\"168.6\" rx=\"12\" ry=\"9\" fill=\"url(#wrCUhl)\"></ellipse><ellipse cx=\"43.7\" cy=\"168.6\" rx=\"5.2\" ry=\"3.6\" fill=\"#FFFBEA\" stroke=\"#9AA3AC\" stroke-width=\"0.8\"></ellipse><path d=\"M107.0 165.2 L95.0 167.2\" stroke=\"#1D2329\" stroke-opacity=\"1\" stroke-width=\"2\" stroke-linecap=\"round\" fill=\"none\"></path><rect x=\"91.0\" y=\"158.2\" width=\"7\" height=\"15\" rx=\"2.5\" fill=\"#1D2329\"></rect><rect x=\"92.4\" y=\"159.7\" width=\"2\" height=\"11\" rx=\"1\" fill=\"#5D6872\"></rect><path d=\"M112.7 216.4 L129.6 211.0 L135.8 214.6 L118.9 220.0 Z\" fill=\"#3A4047\"></path><ellipse cx=\"125.0\" cy=\"217.0\" rx=\"17\" ry=\"24\" fill=\"#060708\"></ellipse><path d=\"M133.4 197.8 L125.0 193.0 L125.0 241.0 L133.4 245.8 Z\" fill=\"#0B0C0E\"></path><ellipse cx=\"133.4\" cy=\"221.8\" rx=\"17\" ry=\"24\" fill=\"url(#wrCUtr)\"></ellipse><ellipse cx=\"134.4\" cy=\"221.8\" rx=\"15.5\" ry=\"22.5\" fill=\"none\" stroke=\"#3A3F45\" stroke-width=\"0.8\"></ellipse><ellipse cx=\"134.9\" cy=\"221.8\" rx=\"10.5\" ry=\"14.5\" fill=\"url(#wrCUrim)\"></ellipse><ellipse cx=\"134.9\" cy=\"221.8\" rx=\"10.5\" ry=\"14.5\" fill=\"none\" stroke=\"#2C3238\" stroke-width=\"1\"></ellipse><ellipse cx=\"141.2\" cy=\"224.5\" rx=\"1.3\" ry=\"1.7\" fill=\"#4A525A\"></ellipse><ellipse cx=\"136.3\" cy=\"230.8\" rx=\"1.3\" ry=\"1.7\" fill=\"#4A525A\"></ellipse><ellipse cx=\"130.0\" cy=\"228.1\" rx=\"1.3\" ry=\"1.7\" fill=\"#4A525A\"></ellipse><ellipse cx=\"128.6\" cy=\"219.1\" rx=\"1.3\" ry=\"1.7\" fill=\"#4A525A\"></ellipse><ellipse cx=\"133.4\" cy=\"212.8\" rx=\"1.3\" ry=\"1.7\" fill=\"#4A525A\"></ellipse><ellipse cx=\"139.7\" cy=\"215.5\" rx=\"1.3\" ry=\"1.7\" fill=\"#4A525A\"></ellipse><ellipse cx=\"134.9\" cy=\"221.8\" rx=\"3.8\" ry=\"5\" fill=\"#69727B\"></ellipse><ellipse cx=\"134.2\" cy=\"220.8\" rx=\"1.6\" ry=\"2\" fill=\"#E8ECEF\"></ellipse><ellipse cx=\"267.9\" cy=\"171.4\" rx=\"17\" ry=\"24\" fill=\"#060708\"></ellipse><path d=\"M276.2 152.2 L267.9 147.4 L267.9 195.4 L276.2 200.2 Z\" fill=\"#0B0C0E\"></path><ellipse cx=\"276.2\" cy=\"176.2\" rx=\"17\" ry=\"24\" fill=\"url(#wrCUtr)\"></ellipse><ellipse cx=\"277.2\" cy=\"176.2\" rx=\"15.5\" ry=\"22.5\" fill=\"none\" stroke=\"#3A3F45\" stroke-width=\"0.8\"></ellipse><ellipse cx=\"277.7\" cy=\"176.2\" rx=\"10.5\" ry=\"14.5\" fill=\"url(#wrCUrim)\"></ellipse><ellipse cx=\"277.7\" cy=\"176.2\" rx=\"10.5\" ry=\"14.5\" fill=\"none\" stroke=\"#2C3238\" stroke-width=\"1\"></ellipse><ellipse cx=\"284.0\" cy=\"178.9\" rx=\"1.3\" ry=\"1.7\" fill=\"#4A525A\"></ellipse><ellipse cx=\"279.2\" cy=\"185.2\" rx=\"1.3\" ry=\"1.7\" fill=\"#4A525A\"></ellipse><ellipse cx=\"272.9\" cy=\"182.5\" rx=\"1.3\" ry=\"1.7\" fill=\"#4A525A\"></ellipse><ellipse cx=\"271.4\" cy=\"173.5\" rx=\"1.3\" ry=\"1.7\" fill=\"#4A525A\"></ellipse><ellipse cx=\"276.3\" cy=\"167.2\" rx=\"1.3\" ry=\"1.7\" fill=\"#4A525A\"></ellipse><ellipse cx=\"282.6\" cy=\"169.9\" rx=\"1.3\" ry=\"1.7\" fill=\"#4A525A\"></ellipse><ellipse cx=\"277.7\" cy=\"176.2\" rx=\"3.8\" ry=\"5\" fill=\"#69727B\"></ellipse><ellipse cx=\"277.0\" cy=\"175.2\" rx=\"1.6\" ry=\"2\" fill=\"#E8ECEF\"></ellipse></g></defs><g mask=\"url(#wrCUm)\" opacity=\"0.32\"><use href=\"#wrCUbody\" transform=\"matrix(1 -0.6383 0 -1 0 530.7)\"></use></g><ellipse cx=\"186\" cy=\"238\" rx=\"170\" ry=\"30\" fill=\"url(#wrCUsh)\" opacity=\"0.85\"></ellipse><ellipse cx=\"160\" cy=\"226\" rx=\"120\" ry=\"14\" fill=\"#000\" opacity=\"0.35\" transform=\"rotate(-17.7 160 226)\"></ellipse><use href=\"#wrCUbody\"></use></svg>", "화이트": "<svg viewBox=\"0 0 360 290\" aria-hidden=\"true\" style=\"display: block\"><defs><radialGradient id=\"wrCUsh\" cx=\"50%\" cy=\"50%\" r=\"50%\"><stop offset=\"0\" stop-color=\"#000\" stop-opacity=\"0.8\"></stop><stop offset=\"0.6\" stop-color=\"#000\" stop-opacity=\"0.35\"></stop><stop offset=\"1\" stop-color=\"#000\" stop-opacity=\"0\"></stop></radialGradient><linearGradient id=\"wrCUfm\" x1=\"193.51999999999998\" y1=\"203.6\" x2=\"207.32\" y2=\"246.83999999999997\" gradientUnits=\"userSpaceOnUse\"><stop offset=\"0\" stop-color=\"#fff\" stop-opacity=\"0.55\"></stop><stop offset=\"1\" stop-color=\"#fff\" stop-opacity=\"0\"></stop></linearGradient><linearGradient id=\"wrCUbs\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\"><stop offset=\"0\" stop-color=\"#F1F4F6\"></stop><stop offset=\"0.1\" stop-color=\"#EEF1F4\"></stop><stop offset=\"0.16\" stop-color=\"#E9ECEF\"></stop><stop offset=\"0.7\" stop-color=\"#D6D8DB\"></stop><stop offset=\"1\" stop-color=\"#9D9FA1\"></stop></linearGradient><linearGradient id=\"wrCUbl\" x1=\"0\" y1=\"0\" x2=\"1\" y2=\"0\"><stop offset=\"0\" stop-color=\"#fff\" stop-opacity=\"0.0\"></stop><stop offset=\"0.55\" stop-color=\"#000\" stop-opacity=\"0.0\"></stop><stop offset=\"1\" stop-color=\"#000\" stop-opacity=\"0.22\"></stop></linearGradient><linearGradient id=\"wrCUbf\" x1=\"1\" y1=\"0\" x2=\"0\" y2=\"0\"><stop offset=\"0\" stop-color=\"#939597\"></stop><stop offset=\"1\" stop-color=\"#BEC0C3\"></stop></linearGradient><linearGradient id=\"wrCUbt\" x1=\"0\" y1=\"1\" x2=\"1\" y2=\"0\"><stop offset=\"0\" stop-color=\"#F2F4F6\"></stop><stop offset=\"1\" stop-color=\"#EEF1F4\"></stop></linearGradient><linearGradient id=\"wrCUcs\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\"><stop offset=\"0\" stop-color=\"#FFFFFF\"></stop><stop offset=\"0.18\" stop-color=\"#F7F7F7\"></stop><stop offset=\"0.22\" stop-color=\"#E5E5E5\"></stop><stop offset=\"1\" stop-color=\"#BCBCBC\"></stop></linearGradient><linearGradient id=\"wrCUcf\" x1=\"1\" y1=\"0\" x2=\"0\" y2=\"0\"><stop offset=\"0\" stop-color=\"#B2B2B2\"></stop><stop offset=\"1\" stop-color=\"#DBDBDB\"></stop></linearGradient><linearGradient id=\"wrCUgl\" x1=\"0\" y1=\"0\" x2=\"1\" y2=\"1\"><stop offset=\"0\" stop-color=\"#4B5866\"></stop><stop offset=\"0.4\" stop-color=\"#1A2028\"></stop><stop offset=\"0.46\" stop-color=\"#5A6876\"></stop><stop offset=\"0.52\" stop-color=\"#1A2028\"></stop><stop offset=\"1\" stop-color=\"#0D1014\"></stop></linearGradient><linearGradient id=\"wrCUtr\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\"><stop offset=\"0\" stop-color=\"#2A2E33\"></stop><stop offset=\"0.5\" stop-color=\"#121417\"></stop><stop offset=\"1\" stop-color=\"#060708\"></stop></linearGradient><radialGradient id=\"wrCUrim\" cx=\"38%\" cy=\"32%\" r=\"75%\"><stop offset=\"0\" stop-color=\"#F4F6F8\"></stop><stop offset=\"0.55\" stop-color=\"#B4BCC4\"></stop><stop offset=\"1\" stop-color=\"#5E666E\"></stop></radialGradient><radialGradient id=\"wrCUhl\" cx=\"50%\" cy=\"50%\" r=\"50%\"><stop offset=\"0\" stop-color=\"#FFF8D8\" stop-opacity=\"0.9\"></stop><stop offset=\"1\" stop-color=\"#FFF8D8\" stop-opacity=\"0\"></stop></radialGradient><mask id=\"wrCUm\" maskUnits=\"userSpaceOnUse\" x=\"0\" y=\"0\" width=\"360\" height=\"290\"><rect x=\"0\" y=\"0\" width=\"360\" height=\"290\" fill=\"url(#wrCUfm)\"></rect></mask><g id=\"wrCUbody\"><ellipse cx=\"79.4\" cy=\"191.8\" rx=\"17\" ry=\"24\" fill=\"#08090B\"></ellipse><ellipse cx=\"222.2\" cy=\"146.2\" rx=\"17\" ry=\"24\" fill=\"#08090B\"></ellipse><path d=\"M95.8 228.8 L308.2 161.0 L308.2 149.0 L95.8 216.8 Z\" fill=\"#1E2227\"></path><path d=\"M163.4 195.2 L310.1 148.4 L310.1 154.4 L163.4 201.2 Z\" fill=\"#15181B\"></path><path d=\"M111.4 165.2 L163.4 195.2 L163.4 87.2 L111.4 57.2 Z\" fill=\"url(#wrCUbf)\"></path><path d=\"M163.4 195.2 L310.1 148.4 L310.1 40.4 L163.4 87.2 Z\" fill=\"url(#wrCUbs)\"></path><path d=\"M163.4 195.2 L310.1 148.4 L310.1 40.4 L163.4 87.2 Z\" fill=\"url(#wrCUbl)\"></path><path d=\"M163.4 87.2 L310.1 40.4 L258.1 10.4 L111.4 57.2 Z\" fill=\"url(#wrCUbt)\"></path><path d=\"M305.4 149.9 L310.1 148.4 L310.1 40.4 L305.4 41.9 Z\" fill=\"#ABADAF\"></path><path d=\"M163.4 195.2 L310.1 148.4 L310.1 141.4 L163.4 188.2 Z\" fill=\"#8E9092\"></path><path d=\"M164.4 87.4 L309.1 41.2\" stroke=\"#FFFFFF\" stroke-opacity=\"0.75\" stroke-width=\"1.6\" stroke-linecap=\"round\" fill=\"none\"></path><path d=\"M164.0 193.0 L164.0 88.0\" stroke=\"#FFFFFF\" stroke-opacity=\"0.55\" stroke-width=\"1.4\" stroke-linecap=\"round\" fill=\"none\"></path><path d=\"M111.4 57.2 L163.4 87.2\" stroke=\"#FFFFFF\" stroke-opacity=\"0.5\" stroke-width=\"1.2\" stroke-linecap=\"round\" fill=\"none\"></path><path d=\"M206.7 181.4 L257.4 91.2 L308.2 149.0 Z\" fill=\"#EDBE2E\" fill-opacity=\"0.96\"></path><text transform=\"matrix(0.94 -0.3 0 1 174.7 105.6)\" font-family=\"Noto Sans KR, sans-serif\" font-size=\"18\" font-weight=\"800\" fill=\"#2B2F33\" letter-spacing=\"0.3\">snack24</text><path d=\"M40.0 192.0 L92.0 222.0 L92.0 186.0 L40.0 156.0 Z\" fill=\"url(#wrCUcf)\"></path><path d=\"M40.0 156.0 L92.0 186.0 L112.7 141.4 L60.7 111.4 Z\" fill=\"url(#wrCUgl)\"></path><path d=\"M92.0 222.0 L159.7 200.4 L159.7 126.4 L112.7 141.4 L92.0 186.0 Z\" fill=\"url(#wrCUcs)\"></path><path d=\"M112.7 141.4 L159.7 126.4 L107.7 96.4 L60.7 111.4 Z\" fill=\"#FFFFFF\"></path><path d=\"M112.7 141.4 L159.7 126.4\" stroke=\"#FFFFFF\" stroke-opacity=\"0.9\" stroke-width=\"1.4\" stroke-linecap=\"round\" fill=\"none\"></path><path d=\"M92.0 186.0 L112.7 141.4\" stroke=\"#FFFFFF\" stroke-opacity=\"0.7\" stroke-width=\"1.2\" stroke-linecap=\"round\" fill=\"none\"></path><path d=\"M92.5 217.8 L92.5 185.8\" stroke=\"#FFFFFF\" stroke-opacity=\"0.6\" stroke-width=\"1.2\" stroke-linecap=\"round\" fill=\"none\"></path><path d=\"M102.3 178.7 L115.5 146.5 L148.4 136.0 L148.4 164.0 Z\" fill=\"url(#wrCUgl)\"></path><path d=\"M150.3 199.4 L150.3 135.4\" stroke=\"#000\" stroke-opacity=\"0.18\" stroke-width=\"1.3\" stroke-linecap=\"round\" fill=\"none\"></path><path d=\"M101.4 215.0 L101.4 183.0\" stroke=\"#000\" stroke-opacity=\"0.12\" stroke-width=\"1.0\" stroke-linecap=\"round\" fill=\"none\"></path><path d=\"M135.2 178.2 L142.8 175.8 L142.8 173.3 L135.2 175.7 Z\" fill=\"#2B3036\"></path><path d=\"M38.1 194.6 L90.1 224.6 L90.1 212.6 L38.1 182.6 Z\" fill=\"#23272C\"></path><path d=\"M90.1 224.6 L107.0 219.2 L107.0 207.2 L90.1 212.6 Z\" fill=\"#2B3035\"></path><path d=\"M76.5 199.9 L53.6 186.7 L53.6 170.7 L76.5 183.9 Z\" fill=\"#1F2328\"></path><path d=\"M75.3 195.4 L54.5 183.4\" stroke=\"#4A5159\" stroke-opacity=\"1\" stroke-width=\"1\" stroke-linecap=\"round\" fill=\"none\"></path><path d=\"M75.3 190.9 L54.5 178.9\" stroke=\"#4A5159\" stroke-opacity=\"1\" stroke-width=\"1\" stroke-linecap=\"round\" fill=\"none\"></path><path d=\"M75.3 186.4 L54.5 174.4\" stroke=\"#4A5159\" stroke-opacity=\"1\" stroke-width=\"1\" stroke-linecap=\"round\" fill=\"none\"></path><path d=\"M109.4 227.5 A 24 30 0 0 1 157.4 212.1 Z\" fill=\"#0A0B0D\" transform=\"rotate(-17.7 133.4 221.8)\"></path><ellipse cx=\"87.4\" cy=\"193.8\" rx=\"12\" ry=\"9\" fill=\"url(#wrCUhl)\"></ellipse><ellipse cx=\"87.4\" cy=\"193.8\" rx=\"5.2\" ry=\"3.6\" fill=\"#FFFBEA\" stroke=\"#9AA3AC\" stroke-width=\"0.8\"></ellipse><ellipse cx=\"43.7\" cy=\"168.6\" rx=\"12\" ry=\"9\" fill=\"url(#wrCUhl)\"></ellipse><ellipse cx=\"43.7\" cy=\"168.6\" rx=\"5.2\" ry=\"3.6\" fill=\"#FFFBEA\" stroke=\"#9AA3AC\" stroke-width=\"0.8\"></ellipse><path d=\"M107.0 165.2 L95.0 167.2\" stroke=\"#1D2329\" stroke-opacity=\"1\" stroke-width=\"2\" stroke-linecap=\"round\" fill=\"none\"></path><rect x=\"91.0\" y=\"158.2\" width=\"7\" height=\"15\" rx=\"2.5\" fill=\"#1D2329\"></rect><rect x=\"92.4\" y=\"159.7\" width=\"2\" height=\"11\" rx=\"1\" fill=\"#5D6872\"></rect><path d=\"M112.7 216.4 L129.6 211.0 L135.8 214.6 L118.9 220.0 Z\" fill=\"#3A4047\"></path><ellipse cx=\"125.0\" cy=\"217.0\" rx=\"17\" ry=\"24\" fill=\"#060708\"></ellipse><path d=\"M133.4 197.8 L125.0 193.0 L125.0 241.0 L133.4 245.8 Z\" fill=\"#0B0C0E\"></path><ellipse cx=\"133.4\" cy=\"221.8\" rx=\"17\" ry=\"24\" fill=\"url(#wrCUtr)\"></ellipse><ellipse cx=\"134.4\" cy=\"221.8\" rx=\"15.5\" ry=\"22.5\" fill=\"none\" stroke=\"#3A3F45\" stroke-width=\"0.8\"></ellipse><ellipse cx=\"134.9\" cy=\"221.8\" rx=\"10.5\" ry=\"14.5\" fill=\"url(#wrCUrim)\"></ellipse><ellipse cx=\"134.9\" cy=\"221.8\" rx=\"10.5\" ry=\"14.5\" fill=\"none\" stroke=\"#2C3238\" stroke-width=\"1\"></ellipse><ellipse cx=\"141.2\" cy=\"224.5\" rx=\"1.3\" ry=\"1.7\" fill=\"#4A525A\"></ellipse><ellipse cx=\"136.3\" cy=\"230.8\" rx=\"1.3\" ry=\"1.7\" fill=\"#4A525A\"></ellipse><ellipse cx=\"130.0\" cy=\"228.1\" rx=\"1.3\" ry=\"1.7\" fill=\"#4A525A\"></ellipse><ellipse cx=\"128.6\" cy=\"219.1\" rx=\"1.3\" ry=\"1.7\" fill=\"#4A525A\"></ellipse><ellipse cx=\"133.4\" cy=\"212.8\" rx=\"1.3\" ry=\"1.7\" fill=\"#4A525A\"></ellipse><ellipse cx=\"139.7\" cy=\"215.5\" rx=\"1.3\" ry=\"1.7\" fill=\"#4A525A\"></ellipse><ellipse cx=\"134.9\" cy=\"221.8\" rx=\"3.8\" ry=\"5\" fill=\"#69727B\"></ellipse><ellipse cx=\"134.2\" cy=\"220.8\" rx=\"1.6\" ry=\"2\" fill=\"#E8ECEF\"></ellipse><ellipse cx=\"267.9\" cy=\"171.4\" rx=\"17\" ry=\"24\" fill=\"#060708\"></ellipse><path d=\"M276.2 152.2 L267.9 147.4 L267.9 195.4 L276.2 200.2 Z\" fill=\"#0B0C0E\"></path><ellipse cx=\"276.2\" cy=\"176.2\" rx=\"17\" ry=\"24\" fill=\"url(#wrCUtr)\"></ellipse><ellipse cx=\"277.2\" cy=\"176.2\" rx=\"15.5\" ry=\"22.5\" fill=\"none\" stroke=\"#3A3F45\" stroke-width=\"0.8\"></ellipse><ellipse cx=\"277.7\" cy=\"176.2\" rx=\"10.5\" ry=\"14.5\" fill=\"url(#wrCUrim)\"></ellipse><ellipse cx=\"277.7\" cy=\"176.2\" rx=\"10.5\" ry=\"14.5\" fill=\"none\" stroke=\"#2C3238\" stroke-width=\"1\"></ellipse><ellipse cx=\"284.0\" cy=\"178.9\" rx=\"1.3\" ry=\"1.7\" fill=\"#4A525A\"></ellipse><ellipse cx=\"279.2\" cy=\"185.2\" rx=\"1.3\" ry=\"1.7\" fill=\"#4A525A\"></ellipse><ellipse cx=\"272.9\" cy=\"182.5\" rx=\"1.3\" ry=\"1.7\" fill=\"#4A525A\"></ellipse><ellipse cx=\"271.4\" cy=\"173.5\" rx=\"1.3\" ry=\"1.7\" fill=\"#4A525A\"></ellipse><ellipse cx=\"276.3\" cy=\"167.2\" rx=\"1.3\" ry=\"1.7\" fill=\"#4A525A\"></ellipse><ellipse cx=\"282.6\" cy=\"169.9\" rx=\"1.3\" ry=\"1.7\" fill=\"#4A525A\"></ellipse><ellipse cx=\"277.7\" cy=\"176.2\" rx=\"3.8\" ry=\"5\" fill=\"#69727B\"></ellipse><ellipse cx=\"277.0\" cy=\"175.2\" rx=\"1.6\" ry=\"2\" fill=\"#E8ECEF\"></ellipse></g></defs><g mask=\"url(#wrCUm)\" opacity=\"0.32\"><use href=\"#wrCUbody\" transform=\"matrix(1 -0.6383 0 -1 0 530.7)\"></use></g><ellipse cx=\"186\" cy=\"238\" rx=\"170\" ry=\"30\" fill=\"url(#wrCUsh)\" opacity=\"0.85\"></ellipse><ellipse cx=\"160\" cy=\"226\" rx=\"120\" ry=\"14\" fill=\"#000\" opacity=\"0.35\" transform=\"rotate(-17.7 160 226)\"></ellipse><use href=\"#wrCUbody\"></use></svg>", "블랙": "<svg viewBox=\"0 0 360 290\" aria-hidden=\"true\" style=\"display: block\"><defs><radialGradient id=\"wrCUsh\" cx=\"50%\" cy=\"50%\" r=\"50%\"><stop offset=\"0\" stop-color=\"#000\" stop-opacity=\"0.8\"></stop><stop offset=\"0.6\" stop-color=\"#000\" stop-opacity=\"0.35\"></stop><stop offset=\"1\" stop-color=\"#000\" stop-opacity=\"0\"></stop></radialGradient><linearGradient id=\"wrCUfm\" x1=\"193.51999999999998\" y1=\"203.6\" x2=\"207.32\" y2=\"246.83999999999997\" gradientUnits=\"userSpaceOnUse\"><stop offset=\"0\" stop-color=\"#fff\" stop-opacity=\"0.55\"></stop><stop offset=\"1\" stop-color=\"#fff\" stop-opacity=\"0\"></stop></linearGradient><linearGradient id=\"wrCUbs\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\"><stop offset=\"0\" stop-color=\"#78797B\"></stop><stop offset=\"0.1\" stop-color=\"#3C3D40\"></stop><stop offset=\"0.16\" stop-color=\"#16181B\"></stop><stop offset=\"0.7\" stop-color=\"#141619\"></stop><stop offset=\"1\" stop-color=\"#0F1012\"></stop></linearGradient><linearGradient id=\"wrCUbl\" x1=\"0\" y1=\"0\" x2=\"1\" y2=\"0\"><stop offset=\"0\" stop-color=\"#fff\" stop-opacity=\"0.0\"></stop><stop offset=\"0.55\" stop-color=\"#000\" stop-opacity=\"0.0\"></stop><stop offset=\"1\" stop-color=\"#000\" stop-opacity=\"0.22\"></stop></linearGradient><linearGradient id=\"wrCUbf\" x1=\"1\" y1=\"0\" x2=\"0\" y2=\"0\"><stop offset=\"0\" stop-color=\"#0E0F11\"></stop><stop offset=\"1\" stop-color=\"#121416\"></stop></linearGradient><linearGradient id=\"wrCUbt\" x1=\"0\" y1=\"1\" x2=\"1\" y2=\"0\"><stop offset=\"0\" stop-color=\"#656769\"></stop><stop offset=\"1\" stop-color=\"#323437\"></stop></linearGradient><linearGradient id=\"wrCUcs\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\"><stop offset=\"0\" stop-color=\"#FFFFFF\"></stop><stop offset=\"0.18\" stop-color=\"#F7F7F7\"></stop><stop offset=\"0.22\" stop-color=\"#E5E5E5\"></stop><stop offset=\"1\" stop-color=\"#BCBCBC\"></stop></linearGradient><linearGradient id=\"wrCUcf\" x1=\"1\" y1=\"0\" x2=\"0\" y2=\"0\"><stop offset=\"0\" stop-color=\"#B2B2B2\"></stop><stop offset=\"1\" stop-color=\"#DBDBDB\"></stop></linearGradient><linearGradient id=\"wrCUgl\" x1=\"0\" y1=\"0\" x2=\"1\" y2=\"1\"><stop offset=\"0\" stop-color=\"#4B5866\"></stop><stop offset=\"0.4\" stop-color=\"#1A2028\"></stop><stop offset=\"0.46\" stop-color=\"#5A6876\"></stop><stop offset=\"0.52\" stop-color=\"#1A2028\"></stop><stop offset=\"1\" stop-color=\"#0D1014\"></stop></linearGradient><linearGradient id=\"wrCUtr\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\"><stop offset=\"0\" stop-color=\"#2A2E33\"></stop><stop offset=\"0.5\" stop-color=\"#121417\"></stop><stop offset=\"1\" stop-color=\"#060708\"></stop></linearGradient><radialGradient id=\"wrCUrim\" cx=\"38%\" cy=\"32%\" r=\"75%\"><stop offset=\"0\" stop-color=\"#F4F6F8\"></stop><stop offset=\"0.55\" stop-color=\"#B4BCC4\"></stop><stop offset=\"1\" stop-color=\"#5E666E\"></stop></radialGradient><radialGradient id=\"wrCUhl\" cx=\"50%\" cy=\"50%\" r=\"50%\"><stop offset=\"0\" stop-color=\"#FFF8D8\" stop-opacity=\"0.9\"></stop><stop offset=\"1\" stop-color=\"#FFF8D8\" stop-opacity=\"0\"></stop></radialGradient><mask id=\"wrCUm\" maskUnits=\"userSpaceOnUse\" x=\"0\" y=\"0\" width=\"360\" height=\"290\"><rect x=\"0\" y=\"0\" width=\"360\" height=\"290\" fill=\"url(#wrCUfm)\"></rect></mask><g id=\"wrCUbody\"><ellipse cx=\"79.4\" cy=\"191.8\" rx=\"17\" ry=\"24\" fill=\"#08090B\"></ellipse><ellipse cx=\"222.2\" cy=\"146.2\" rx=\"17\" ry=\"24\" fill=\"#08090B\"></ellipse><path d=\"M95.8 228.8 L308.2 161.0 L308.2 149.0 L95.8 216.8 Z\" fill=\"#1E2227\"></path><path d=\"M163.4 195.2 L310.1 148.4 L310.1 154.4 L163.4 201.2 Z\" fill=\"#15181B\"></path><path d=\"M111.4 165.2 L163.4 195.2 L163.4 87.2 L111.4 57.2 Z\" fill=\"url(#wrCUbf)\"></path><path d=\"M163.4 195.2 L310.1 148.4 L310.1 40.4 L163.4 87.2 Z\" fill=\"url(#wrCUbs)\"></path><path d=\"M163.4 195.2 L310.1 148.4 L310.1 40.4 L163.4 87.2 Z\" fill=\"url(#wrCUbl)\"></path><path d=\"M163.4 87.2 L310.1 40.4 L258.1 10.4 L111.4 57.2 Z\" fill=\"url(#wrCUbt)\"></path><path d=\"M305.4 149.9 L310.1 148.4 L310.1 40.4 L305.4 41.9 Z\" fill=\"#101214\"></path><path d=\"M163.4 195.2 L310.1 148.4 L310.1 141.4 L163.4 188.2 Z\" fill=\"#0D0F10\"></path><path d=\"M164.4 87.4 L309.1 41.2\" stroke=\"#FFFFFF\" stroke-opacity=\"0.45\" stroke-width=\"1.6\" stroke-linecap=\"round\" fill=\"none\"></path><path d=\"M164.0 193.0 L164.0 88.0\" stroke=\"#FFFFFF\" stroke-opacity=\"0.35\" stroke-width=\"1.4\" stroke-linecap=\"round\" fill=\"none\"></path><path d=\"M111.4 57.2 L163.4 87.2\" stroke=\"#FFFFFF\" stroke-opacity=\"0.5\" stroke-width=\"1.2\" stroke-linecap=\"round\" fill=\"none\"></path><path d=\"M206.7 181.4 L257.4 91.2 L308.2 149.0 Z\" fill=\"#FFFFFF\" fill-opacity=\"0.96\"></path><text transform=\"matrix(0.94 -0.3 0 1 174.7 105.6)\" font-family=\"Noto Sans KR, sans-serif\" font-size=\"18\" font-weight=\"800\" fill=\"#FFFFFF\" letter-spacing=\"0.3\">snack24</text><path d=\"M40.0 192.0 L92.0 222.0 L92.0 186.0 L40.0 156.0 Z\" fill=\"url(#wrCUcf)\"></path><path d=\"M40.0 156.0 L92.0 186.0 L112.7 141.4 L60.7 111.4 Z\" fill=\"url(#wrCUgl)\"></path><path d=\"M92.0 222.0 L159.7 200.4 L159.7 126.4 L112.7 141.4 L92.0 186.0 Z\" fill=\"url(#wrCUcs)\"></path><path d=\"M112.7 141.4 L159.7 126.4 L107.7 96.4 L60.7 111.4 Z\" fill=\"#FFFFFF\"></path><path d=\"M112.7 141.4 L159.7 126.4\" stroke=\"#FFFFFF\" stroke-opacity=\"0.9\" stroke-width=\"1.4\" stroke-linecap=\"round\" fill=\"none\"></path><path d=\"M92.0 186.0 L112.7 141.4\" stroke=\"#FFFFFF\" stroke-opacity=\"0.7\" stroke-width=\"1.2\" stroke-linecap=\"round\" fill=\"none\"></path><path d=\"M92.5 217.8 L92.5 185.8\" stroke=\"#FFFFFF\" stroke-opacity=\"0.6\" stroke-width=\"1.2\" stroke-linecap=\"round\" fill=\"none\"></path><path d=\"M102.3 178.7 L115.5 146.5 L148.4 136.0 L148.4 164.0 Z\" fill=\"url(#wrCUgl)\"></path><path d=\"M150.3 199.4 L150.3 135.4\" stroke=\"#000\" stroke-opacity=\"0.18\" stroke-width=\"1.3\" stroke-linecap=\"round\" fill=\"none\"></path><path d=\"M101.4 215.0 L101.4 183.0\" stroke=\"#000\" stroke-opacity=\"0.12\" stroke-width=\"1.0\" stroke-linecap=\"round\" fill=\"none\"></path><path d=\"M135.2 178.2 L142.8 175.8 L142.8 173.3 L135.2 175.7 Z\" fill=\"#2B3036\"></path><path d=\"M38.1 194.6 L90.1 224.6 L90.1 212.6 L38.1 182.6 Z\" fill=\"#23272C\"></path><path d=\"M90.1 224.6 L107.0 219.2 L107.0 207.2 L90.1 212.6 Z\" fill=\"#2B3035\"></path><path d=\"M76.5 199.9 L53.6 186.7 L53.6 170.7 L76.5 183.9 Z\" fill=\"#1F2328\"></path><path d=\"M75.3 195.4 L54.5 183.4\" stroke=\"#4A5159\" stroke-opacity=\"1\" stroke-width=\"1\" stroke-linecap=\"round\" fill=\"none\"></path><path d=\"M75.3 190.9 L54.5 178.9\" stroke=\"#4A5159\" stroke-opacity=\"1\" stroke-width=\"1\" stroke-linecap=\"round\" fill=\"none\"></path><path d=\"M75.3 186.4 L54.5 174.4\" stroke=\"#4A5159\" stroke-opacity=\"1\" stroke-width=\"1\" stroke-linecap=\"round\" fill=\"none\"></path><path d=\"M109.4 227.5 A 24 30 0 0 1 157.4 212.1 Z\" fill=\"#0A0B0D\" transform=\"rotate(-17.7 133.4 221.8)\"></path><ellipse cx=\"87.4\" cy=\"193.8\" rx=\"12\" ry=\"9\" fill=\"url(#wrCUhl)\"></ellipse><ellipse cx=\"87.4\" cy=\"193.8\" rx=\"5.2\" ry=\"3.6\" fill=\"#FFFBEA\" stroke=\"#9AA3AC\" stroke-width=\"0.8\"></ellipse><ellipse cx=\"43.7\" cy=\"168.6\" rx=\"12\" ry=\"9\" fill=\"url(#wrCUhl)\"></ellipse><ellipse cx=\"43.7\" cy=\"168.6\" rx=\"5.2\" ry=\"3.6\" fill=\"#FFFBEA\" stroke=\"#9AA3AC\" stroke-width=\"0.8\"></ellipse><path d=\"M107.0 165.2 L95.0 167.2\" stroke=\"#1D2329\" stroke-opacity=\"1\" stroke-width=\"2\" stroke-linecap=\"round\" fill=\"none\"></path><rect x=\"91.0\" y=\"158.2\" width=\"7\" height=\"15\" rx=\"2.5\" fill=\"#1D2329\"></rect><rect x=\"92.4\" y=\"159.7\" width=\"2\" height=\"11\" rx=\"1\" fill=\"#5D6872\"></rect><path d=\"M112.7 216.4 L129.6 211.0 L135.8 214.6 L118.9 220.0 Z\" fill=\"#3A4047\"></path><ellipse cx=\"125.0\" cy=\"217.0\" rx=\"17\" ry=\"24\" fill=\"#060708\"></ellipse><path d=\"M133.4 197.8 L125.0 193.0 L125.0 241.0 L133.4 245.8 Z\" fill=\"#0B0C0E\"></path><ellipse cx=\"133.4\" cy=\"221.8\" rx=\"17\" ry=\"24\" fill=\"url(#wrCUtr)\"></ellipse><ellipse cx=\"134.4\" cy=\"221.8\" rx=\"15.5\" ry=\"22.5\" fill=\"none\" stroke=\"#3A3F45\" stroke-width=\"0.8\"></ellipse><ellipse cx=\"134.9\" cy=\"221.8\" rx=\"10.5\" ry=\"14.5\" fill=\"url(#wrCUrim)\"></ellipse><ellipse cx=\"134.9\" cy=\"221.8\" rx=\"10.5\" ry=\"14.5\" fill=\"none\" stroke=\"#2C3238\" stroke-width=\"1\"></ellipse><ellipse cx=\"141.2\" cy=\"224.5\" rx=\"1.3\" ry=\"1.7\" fill=\"#4A525A\"></ellipse><ellipse cx=\"136.3\" cy=\"230.8\" rx=\"1.3\" ry=\"1.7\" fill=\"#4A525A\"></ellipse><ellipse cx=\"130.0\" cy=\"228.1\" rx=\"1.3\" ry=\"1.7\" fill=\"#4A525A\"></ellipse><ellipse cx=\"128.6\" cy=\"219.1\" rx=\"1.3\" ry=\"1.7\" fill=\"#4A525A\"></ellipse><ellipse cx=\"133.4\" cy=\"212.8\" rx=\"1.3\" ry=\"1.7\" fill=\"#4A525A\"></ellipse><ellipse cx=\"139.7\" cy=\"215.5\" rx=\"1.3\" ry=\"1.7\" fill=\"#4A525A\"></ellipse><ellipse cx=\"134.9\" cy=\"221.8\" rx=\"3.8\" ry=\"5\" fill=\"#69727B\"></ellipse><ellipse cx=\"134.2\" cy=\"220.8\" rx=\"1.6\" ry=\"2\" fill=\"#E8ECEF\"></ellipse><ellipse cx=\"267.9\" cy=\"171.4\" rx=\"17\" ry=\"24\" fill=\"#060708\"></ellipse><path d=\"M276.2 152.2 L267.9 147.4 L267.9 195.4 L276.2 200.2 Z\" fill=\"#0B0C0E\"></path><ellipse cx=\"276.2\" cy=\"176.2\" rx=\"17\" ry=\"24\" fill=\"url(#wrCUtr)\"></ellipse><ellipse cx=\"277.2\" cy=\"176.2\" rx=\"15.5\" ry=\"22.5\" fill=\"none\" stroke=\"#3A3F45\" stroke-width=\"0.8\"></ellipse><ellipse cx=\"277.7\" cy=\"176.2\" rx=\"10.5\" ry=\"14.5\" fill=\"url(#wrCUrim)\"></ellipse><ellipse cx=\"277.7\" cy=\"176.2\" rx=\"10.5\" ry=\"14.5\" fill=\"none\" stroke=\"#2C3238\" stroke-width=\"1\"></ellipse><ellipse cx=\"284.0\" cy=\"178.9\" rx=\"1.3\" ry=\"1.7\" fill=\"#4A525A\"></ellipse><ellipse cx=\"279.2\" cy=\"185.2\" rx=\"1.3\" ry=\"1.7\" fill=\"#4A525A\"></ellipse><ellipse cx=\"272.9\" cy=\"182.5\" rx=\"1.3\" ry=\"1.7\" fill=\"#4A525A\"></ellipse><ellipse cx=\"271.4\" cy=\"173.5\" rx=\"1.3\" ry=\"1.7\" fill=\"#4A525A\"></ellipse><ellipse cx=\"276.3\" cy=\"167.2\" rx=\"1.3\" ry=\"1.7\" fill=\"#4A525A\"></ellipse><ellipse cx=\"282.6\" cy=\"169.9\" rx=\"1.3\" ry=\"1.7\" fill=\"#4A525A\"></ellipse><ellipse cx=\"277.7\" cy=\"176.2\" rx=\"3.8\" ry=\"5\" fill=\"#69727B\"></ellipse><ellipse cx=\"277.0\" cy=\"175.2\" rx=\"1.6\" ry=\"2\" fill=\"#E8ECEF\"></ellipse></g></defs><g mask=\"url(#wrCUm)\" opacity=\"0.32\"><use href=\"#wrCUbody\" transform=\"matrix(1 -0.6383 0 -1 0 530.7)\"></use></g><ellipse cx=\"186\" cy=\"238\" rx=\"170\" ry=\"30\" fill=\"url(#wrCUsh)\" opacity=\"0.85\"></ellipse><ellipse cx=\"160\" cy=\"226\" rx=\"120\" ry=\"14\" fill=\"#000\" opacity=\"0.35\" transform=\"rotate(-17.7 160 226)\"></ellipse><use href=\"#wrCUbody\"></use></svg>", "그레이": "<svg viewBox=\"0 0 360 290\" aria-hidden=\"true\" style=\"display: block\"><defs><radialGradient id=\"wrCUsh\" cx=\"50%\" cy=\"50%\" r=\"50%\"><stop offset=\"0\" stop-color=\"#000\" stop-opacity=\"0.8\"></stop><stop offset=\"0.6\" stop-color=\"#000\" stop-opacity=\"0.35\"></stop><stop offset=\"1\" stop-color=\"#000\" stop-opacity=\"0\"></stop></radialGradient><linearGradient id=\"wrCUfm\" x1=\"193.51999999999998\" y1=\"203.6\" x2=\"207.32\" y2=\"246.83999999999997\" gradientUnits=\"userSpaceOnUse\"><stop offset=\"0\" stop-color=\"#fff\" stop-opacity=\"0.55\"></stop><stop offset=\"1\" stop-color=\"#fff\" stop-opacity=\"0\"></stop></linearGradient><linearGradient id=\"wrCUbs\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\"><stop offset=\"0\" stop-color=\"#A5ACB3\"></stop><stop offset=\"0.1\" stop-color=\"#919AA2\"></stop><stop offset=\"0.16\" stop-color=\"#89929A\"></stop><stop offset=\"0.7\" stop-color=\"#7E868E\"></stop><stop offset=\"1\" stop-color=\"#5C6268\"></stop></linearGradient><linearGradient id=\"wrCUbl\" x1=\"0\" y1=\"0\" x2=\"1\" y2=\"0\"><stop offset=\"0\" stop-color=\"#fff\" stop-opacity=\"0.0\"></stop><stop offset=\"0.55\" stop-color=\"#000\" stop-opacity=\"0.0\"></stop><stop offset=\"1\" stop-color=\"#000\" stop-opacity=\"0.22\"></stop></linearGradient><linearGradient id=\"wrCUbf\" x1=\"1\" y1=\"0\" x2=\"0\" y2=\"0\"><stop offset=\"0\" stop-color=\"#565C61\"></stop><stop offset=\"1\" stop-color=\"#70777E\"></stop></linearGradient><linearGradient id=\"wrCUbt\" x1=\"0\" y1=\"1\" x2=\"1\" y2=\"0\"><stop offset=\"0\" stop-color=\"#A8AFB6\"></stop><stop offset=\"1\" stop-color=\"#919AA2\"></stop></linearGradient><linearGradient id=\"wrCUcs\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\"><stop offset=\"0\" stop-color=\"#FFFFFF\"></stop><stop offset=\"0.18\" stop-color=\"#F7F7F7\"></stop><stop offset=\"0.22\" stop-color=\"#E5E5E5\"></stop><stop offset=\"1\" stop-color=\"#BCBCBC\"></stop></linearGradient><linearGradient id=\"wrCUcf\" x1=\"1\" y1=\"0\" x2=\"0\" y2=\"0\"><stop offset=\"0\" stop-color=\"#B2B2B2\"></stop><stop offset=\"1\" stop-color=\"#DBDBDB\"></stop></linearGradient><linearGradient id=\"wrCUgl\" x1=\"0\" y1=\"0\" x2=\"1\" y2=\"1\"><stop offset=\"0\" stop-color=\"#4B5866\"></stop><stop offset=\"0.4\" stop-color=\"#1A2028\"></stop><stop offset=\"0.46\" stop-color=\"#5A6876\"></stop><stop offset=\"0.52\" stop-color=\"#1A2028\"></stop><stop offset=\"1\" stop-color=\"#0D1014\"></stop></linearGradient><linearGradient id=\"wrCUtr\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\"><stop offset=\"0\" stop-color=\"#2A2E33\"></stop><stop offset=\"0.5\" stop-color=\"#121417\"></stop><stop offset=\"1\" stop-color=\"#060708\"></stop></linearGradient><radialGradient id=\"wrCUrim\" cx=\"38%\" cy=\"32%\" r=\"75%\"><stop offset=\"0\" stop-color=\"#F4F6F8\"></stop><stop offset=\"0.55\" stop-color=\"#B4BCC4\"></stop><stop offset=\"1\" stop-color=\"#5E666E\"></stop></radialGradient><radialGradient id=\"wrCUhl\" cx=\"50%\" cy=\"50%\" r=\"50%\"><stop offset=\"0\" stop-color=\"#FFF8D8\" stop-opacity=\"0.9\"></stop><stop offset=\"1\" stop-color=\"#FFF8D8\" stop-opacity=\"0\"></stop></radialGradient><mask id=\"wrCUm\" maskUnits=\"userSpaceOnUse\" x=\"0\" y=\"0\" width=\"360\" height=\"290\"><rect x=\"0\" y=\"0\" width=\"360\" height=\"290\" fill=\"url(#wrCUfm)\"></rect></mask><g id=\"wrCUbody\"><ellipse cx=\"79.4\" cy=\"191.8\" rx=\"17\" ry=\"24\" fill=\"#08090B\"></ellipse><ellipse cx=\"222.2\" cy=\"146.2\" rx=\"17\" ry=\"24\" fill=\"#08090B\"></ellipse><path d=\"M95.8 228.8 L308.2 161.0 L308.2 149.0 L95.8 216.8 Z\" fill=\"#1E2227\"></path><path d=\"M163.4 195.2 L310.1 148.4 L310.1 154.4 L163.4 201.2 Z\" fill=\"#15181B\"></path><path d=\"M111.4 165.2 L163.4 195.2 L163.4 87.2 L111.4 57.2 Z\" fill=\"url(#wrCUbf)\"></path><path d=\"M163.4 195.2 L310.1 148.4 L310.1 40.4 L163.4 87.2 Z\" fill=\"url(#wrCUbs)\"></path><path d=\"M163.4 195.2 L310.1 148.4 L310.1 40.4 L163.4 87.2 Z\" fill=\"url(#wrCUbl)\"></path><path d=\"M163.4 87.2 L310.1 40.4 L258.1 10.4 L111.4 57.2 Z\" fill=\"url(#wrCUbt)\"></path><path d=\"M305.4 149.9 L310.1 148.4 L310.1 40.4 L305.4 41.9 Z\" fill=\"#646B71\"></path><path d=\"M163.4 195.2 L310.1 148.4 L310.1 141.4 L163.4 188.2 Z\" fill=\"#54595E\"></path><path d=\"M164.4 87.4 L309.1 41.2\" stroke=\"#FFFFFF\" stroke-opacity=\"0.75\" stroke-width=\"1.6\" stroke-linecap=\"round\" fill=\"none\"></path><path d=\"M164.0 193.0 L164.0 88.0\" stroke=\"#FFFFFF\" stroke-opacity=\"0.55\" stroke-width=\"1.4\" stroke-linecap=\"round\" fill=\"none\"></path><path d=\"M111.4 57.2 L163.4 87.2\" stroke=\"#FFFFFF\" stroke-opacity=\"0.5\" stroke-width=\"1.2\" stroke-linecap=\"round\" fill=\"none\"></path><path d=\"M206.7 181.4 L257.4 91.2 L308.2 149.0 Z\" fill=\"#FFFFFF\" fill-opacity=\"0.96\"></path><text transform=\"matrix(0.94 -0.3 0 1 174.7 105.6)\" font-family=\"Noto Sans KR, sans-serif\" font-size=\"18\" font-weight=\"800\" fill=\"#1E2226\" letter-spacing=\"0.3\">snack24</text><path d=\"M40.0 192.0 L92.0 222.0 L92.0 186.0 L40.0 156.0 Z\" fill=\"url(#wrCUcf)\"></path><path d=\"M40.0 156.0 L92.0 186.0 L112.7 141.4 L60.7 111.4 Z\" fill=\"url(#wrCUgl)\"></path><path d=\"M92.0 222.0 L159.7 200.4 L159.7 126.4 L112.7 141.4 L92.0 186.0 Z\" fill=\"url(#wrCUcs)\"></path><path d=\"M112.7 141.4 L159.7 126.4 L107.7 96.4 L60.7 111.4 Z\" fill=\"#FFFFFF\"></path><path d=\"M112.7 141.4 L159.7 126.4\" stroke=\"#FFFFFF\" stroke-opacity=\"0.9\" stroke-width=\"1.4\" stroke-linecap=\"round\" fill=\"none\"></path><path d=\"M92.0 186.0 L112.7 141.4\" stroke=\"#FFFFFF\" stroke-opacity=\"0.7\" stroke-width=\"1.2\" stroke-linecap=\"round\" fill=\"none\"></path><path d=\"M92.5 217.8 L92.5 185.8\" stroke=\"#FFFFFF\" stroke-opacity=\"0.6\" stroke-width=\"1.2\" stroke-linecap=\"round\" fill=\"none\"></path><path d=\"M102.3 178.7 L115.5 146.5 L148.4 136.0 L148.4 164.0 Z\" fill=\"url(#wrCUgl)\"></path><path d=\"M150.3 199.4 L150.3 135.4\" stroke=\"#000\" stroke-opacity=\"0.18\" stroke-width=\"1.3\" stroke-linecap=\"round\" fill=\"none\"></path><path d=\"M101.4 215.0 L101.4 183.0\" stroke=\"#000\" stroke-opacity=\"0.12\" stroke-width=\"1.0\" stroke-linecap=\"round\" fill=\"none\"></path><path d=\"M135.2 178.2 L142.8 175.8 L142.8 173.3 L135.2 175.7 Z\" fill=\"#2B3036\"></path><path d=\"M38.1 194.6 L90.1 224.6 L90.1 212.6 L38.1 182.6 Z\" fill=\"#23272C\"></path><path d=\"M90.1 224.6 L107.0 219.2 L107.0 207.2 L90.1 212.6 Z\" fill=\"#2B3035\"></path><path d=\"M76.5 199.9 L53.6 186.7 L53.6 170.7 L76.5 183.9 Z\" fill=\"#1F2328\"></path><path d=\"M75.3 195.4 L54.5 183.4\" stroke=\"#4A5159\" stroke-opacity=\"1\" stroke-width=\"1\" stroke-linecap=\"round\" fill=\"none\"></path><path d=\"M75.3 190.9 L54.5 178.9\" stroke=\"#4A5159\" stroke-opacity=\"1\" stroke-width=\"1\" stroke-linecap=\"round\" fill=\"none\"></path><path d=\"M75.3 186.4 L54.5 174.4\" stroke=\"#4A5159\" stroke-opacity=\"1\" stroke-width=\"1\" stroke-linecap=\"round\" fill=\"none\"></path><path d=\"M109.4 227.5 A 24 30 0 0 1 157.4 212.1 Z\" fill=\"#0A0B0D\" transform=\"rotate(-17.7 133.4 221.8)\"></path><ellipse cx=\"87.4\" cy=\"193.8\" rx=\"12\" ry=\"9\" fill=\"url(#wrCUhl)\"></ellipse><ellipse cx=\"87.4\" cy=\"193.8\" rx=\"5.2\" ry=\"3.6\" fill=\"#FFFBEA\" stroke=\"#9AA3AC\" stroke-width=\"0.8\"></ellipse><ellipse cx=\"43.7\" cy=\"168.6\" rx=\"12\" ry=\"9\" fill=\"url(#wrCUhl)\"></ellipse><ellipse cx=\"43.7\" cy=\"168.6\" rx=\"5.2\" ry=\"3.6\" fill=\"#FFFBEA\" stroke=\"#9AA3AC\" stroke-width=\"0.8\"></ellipse><path d=\"M107.0 165.2 L95.0 167.2\" stroke=\"#1D2329\" stroke-opacity=\"1\" stroke-width=\"2\" stroke-linecap=\"round\" fill=\"none\"></path><rect x=\"91.0\" y=\"158.2\" width=\"7\" height=\"15\" rx=\"2.5\" fill=\"#1D2329\"></rect><rect x=\"92.4\" y=\"159.7\" width=\"2\" height=\"11\" rx=\"1\" fill=\"#5D6872\"></rect><path d=\"M112.7 216.4 L129.6 211.0 L135.8 214.6 L118.9 220.0 Z\" fill=\"#3A4047\"></path><ellipse cx=\"125.0\" cy=\"217.0\" rx=\"17\" ry=\"24\" fill=\"#060708\"></ellipse><path d=\"M133.4 197.8 L125.0 193.0 L125.0 241.0 L133.4 245.8 Z\" fill=\"#0B0C0E\"></path><ellipse cx=\"133.4\" cy=\"221.8\" rx=\"17\" ry=\"24\" fill=\"url(#wrCUtr)\"></ellipse><ellipse cx=\"134.4\" cy=\"221.8\" rx=\"15.5\" ry=\"22.5\" fill=\"none\" stroke=\"#3A3F45\" stroke-width=\"0.8\"></ellipse><ellipse cx=\"134.9\" cy=\"221.8\" rx=\"10.5\" ry=\"14.5\" fill=\"url(#wrCUrim)\"></ellipse><ellipse cx=\"134.9\" cy=\"221.8\" rx=\"10.5\" ry=\"14.5\" fill=\"none\" stroke=\"#2C3238\" stroke-width=\"1\"></ellipse><ellipse cx=\"141.2\" cy=\"224.5\" rx=\"1.3\" ry=\"1.7\" fill=\"#4A525A\"></ellipse><ellipse cx=\"136.3\" cy=\"230.8\" rx=\"1.3\" ry=\"1.7\" fill=\"#4A525A\"></ellipse><ellipse cx=\"130.0\" cy=\"228.1\" rx=\"1.3\" ry=\"1.7\" fill=\"#4A525A\"></ellipse><ellipse cx=\"128.6\" cy=\"219.1\" rx=\"1.3\" ry=\"1.7\" fill=\"#4A525A\"></ellipse><ellipse cx=\"133.4\" cy=\"212.8\" rx=\"1.3\" ry=\"1.7\" fill=\"#4A525A\"></ellipse><ellipse cx=\"139.7\" cy=\"215.5\" rx=\"1.3\" ry=\"1.7\" fill=\"#4A525A\"></ellipse><ellipse cx=\"134.9\" cy=\"221.8\" rx=\"3.8\" ry=\"5\" fill=\"#69727B\"></ellipse><ellipse cx=\"134.2\" cy=\"220.8\" rx=\"1.6\" ry=\"2\" fill=\"#E8ECEF\"></ellipse><ellipse cx=\"267.9\" cy=\"171.4\" rx=\"17\" ry=\"24\" fill=\"#060708\"></ellipse><path d=\"M276.2 152.2 L267.9 147.4 L267.9 195.4 L276.2 200.2 Z\" fill=\"#0B0C0E\"></path><ellipse cx=\"276.2\" cy=\"176.2\" rx=\"17\" ry=\"24\" fill=\"url(#wrCUtr)\"></ellipse><ellipse cx=\"277.2\" cy=\"176.2\" rx=\"15.5\" ry=\"22.5\" fill=\"none\" stroke=\"#3A3F45\" stroke-width=\"0.8\"></ellipse><ellipse cx=\"277.7\" cy=\"176.2\" rx=\"10.5\" ry=\"14.5\" fill=\"url(#wrCUrim)\"></ellipse><ellipse cx=\"277.7\" cy=\"176.2\" rx=\"10.5\" ry=\"14.5\" fill=\"none\" stroke=\"#2C3238\" stroke-width=\"1\"></ellipse><ellipse cx=\"284.0\" cy=\"178.9\" rx=\"1.3\" ry=\"1.7\" fill=\"#4A525A\"></ellipse><ellipse cx=\"279.2\" cy=\"185.2\" rx=\"1.3\" ry=\"1.7\" fill=\"#4A525A\"></ellipse><ellipse cx=\"272.9\" cy=\"182.5\" rx=\"1.3\" ry=\"1.7\" fill=\"#4A525A\"></ellipse><ellipse cx=\"271.4\" cy=\"173.5\" rx=\"1.3\" ry=\"1.7\" fill=\"#4A525A\"></ellipse><ellipse cx=\"276.3\" cy=\"167.2\" rx=\"1.3\" ry=\"1.7\" fill=\"#4A525A\"></ellipse><ellipse cx=\"282.6\" cy=\"169.9\" rx=\"1.3\" ry=\"1.7\" fill=\"#4A525A\"></ellipse><ellipse cx=\"277.7\" cy=\"176.2\" rx=\"3.8\" ry=\"5\" fill=\"#69727B\"></ellipse><ellipse cx=\"277.0\" cy=\"175.2\" rx=\"1.6\" ry=\"2\" fill=\"#E8ECEF\"></ellipse></g></defs><g mask=\"url(#wrCUm)\" opacity=\"0.32\"><use href=\"#wrCUbody\" transform=\"matrix(1 -0.6383 0 -1 0 530.7)\"></use></g><ellipse cx=\"186\" cy=\"238\" rx=\"170\" ry=\"30\" fill=\"url(#wrCUsh)\" opacity=\"0.85\"></ellipse><ellipse cx=\"160\" cy=\"226\" rx=\"120\" ry=\"14\" fill=\"#000\" opacity=\"0.35\" transform=\"rotate(-17.7 160 226)\"></ellipse><use href=\"#wrCUbody\"></use></svg>", "블루": "<svg viewBox=\"0 0 360 290\" aria-hidden=\"true\" style=\"display: block\"><defs><radialGradient id=\"wrCUsh\" cx=\"50%\" cy=\"50%\" r=\"50%\"><stop offset=\"0\" stop-color=\"#000\" stop-opacity=\"0.8\"></stop><stop offset=\"0.6\" stop-color=\"#000\" stop-opacity=\"0.35\"></stop><stop offset=\"1\" stop-color=\"#000\" stop-opacity=\"0\"></stop></radialGradient><linearGradient id=\"wrCUfm\" x1=\"193.51999999999998\" y1=\"203.6\" x2=\"207.32\" y2=\"246.83999999999997\" gradientUnits=\"userSpaceOnUse\"><stop offset=\"0\" stop-color=\"#fff\" stop-opacity=\"0.55\"></stop><stop offset=\"1\" stop-color=\"#fff\" stop-opacity=\"0\"></stop></linearGradient><linearGradient id=\"wrCUbs\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\"><stop offset=\"0\" stop-color=\"#4F74B3\"></stop><stop offset=\"0.1\" stop-color=\"#2956A2\"></stop><stop offset=\"0.16\" stop-color=\"#1D4C9A\"></stop><stop offset=\"0.7\" stop-color=\"#1B468E\"></stop><stop offset=\"1\" stop-color=\"#133368\"></stop></linearGradient><linearGradient id=\"wrCUbl\" x1=\"0\" y1=\"0\" x2=\"1\" y2=\"0\"><stop offset=\"0\" stop-color=\"#fff\" stop-opacity=\"0.0\"></stop><stop offset=\"0.55\" stop-color=\"#000\" stop-opacity=\"0.0\"></stop><stop offset=\"1\" stop-color=\"#000\" stop-opacity=\"0.22\"></stop></linearGradient><linearGradient id=\"wrCUbf\" x1=\"1\" y1=\"0\" x2=\"0\" y2=\"0\"><stop offset=\"0\" stop-color=\"#123061\"></stop><stop offset=\"1\" stop-color=\"#183E7E\"></stop></linearGradient><linearGradient id=\"wrCUbt\" x1=\"0\" y1=\"1\" x2=\"1\" y2=\"0\"><stop offset=\"0\" stop-color=\"#567AB6\"></stop><stop offset=\"1\" stop-color=\"#2956A2\"></stop></linearGradient><linearGradient id=\"wrCUcs\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\"><stop offset=\"0\" stop-color=\"#FFFFFF\"></stop><stop offset=\"0.18\" stop-color=\"#F7F7F7\"></stop><stop offset=\"0.22\" stop-color=\"#E5E5E5\"></stop><stop offset=\"1\" stop-color=\"#BCBCBC\"></stop></linearGradient><linearGradient id=\"wrCUcf\" x1=\"1\" y1=\"0\" x2=\"0\" y2=\"0\"><stop offset=\"0\" stop-color=\"#B2B2B2\"></stop><stop offset=\"1\" stop-color=\"#DBDBDB\"></stop></linearGradient><linearGradient id=\"wrCUgl\" x1=\"0\" y1=\"0\" x2=\"1\" y2=\"1\"><stop offset=\"0\" stop-color=\"#4B5866\"></stop><stop offset=\"0.4\" stop-color=\"#1A2028\"></stop><stop offset=\"0.46\" stop-color=\"#5A6876\"></stop><stop offset=\"0.52\" stop-color=\"#1A2028\"></stop><stop offset=\"1\" stop-color=\"#0D1014\"></stop></linearGradient><linearGradient id=\"wrCUtr\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\"><stop offset=\"0\" stop-color=\"#2A2E33\"></stop><stop offset=\"0.5\" stop-color=\"#121417\"></stop><stop offset=\"1\" stop-color=\"#060708\"></stop></linearGradient><radialGradient id=\"wrCUrim\" cx=\"38%\" cy=\"32%\" r=\"75%\"><stop offset=\"0\" stop-color=\"#F4F6F8\"></stop><stop offset=\"0.55\" stop-color=\"#B4BCC4\"></stop><stop offset=\"1\" stop-color=\"#5E666E\"></stop></radialGradient><radialGradient id=\"wrCUhl\" cx=\"50%\" cy=\"50%\" r=\"50%\"><stop offset=\"0\" stop-color=\"#FFF8D8\" stop-opacity=\"0.9\"></stop><stop offset=\"1\" stop-color=\"#FFF8D8\" stop-opacity=\"0\"></stop></radialGradient><mask id=\"wrCUm\" maskUnits=\"userSpaceOnUse\" x=\"0\" y=\"0\" width=\"360\" height=\"290\"><rect x=\"0\" y=\"0\" width=\"360\" height=\"290\" fill=\"url(#wrCUfm)\"></rect></mask><g id=\"wrCUbody\"><ellipse cx=\"79.4\" cy=\"191.8\" rx=\"17\" ry=\"24\" fill=\"#08090B\"></ellipse><ellipse cx=\"222.2\" cy=\"146.2\" rx=\"17\" ry=\"24\" fill=\"#08090B\"></ellipse><path d=\"M95.8 228.8 L308.2 161.0 L308.2 149.0 L95.8 216.8 Z\" fill=\"#1E2227\"></path><path d=\"M163.4 195.2 L310.1 148.4 L310.1 154.4 L163.4 201.2 Z\" fill=\"#15181B\"></path><path d=\"M111.4 165.2 L163.4 195.2 L163.4 87.2 L111.4 57.2 Z\" fill=\"url(#wrCUbf)\"></path><path d=\"M163.4 195.2 L310.1 148.4 L310.1 40.4 L163.4 87.2 Z\" fill=\"url(#wrCUbs)\"></path><path d=\"M163.4 195.2 L310.1 148.4 L310.1 40.4 L163.4 87.2 Z\" fill=\"url(#wrCUbl)\"></path><path d=\"M163.4 87.2 L310.1 40.4 L258.1 10.4 L111.4 57.2 Z\" fill=\"url(#wrCUbt)\"></path><path d=\"M305.4 149.9 L310.1 148.4 L310.1 40.4 L305.4 41.9 Z\" fill=\"#153871\"></path><path d=\"M163.4 195.2 L310.1 148.4 L310.1 141.4 L163.4 188.2 Z\" fill=\"#122E5E\"></path><path d=\"M164.4 87.4 L309.1 41.2\" stroke=\"#FFFFFF\" stroke-opacity=\"0.75\" stroke-width=\"1.6\" stroke-linecap=\"round\" fill=\"none\"></path><path d=\"M164.0 193.0 L164.0 88.0\" stroke=\"#FFFFFF\" stroke-opacity=\"0.55\" stroke-width=\"1.4\" stroke-linecap=\"round\" fill=\"none\"></path><path d=\"M111.4 57.2 L163.4 87.2\" stroke=\"#FFFFFF\" stroke-opacity=\"0.5\" stroke-width=\"1.2\" stroke-linecap=\"round\" fill=\"none\"></path><path d=\"M206.7 181.4 L257.4 91.2 L308.2 149.0 Z\" fill=\"#FFFFFF\" fill-opacity=\"0.96\"></path><text transform=\"matrix(0.94 -0.3 0 1 174.7 105.6)\" font-family=\"Noto Sans KR, sans-serif\" font-size=\"18\" font-weight=\"800\" fill=\"#FFFFFF\" letter-spacing=\"0.3\">snack24</text><path d=\"M40.0 192.0 L92.0 222.0 L92.0 186.0 L40.0 156.0 Z\" fill=\"url(#wrCUcf)\"></path><path d=\"M40.0 156.0 L92.0 186.0 L112.7 141.4 L60.7 111.4 Z\" fill=\"url(#wrCUgl)\"></path><path d=\"M92.0 222.0 L159.7 200.4 L159.7 126.4 L112.7 141.4 L92.0 186.0 Z\" fill=\"url(#wrCUcs)\"></path><path d=\"M112.7 141.4 L159.7 126.4 L107.7 96.4 L60.7 111.4 Z\" fill=\"#FFFFFF\"></path><path d=\"M112.7 141.4 L159.7 126.4\" stroke=\"#FFFFFF\" stroke-opacity=\"0.9\" stroke-width=\"1.4\" stroke-linecap=\"round\" fill=\"none\"></path><path d=\"M92.0 186.0 L112.7 141.4\" stroke=\"#FFFFFF\" stroke-opacity=\"0.7\" stroke-width=\"1.2\" stroke-linecap=\"round\" fill=\"none\"></path><path d=\"M92.5 217.8 L92.5 185.8\" stroke=\"#FFFFFF\" stroke-opacity=\"0.6\" stroke-width=\"1.2\" stroke-linecap=\"round\" fill=\"none\"></path><path d=\"M102.3 178.7 L115.5 146.5 L148.4 136.0 L148.4 164.0 Z\" fill=\"url(#wrCUgl)\"></path><path d=\"M150.3 199.4 L150.3 135.4\" stroke=\"#000\" stroke-opacity=\"0.18\" stroke-width=\"1.3\" stroke-linecap=\"round\" fill=\"none\"></path><path d=\"M101.4 215.0 L101.4 183.0\" stroke=\"#000\" stroke-opacity=\"0.12\" stroke-width=\"1.0\" stroke-linecap=\"round\" fill=\"none\"></path><path d=\"M135.2 178.2 L142.8 175.8 L142.8 173.3 L135.2 175.7 Z\" fill=\"#2B3036\"></path><path d=\"M38.1 194.6 L90.1 224.6 L90.1 212.6 L38.1 182.6 Z\" fill=\"#23272C\"></path><path d=\"M90.1 224.6 L107.0 219.2 L107.0 207.2 L90.1 212.6 Z\" fill=\"#2B3035\"></path><path d=\"M76.5 199.9 L53.6 186.7 L53.6 170.7 L76.5 183.9 Z\" fill=\"#1F2328\"></path><path d=\"M75.3 195.4 L54.5 183.4\" stroke=\"#4A5159\" stroke-opacity=\"1\" stroke-width=\"1\" stroke-linecap=\"round\" fill=\"none\"></path><path d=\"M75.3 190.9 L54.5 178.9\" stroke=\"#4A5159\" stroke-opacity=\"1\" stroke-width=\"1\" stroke-linecap=\"round\" fill=\"none\"></path><path d=\"M75.3 186.4 L54.5 174.4\" stroke=\"#4A5159\" stroke-opacity=\"1\" stroke-width=\"1\" stroke-linecap=\"round\" fill=\"none\"></path><path d=\"M109.4 227.5 A 24 30 0 0 1 157.4 212.1 Z\" fill=\"#0A0B0D\" transform=\"rotate(-17.7 133.4 221.8)\"></path><ellipse cx=\"87.4\" cy=\"193.8\" rx=\"12\" ry=\"9\" fill=\"url(#wrCUhl)\"></ellipse><ellipse cx=\"87.4\" cy=\"193.8\" rx=\"5.2\" ry=\"3.6\" fill=\"#FFFBEA\" stroke=\"#9AA3AC\" stroke-width=\"0.8\"></ellipse><ellipse cx=\"43.7\" cy=\"168.6\" rx=\"12\" ry=\"9\" fill=\"url(#wrCUhl)\"></ellipse><ellipse cx=\"43.7\" cy=\"168.6\" rx=\"5.2\" ry=\"3.6\" fill=\"#FFFBEA\" stroke=\"#9AA3AC\" stroke-width=\"0.8\"></ellipse><path d=\"M107.0 165.2 L95.0 167.2\" stroke=\"#1D2329\" stroke-opacity=\"1\" stroke-width=\"2\" stroke-linecap=\"round\" fill=\"none\"></path><rect x=\"91.0\" y=\"158.2\" width=\"7\" height=\"15\" rx=\"2.5\" fill=\"#1D2329\"></rect><rect x=\"92.4\" y=\"159.7\" width=\"2\" height=\"11\" rx=\"1\" fill=\"#5D6872\"></rect><path d=\"M112.7 216.4 L129.6 211.0 L135.8 214.6 L118.9 220.0 Z\" fill=\"#3A4047\"></path><ellipse cx=\"125.0\" cy=\"217.0\" rx=\"17\" ry=\"24\" fill=\"#060708\"></ellipse><path d=\"M133.4 197.8 L125.0 193.0 L125.0 241.0 L133.4 245.8 Z\" fill=\"#0B0C0E\"></path><ellipse cx=\"133.4\" cy=\"221.8\" rx=\"17\" ry=\"24\" fill=\"url(#wrCUtr)\"></ellipse><ellipse cx=\"134.4\" cy=\"221.8\" rx=\"15.5\" ry=\"22.5\" fill=\"none\" stroke=\"#3A3F45\" stroke-width=\"0.8\"></ellipse><ellipse cx=\"134.9\" cy=\"221.8\" rx=\"10.5\" ry=\"14.5\" fill=\"url(#wrCUrim)\"></ellipse><ellipse cx=\"134.9\" cy=\"221.8\" rx=\"10.5\" ry=\"14.5\" fill=\"none\" stroke=\"#2C3238\" stroke-width=\"1\"></ellipse><ellipse cx=\"141.2\" cy=\"224.5\" rx=\"1.3\" ry=\"1.7\" fill=\"#4A525A\"></ellipse><ellipse cx=\"136.3\" cy=\"230.8\" rx=\"1.3\" ry=\"1.7\" fill=\"#4A525A\"></ellipse><ellipse cx=\"130.0\" cy=\"228.1\" rx=\"1.3\" ry=\"1.7\" fill=\"#4A525A\"></ellipse><ellipse cx=\"128.6\" cy=\"219.1\" rx=\"1.3\" ry=\"1.7\" fill=\"#4A525A\"></ellipse><ellipse cx=\"133.4\" cy=\"212.8\" rx=\"1.3\" ry=\"1.7\" fill=\"#4A525A\"></ellipse><ellipse cx=\"139.7\" cy=\"215.5\" rx=\"1.3\" ry=\"1.7\" fill=\"#4A525A\"></ellipse><ellipse cx=\"134.9\" cy=\"221.8\" rx=\"3.8\" ry=\"5\" fill=\"#69727B\"></ellipse><ellipse cx=\"134.2\" cy=\"220.8\" rx=\"1.6\" ry=\"2\" fill=\"#E8ECEF\"></ellipse><ellipse cx=\"267.9\" cy=\"171.4\" rx=\"17\" ry=\"24\" fill=\"#060708\"></ellipse><path d=\"M276.2 152.2 L267.9 147.4 L267.9 195.4 L276.2 200.2 Z\" fill=\"#0B0C0E\"></path><ellipse cx=\"276.2\" cy=\"176.2\" rx=\"17\" ry=\"24\" fill=\"url(#wrCUtr)\"></ellipse><ellipse cx=\"277.2\" cy=\"176.2\" rx=\"15.5\" ry=\"22.5\" fill=\"none\" stroke=\"#3A3F45\" stroke-width=\"0.8\"></ellipse><ellipse cx=\"277.7\" cy=\"176.2\" rx=\"10.5\" ry=\"14.5\" fill=\"url(#wrCUrim)\"></ellipse><ellipse cx=\"277.7\" cy=\"176.2\" rx=\"10.5\" ry=\"14.5\" fill=\"none\" stroke=\"#2C3238\" stroke-width=\"1\"></ellipse><ellipse cx=\"284.0\" cy=\"178.9\" rx=\"1.3\" ry=\"1.7\" fill=\"#4A525A\"></ellipse><ellipse cx=\"279.2\" cy=\"185.2\" rx=\"1.3\" ry=\"1.7\" fill=\"#4A525A\"></ellipse><ellipse cx=\"272.9\" cy=\"182.5\" rx=\"1.3\" ry=\"1.7\" fill=\"#4A525A\"></ellipse><ellipse cx=\"271.4\" cy=\"173.5\" rx=\"1.3\" ry=\"1.7\" fill=\"#4A525A\"></ellipse><ellipse cx=\"276.3\" cy=\"167.2\" rx=\"1.3\" ry=\"1.7\" fill=\"#4A525A\"></ellipse><ellipse cx=\"282.6\" cy=\"169.9\" rx=\"1.3\" ry=\"1.7\" fill=\"#4A525A\"></ellipse><ellipse cx=\"277.7\" cy=\"176.2\" rx=\"3.8\" ry=\"5\" fill=\"#69727B\"></ellipse><ellipse cx=\"277.0\" cy=\"175.2\" rx=\"1.6\" ry=\"2\" fill=\"#E8ECEF\"></ellipse></g></defs><g mask=\"url(#wrCUm)\" opacity=\"0.32\"><use href=\"#wrCUbody\" transform=\"matrix(1 -0.6383 0 -1 0 530.7)\"></use></g><ellipse cx=\"186\" cy=\"238\" rx=\"170\" ry=\"30\" fill=\"url(#wrCUsh)\" opacity=\"0.85\"></ellipse><ellipse cx=\"160\" cy=\"226\" rx=\"120\" ry=\"14\" fill=\"#000\" opacity=\"0.35\" transform=\"rotate(-17.7 160 226)\"></ellipse><use href=\"#wrCUbody\"></use></svg>", "레드": "<svg viewBox=\"0 0 360 290\" aria-hidden=\"true\" style=\"display: block\"><defs><radialGradient id=\"wrCUsh\" cx=\"50%\" cy=\"50%\" r=\"50%\"><stop offset=\"0\" stop-color=\"#000\" stop-opacity=\"0.8\"></stop><stop offset=\"0.6\" stop-color=\"#000\" stop-opacity=\"0.35\"></stop><stop offset=\"1\" stop-color=\"#000\" stop-opacity=\"0\"></stop></radialGradient><linearGradient id=\"wrCUfm\" x1=\"193.51999999999998\" y1=\"203.6\" x2=\"207.32\" y2=\"246.83999999999997\" gradientUnits=\"userSpaceOnUse\"><stop offset=\"0\" stop-color=\"#fff\" stop-opacity=\"0.55\"></stop><stop offset=\"1\" stop-color=\"#fff\" stop-opacity=\"0\"></stop></linearGradient><linearGradient id=\"wrCUbs\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\"><stop offset=\"0\" stop-color=\"#D45F58\"></stop><stop offset=\"0.1\" stop-color=\"#CA3C34\"></stop><stop offset=\"0.16\" stop-color=\"#C43129\"></stop><stop offset=\"0.7\" stop-color=\"#B42D25\"></stop><stop offset=\"1\" stop-color=\"#84211B\"></stop></linearGradient><linearGradient id=\"wrCUbl\" x1=\"0\" y1=\"0\" x2=\"1\" y2=\"0\"><stop offset=\"0\" stop-color=\"#fff\" stop-opacity=\"0.0\"></stop><stop offset=\"0.55\" stop-color=\"#000\" stop-opacity=\"0.0\"></stop><stop offset=\"1\" stop-color=\"#000\" stop-opacity=\"0.22\"></stop></linearGradient><linearGradient id=\"wrCUbf\" x1=\"1\" y1=\"0\" x2=\"0\" y2=\"0\"><stop offset=\"0\" stop-color=\"#7C1F1A\"></stop><stop offset=\"1\" stop-color=\"#A02821\"></stop></linearGradient><linearGradient id=\"wrCUbt\" x1=\"0\" y1=\"1\" x2=\"1\" y2=\"0\"><stop offset=\"0\" stop-color=\"#D5655F\"></stop><stop offset=\"1\" stop-color=\"#CA3C34\"></stop></linearGradient><linearGradient id=\"wrCUcs\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\"><stop offset=\"0\" stop-color=\"#FFFFFF\"></stop><stop offset=\"0.18\" stop-color=\"#F7F7F7\"></stop><stop offset=\"0.22\" stop-color=\"#E5E5E5\"></stop><stop offset=\"1\" stop-color=\"#BCBCBC\"></stop></linearGradient><linearGradient id=\"wrCUcf\" x1=\"1\" y1=\"0\" x2=\"0\" y2=\"0\"><stop offset=\"0\" stop-color=\"#B2B2B2\"></stop><stop offset=\"1\" stop-color=\"#DBDBDB\"></stop></linearGradient><linearGradient id=\"wrCUgl\" x1=\"0\" y1=\"0\" x2=\"1\" y2=\"1\"><stop offset=\"0\" stop-color=\"#4B5866\"></stop><stop offset=\"0.4\" stop-color=\"#1A2028\"></stop><stop offset=\"0.46\" stop-color=\"#5A6876\"></stop><stop offset=\"0.52\" stop-color=\"#1A2028\"></stop><stop offset=\"1\" stop-color=\"#0D1014\"></stop></linearGradient><linearGradient id=\"wrCUtr\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\"><stop offset=\"0\" stop-color=\"#2A2E33\"></stop><stop offset=\"0.5\" stop-color=\"#121417\"></stop><stop offset=\"1\" stop-color=\"#060708\"></stop></linearGradient><radialGradient id=\"wrCUrim\" cx=\"38%\" cy=\"32%\" r=\"75%\"><stop offset=\"0\" stop-color=\"#F4F6F8\"></stop><stop offset=\"0.55\" stop-color=\"#B4BCC4\"></stop><stop offset=\"1\" stop-color=\"#5E666E\"></stop></radialGradient><radialGradient id=\"wrCUhl\" cx=\"50%\" cy=\"50%\" r=\"50%\"><stop offset=\"0\" stop-color=\"#FFF8D8\" stop-opacity=\"0.9\"></stop><stop offset=\"1\" stop-color=\"#FFF8D8\" stop-opacity=\"0\"></stop></radialGradient><mask id=\"wrCUm\" maskUnits=\"userSpaceOnUse\" x=\"0\" y=\"0\" width=\"360\" height=\"290\"><rect x=\"0\" y=\"0\" width=\"360\" height=\"290\" fill=\"url(#wrCUfm)\"></rect></mask><g id=\"wrCUbody\"><ellipse cx=\"79.4\" cy=\"191.8\" rx=\"17\" ry=\"24\" fill=\"#08090B\"></ellipse><ellipse cx=\"222.2\" cy=\"146.2\" rx=\"17\" ry=\"24\" fill=\"#08090B\"></ellipse><path d=\"M95.8 228.8 L308.2 161.0 L308.2 149.0 L95.8 216.8 Z\" fill=\"#1E2227\"></path><path d=\"M163.4 195.2 L310.1 148.4 L310.1 154.4 L163.4 201.2 Z\" fill=\"#15181B\"></path><path d=\"M111.4 165.2 L163.4 195.2 L163.4 87.2 L111.4 57.2 Z\" fill=\"url(#wrCUbf)\"></path><path d=\"M163.4 195.2 L310.1 148.4 L310.1 40.4 L163.4 87.2 Z\" fill=\"url(#wrCUbs)\"></path><path d=\"M163.4 195.2 L310.1 148.4 L310.1 40.4 L163.4 87.2 Z\" fill=\"url(#wrCUbl)\"></path><path d=\"M163.4 87.2 L310.1 40.4 L258.1 10.4 L111.4 57.2 Z\" fill=\"url(#wrCUbt)\"></path><path d=\"M305.4 149.9 L310.1 148.4 L310.1 40.4 L305.4 41.9 Z\" fill=\"#90241E\"></path><path d=\"M163.4 195.2 L310.1 148.4 L310.1 141.4 L163.4 188.2 Z\" fill=\"#781E19\"></path><path d=\"M164.4 87.4 L309.1 41.2\" stroke=\"#FFFFFF\" stroke-opacity=\"0.75\" stroke-width=\"1.6\" stroke-linecap=\"round\" fill=\"none\"></path><path d=\"M164.0 193.0 L164.0 88.0\" stroke=\"#FFFFFF\" stroke-opacity=\"0.55\" stroke-width=\"1.4\" stroke-linecap=\"round\" fill=\"none\"></path><path d=\"M111.4 57.2 L163.4 87.2\" stroke=\"#FFFFFF\" stroke-opacity=\"0.5\" stroke-width=\"1.2\" stroke-linecap=\"round\" fill=\"none\"></path><path d=\"M206.7 181.4 L257.4 91.2 L308.2 149.0 Z\" fill=\"#FFFFFF\" fill-opacity=\"0.96\"></path><text transform=\"matrix(0.94 -0.3 0 1 174.7 105.6)\" font-family=\"Noto Sans KR, sans-serif\" font-size=\"18\" font-weight=\"800\" fill=\"#FFFFFF\" letter-spacing=\"0.3\">snack24</text><path d=\"M40.0 192.0 L92.0 222.0 L92.0 186.0 L40.0 156.0 Z\" fill=\"url(#wrCUcf)\"></path><path d=\"M40.0 156.0 L92.0 186.0 L112.7 141.4 L60.7 111.4 Z\" fill=\"url(#wrCUgl)\"></path><path d=\"M92.0 222.0 L159.7 200.4 L159.7 126.4 L112.7 141.4 L92.0 186.0 Z\" fill=\"url(#wrCUcs)\"></path><path d=\"M112.7 141.4 L159.7 126.4 L107.7 96.4 L60.7 111.4 Z\" fill=\"#FFFFFF\"></path><path d=\"M112.7 141.4 L159.7 126.4\" stroke=\"#FFFFFF\" stroke-opacity=\"0.9\" stroke-width=\"1.4\" stroke-linecap=\"round\" fill=\"none\"></path><path d=\"M92.0 186.0 L112.7 141.4\" stroke=\"#FFFFFF\" stroke-opacity=\"0.7\" stroke-width=\"1.2\" stroke-linecap=\"round\" fill=\"none\"></path><path d=\"M92.5 217.8 L92.5 185.8\" stroke=\"#FFFFFF\" stroke-opacity=\"0.6\" stroke-width=\"1.2\" stroke-linecap=\"round\" fill=\"none\"></path><path d=\"M102.3 178.7 L115.5 146.5 L148.4 136.0 L148.4 164.0 Z\" fill=\"url(#wrCUgl)\"></path><path d=\"M150.3 199.4 L150.3 135.4\" stroke=\"#000\" stroke-opacity=\"0.18\" stroke-width=\"1.3\" stroke-linecap=\"round\" fill=\"none\"></path><path d=\"M101.4 215.0 L101.4 183.0\" stroke=\"#000\" stroke-opacity=\"0.12\" stroke-width=\"1.0\" stroke-linecap=\"round\" fill=\"none\"></path><path d=\"M135.2 178.2 L142.8 175.8 L142.8 173.3 L135.2 175.7 Z\" fill=\"#2B3036\"></path><path d=\"M38.1 194.6 L90.1 224.6 L90.1 212.6 L38.1 182.6 Z\" fill=\"#23272C\"></path><path d=\"M90.1 224.6 L107.0 219.2 L107.0 207.2 L90.1 212.6 Z\" fill=\"#2B3035\"></path><path d=\"M76.5 199.9 L53.6 186.7 L53.6 170.7 L76.5 183.9 Z\" fill=\"#1F2328\"></path><path d=\"M75.3 195.4 L54.5 183.4\" stroke=\"#4A5159\" stroke-opacity=\"1\" stroke-width=\"1\" stroke-linecap=\"round\" fill=\"none\"></path><path d=\"M75.3 190.9 L54.5 178.9\" stroke=\"#4A5159\" stroke-opacity=\"1\" stroke-width=\"1\" stroke-linecap=\"round\" fill=\"none\"></path><path d=\"M75.3 186.4 L54.5 174.4\" stroke=\"#4A5159\" stroke-opacity=\"1\" stroke-width=\"1\" stroke-linecap=\"round\" fill=\"none\"></path><path d=\"M109.4 227.5 A 24 30 0 0 1 157.4 212.1 Z\" fill=\"#0A0B0D\" transform=\"rotate(-17.7 133.4 221.8)\"></path><ellipse cx=\"87.4\" cy=\"193.8\" rx=\"12\" ry=\"9\" fill=\"url(#wrCUhl)\"></ellipse><ellipse cx=\"87.4\" cy=\"193.8\" rx=\"5.2\" ry=\"3.6\" fill=\"#FFFBEA\" stroke=\"#9AA3AC\" stroke-width=\"0.8\"></ellipse><ellipse cx=\"43.7\" cy=\"168.6\" rx=\"12\" ry=\"9\" fill=\"url(#wrCUhl)\"></ellipse><ellipse cx=\"43.7\" cy=\"168.6\" rx=\"5.2\" ry=\"3.6\" fill=\"#FFFBEA\" stroke=\"#9AA3AC\" stroke-width=\"0.8\"></ellipse><path d=\"M107.0 165.2 L95.0 167.2\" stroke=\"#1D2329\" stroke-opacity=\"1\" stroke-width=\"2\" stroke-linecap=\"round\" fill=\"none\"></path><rect x=\"91.0\" y=\"158.2\" width=\"7\" height=\"15\" rx=\"2.5\" fill=\"#1D2329\"></rect><rect x=\"92.4\" y=\"159.7\" width=\"2\" height=\"11\" rx=\"1\" fill=\"#5D6872\"></rect><path d=\"M112.7 216.4 L129.6 211.0 L135.8 214.6 L118.9 220.0 Z\" fill=\"#3A4047\"></path><ellipse cx=\"125.0\" cy=\"217.0\" rx=\"17\" ry=\"24\" fill=\"#060708\"></ellipse><path d=\"M133.4 197.8 L125.0 193.0 L125.0 241.0 L133.4 245.8 Z\" fill=\"#0B0C0E\"></path><ellipse cx=\"133.4\" cy=\"221.8\" rx=\"17\" ry=\"24\" fill=\"url(#wrCUtr)\"></ellipse><ellipse cx=\"134.4\" cy=\"221.8\" rx=\"15.5\" ry=\"22.5\" fill=\"none\" stroke=\"#3A3F45\" stroke-width=\"0.8\"></ellipse><ellipse cx=\"134.9\" cy=\"221.8\" rx=\"10.5\" ry=\"14.5\" fill=\"url(#wrCUrim)\"></ellipse><ellipse cx=\"134.9\" cy=\"221.8\" rx=\"10.5\" ry=\"14.5\" fill=\"none\" stroke=\"#2C3238\" stroke-width=\"1\"></ellipse><ellipse cx=\"141.2\" cy=\"224.5\" rx=\"1.3\" ry=\"1.7\" fill=\"#4A525A\"></ellipse><ellipse cx=\"136.3\" cy=\"230.8\" rx=\"1.3\" ry=\"1.7\" fill=\"#4A525A\"></ellipse><ellipse cx=\"130.0\" cy=\"228.1\" rx=\"1.3\" ry=\"1.7\" fill=\"#4A525A\"></ellipse><ellipse cx=\"128.6\" cy=\"219.1\" rx=\"1.3\" ry=\"1.7\" fill=\"#4A525A\"></ellipse><ellipse cx=\"133.4\" cy=\"212.8\" rx=\"1.3\" ry=\"1.7\" fill=\"#4A525A\"></ellipse><ellipse cx=\"139.7\" cy=\"215.5\" rx=\"1.3\" ry=\"1.7\" fill=\"#4A525A\"></ellipse><ellipse cx=\"134.9\" cy=\"221.8\" rx=\"3.8\" ry=\"5\" fill=\"#69727B\"></ellipse><ellipse cx=\"134.2\" cy=\"220.8\" rx=\"1.6\" ry=\"2\" fill=\"#E8ECEF\"></ellipse><ellipse cx=\"267.9\" cy=\"171.4\" rx=\"17\" ry=\"24\" fill=\"#060708\"></ellipse><path d=\"M276.2 152.2 L267.9 147.4 L267.9 195.4 L276.2 200.2 Z\" fill=\"#0B0C0E\"></path><ellipse cx=\"276.2\" cy=\"176.2\" rx=\"17\" ry=\"24\" fill=\"url(#wrCUtr)\"></ellipse><ellipse cx=\"277.2\" cy=\"176.2\" rx=\"15.5\" ry=\"22.5\" fill=\"none\" stroke=\"#3A3F45\" stroke-width=\"0.8\"></ellipse><ellipse cx=\"277.7\" cy=\"176.2\" rx=\"10.5\" ry=\"14.5\" fill=\"url(#wrCUrim)\"></ellipse><ellipse cx=\"277.7\" cy=\"176.2\" rx=\"10.5\" ry=\"14.5\" fill=\"none\" stroke=\"#2C3238\" stroke-width=\"1\"></ellipse><ellipse cx=\"284.0\" cy=\"178.9\" rx=\"1.3\" ry=\"1.7\" fill=\"#4A525A\"></ellipse><ellipse cx=\"279.2\" cy=\"185.2\" rx=\"1.3\" ry=\"1.7\" fill=\"#4A525A\"></ellipse><ellipse cx=\"272.9\" cy=\"182.5\" rx=\"1.3\" ry=\"1.7\" fill=\"#4A525A\"></ellipse><ellipse cx=\"271.4\" cy=\"173.5\" rx=\"1.3\" ry=\"1.7\" fill=\"#4A525A\"></ellipse><ellipse cx=\"276.3\" cy=\"167.2\" rx=\"1.3\" ry=\"1.7\" fill=\"#4A525A\"></ellipse><ellipse cx=\"282.6\" cy=\"169.9\" rx=\"1.3\" ry=\"1.7\" fill=\"#4A525A\"></ellipse><ellipse cx=\"277.7\" cy=\"176.2\" rx=\"3.8\" ry=\"5\" fill=\"#69727B\"></ellipse><ellipse cx=\"277.0\" cy=\"175.2\" rx=\"1.6\" ry=\"2\" fill=\"#E8ECEF\"></ellipse></g></defs><g mask=\"url(#wrCUm)\" opacity=\"0.32\"><use href=\"#wrCUbody\" transform=\"matrix(1 -0.6383 0 -1 0 530.7)\"></use></g><ellipse cx=\"186\" cy=\"238\" rx=\"170\" ry=\"30\" fill=\"url(#wrCUsh)\" opacity=\"0.85\"></ellipse><ellipse cx=\"160\" cy=\"226\" rx=\"120\" ry=\"14\" fill=\"#000\" opacity=\"0.35\" transform=\"rotate(-17.7 160 226)\"></ellipse><use href=\"#wrCUbody\"></use></svg>"};
+  let carN = 0;
+  const carSvg = (k) => (CARS[k] || CARS['옐로우']).replace(/wrCU/g, 'c' + (++carN) + '_');
+  const carGet = () => { try { const k = localStorage.getItem('wr-car'); return CARS[k] ? k : '옐로우'; } catch (e) { return '옐로우'; } };
+  function hmLbl(t) {
+    const ic = { list: 'M8 6h12M8 12h12M8 18h12M4 6h.01M4 12h.01M4 18h.01', work: 'M12 7v5l3 2M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z', pin: 'M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21zM12 12a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z', box: 'M3 8l9-5 9 5v8l-9 5-9-5zM3 8l9 5 9-5M12 13v8', cam: 'M4 8h3l2-3h6l2 3h3v11H4zM12 17a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z', flag: 'M5 21V4h11l-2 4 2 4H5' };
+    const m = { cs: ['실적표', '거래처 · 매출 · 주류확인', 'list'], cw: ['업무', '업무시작 · 배송완료사진 · 업무종료', 'work'], sh: ['실적표', '거래처 · 주소 · 매출', 'list'], loc: ['출근', '위치 전송 켜기 · 끄기', 'pin'], lc: ['상차', '로케이션 · 상차 체크', 'box'], dl: ['배송', '출발 · 도착 · 배송 사진', 'cam'], rec: ['퇴근', '계기판 km · 주유 금액', 'flag'] }[t] || [t, '', 'list'];
+    return { t: m[0], s: m[1], d: ic[m[2]] };
+  }
+  const hmWant = () => { try { return sessionStorage.getItem('wr-hm') !== '0'; } catch (e) { return true; } };
+  var hmKeep = false;
+  function hmOff(t) {
+    if (hmKeep) { $('hbk-t').textContent = hmLbl(t).t; return; }
+    const wasHome = document.body.classList.contains('hm');
+    document.body.classList.remove('hm'); $('hbk-t').textContent = hmLbl(t).t;
+    try { sessionStorage.setItem('wr-hm', '0'); } catch (e) { /* noop */ }
+    if (wasHome) { try { history.pushState({ wr: t }, ''); } catch (e) { /* noop */ } window.scrollTo(0, 0); }
+  }
+  function hmStat() {
+    let on = false, txt = '';
+    if (CVS()) { txt = '위치 전송 ' + ($('cw-l').textContent || '—'); on = /켜|중/.test(txt); }
+    else { on = !!($('st') && $('st').classList.contains('on')); txt = ($('stt') || {}).textContent || ''; }
+    $('hm-st').classList.toggle('on', on); $('hm-stt').textContent = txt || '—';
+  }
+  function hmRender() {
+    $('hm-nm').textContent = cfg.n || '—';
+    $('hm-sub').textContent = isMaster() ? '관리자 계정' : (TNAME[TEAM] || '') + ' 기사';
+    $('hm-car').innerHTML = carSvg(carGet());
+    $('hm-rows').innerHTML = [...document.querySelectorAll('.tabs button')].filter((b) => !b.hidden).map((b) => { const l = hmLbl(b.dataset.tab);
+      return `<button class="hm-row" data-hm="${b.dataset.tab}"><svg width="26" height="26" viewBox="0 0 24 24" aria-hidden="true"><path d="${l.d}" stroke="#A9AFB6" stroke-width="1.9" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg><span><b>${l.t}</b>${l.s ? `<small>${l.s}</small>` : ''}</span><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7" stroke="#6B7178" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></button>`; }).join('');
+    hmStat();
+  }
+  function goHome() {
+    document.body.classList.add('hm'); hmRender(); window.scrollTo(0, 0);
+    try { sessionStorage.setItem('wr-hm', '1'); } catch (e) { /* noop */ }
+  }
+  $('hm-rows').onclick = (ev) => { const b = ev.target.closest('[data-hm]'); if (b) showTab(b.dataset.hm); };
+  $('hbk-b').onclick = () => { if (history.state && history.state.wr) history.back(); else goHome(); };
+  window.addEventListener('popstate', () => { if (!$('car-ov').hidden) { $('car-ov').hidden = true; return; } if (!$('main').hidden && !document.body.classList.contains('hm')) goHome(); });
+  setInterval(() => { if (document.body.classList.contains('hm')) hmStat(); }, 15000);
+  let carSel = '';
+  function carUi() {
+    $('car-hero').innerHTML = carSvg(carSel);
+    $('car-g').innerHTML = Object.keys(CARS).map((k) => `<button class="${k === carSel ? 'on' : ''}" data-car="${k}">${carSvg(k)}${k}</button>`).join('');
+  }
+  $('hm-chg').onclick = () => { carSel = carGet(); carUi(); $('car-ov').hidden = false; $('car-ov').scrollTop = 0; try { history.pushState({ car: 1 }, ''); } catch (e) { /* noop */ } };
+  $('car-g').onclick = (ev) => { const b = ev.target.closest('[data-car]'); if (b) { carSel = b.dataset.car; carUi(); } };
+  const carClose = () => { if (history.state && history.state.car) history.back(); else $('car-ov').hidden = true; };
+  $('car-x').onclick = carClose;
+  $('car-ok').onclick = () => { try { localStorage.setItem('wr-car', carSel); } catch (e) { /* noop */ } $('hm-car').innerHTML = carSvg(carSel); carClose(); };
+  // 배송 탭: 개발팀 딜리버리웹(배송매니저)을 그대로 띄움 — 출발·도착·사진은 딜리버리웹이 위펀오피스로 직접 보냄 (위로드는 화면만)
+  function dlOpen() {
+    if ($('dl-w').firstChild) return;
+    const f = document.createElement('iframe'); f.src = 'https://delivery-manager.wefun.kr/'; f.allow = 'geolocation; camera'; f.title = '배송매니저';
+    $('dl-w').appendChild(f); $('dl-app').hidden = !APP;
+  }
+  function applyType(first) {
+    try { pdUi(); } catch (e) { /* 소모품 카드는 나중에 */ }
+    if (CVS()) { setTimeout(() => csApply(first), 0); return; }   // 편의점 팀 화면 (아래 모듈이 다 읽힌 뒤)
+    const corp = isCorp();
+    tabBtn('rec').hidden = !corp; $('dg-rec').hidden = !corp; tabBtn('loc').hidden = isMaster(); tabBtn('dl').hidden = isMaster(); tabBtn('sh').hidden = isMaster();
+    try { localStorage.setItem(LS + '-type', corp ? 'corp' : 'jiip'); } catch (e) { /* noop */ }
+    const cur = document.querySelector('.tabs button.on');
+    if (first) { let t = ''; try { t = sessionStorage.getItem('wr-tab') || ''; } catch (e) { /* noop */ } if (!t || tabBtn(t).hidden) t = isMaster() ? 'lc' : (localStorage.getItem(LS + '-on') === '1') ? 'lc' : (!corp || new Date().getHours() < 14) ? 'sh' : 'rec'; hmKeep = hmWant(); showTab(t); hmKeep = false; if (hmWant()) goHome(); }
+    else if (!cur || cur.hidden) { hmKeep = document.body.classList.contains('hm'); showTab(isMaster() ? 'lc' : 'loc'); hmKeep = false; }
+    if (typeof aUi === 'function' && A) aUi();
+    if (document.body.classList.contains('hm')) hmRender();
+  }
+  function rUi() {
+    const sel = $('r-v'), cur = sel.value;
+    const mine = (R.mine || []).map((m) => m.plate), extra = vlist().filter((v) => !mine.includes(v));
+    const rest = (R.all || []).filter((v) => !mine.includes(v) && !extra.includes(v));
+    sel.innerHTML = (mine.length ? `<optgroup label="내 차량 (위로드 차량관리 기준)">${(R.mine || []).map((m) => `<option value="${m.plate}">${m.plate} · ${m.shift}</option>`).join('')}</optgroup>` : '')
+      + (extra.length ? `<optgroup label="최근 쓴 차량">${extra.map((v) => `<option>${v}</option>`).join('')}</optgroup>` : '')
+      + (rest.length ? `<optgroup label="다른 차량">${rest.map((v) => `<option>${v}</option>`).join('')}</optgroup>` : '')
+      + '<option value="__other">' + (mine.length || extra.length || rest.length ? '목록에 없는 차량 (직접 입력)' : '차량번호 넣기…') + '</option>';
+    if (cur && [...sel.options].some((o) => o.value === cur)) sel.value = cur;
+    else if (mine.length) { const pick = (R.mine || []).find((m) => m.shift === R.shift) || R.mine[0]; sel.value = pick.plate; }
+    document.querySelectorAll('.seg2 button').forEach((b) => b.classList.toggle('on', b.dataset.sh === R.shift));
+    const last = R.hist.find((h) => h.vehicle === sel.value);
+    $('r-hint').innerHTML = !mine.length && !rest.length ? '위로드 차량관리에 차량·탑승자가 아직 없어요. 관리자에게 알려 주시거나 직접 입력하세요.' : last ? `지난 기록 <b>${won(last.odo_km)} km</b> (${String(last.date).slice(5)} ${last.shift})` : (sel.value && sel.value !== '__other' ? '이 차 첫 기록이에요' : '');
+    $('r-hist').innerHTML = R.hist.slice(0, 7).map((h) => `<div><span>${String(h.date).slice(5).replace('-', '/')} ${h.shift} · ${h.vehicle}${h.fuel_won ? ' · 주유 ' + won(h.fuel_won) + '원' : ''}${h.sent === false ? ' <i style="opacity:.6">(전송 대기)</i>' : ''}</span><span>${won(h.odo_km)} km</span></div>`).join('') || '—';
+  }
+  document.querySelectorAll('.seg2 button').forEach((b) => { b.onclick = () => { R.shift = b.dataset.sh; rUi(); }; });
+  $('r-v').onchange = () => { const m = (R.mine || []).find((x) => x.plate === $('r-v').value); if (m) R.shift = m.shift; if ($('r-v').value === '__other') { const v = prompt('차량번호를 넣어 주세요 (예: 83수1306)'); if (v && v.trim()) { cfg.v = [...vlist(), v.trim().replace(/\s+/g, '')].join(', '); localStorage.setItem(LS, JSON.stringify(cfg)); rUi(); $('r-v').value = v.trim().replace(/\s+/g, ''); } else rUi(); } rUi(); };
+  async function rLoadVeh() {
+    if (!loggedIn()) return;
+    R.vehErr = '';
+    try { const r = await rpc('my_vehicles', { p_name: cfg.n, p_token: cfg.tok }); if (r && Array.isArray(r.mine)) { R.mine = r.mine; R.all = r.all || []; localStorage.setItem(LS + '-veh', JSON.stringify({ mine: R.mine, all: R.all })); if (R.mine.length) { const pick = R.mine.find((m) => m.shift === R.shift) || R.mine[0]; R.shift = pick.shift; $('r-v').value = ''; } } }
+    catch (e) { R.vehErr = e.message; log('차량 목록 불러오기 실패 ' + e.message); }
+    // 10/30: 내 차 목록을 못 받았거나 관리자 계정이면 → 위펀 전체 차량(번호만)을 따로 받아서 모두 고를 수 있게
+    if (R.vehErr || isMaster() || !(R.all || []).length) {
+      try { const ps = await rpc('shop_plates', {}); const all = (ps || []).map((x) => x.plate).filter(Boolean); if (all.length) { R.all = [...new Set([...(R.all || []), ...all])].sort(); localStorage.setItem(LS + '-veh', JSON.stringify({ mine: R.mine || [], all: R.all })); } }
+      catch (e) { log('전체 차량 목록 실패 ' + e.message); }
+    }
+    rUi(); applyType(false);
+    if (R.vehErr && /로그인/.test(R.vehErr)) $('r-hint').innerHTML = '로그인이 만료됐어요. 맨 아래 <b>다른 이름으로 로그인</b>을 눌러 다시 로그인하면 내 차량이 자동으로 잡혀요. (지금도 목록에서 골라 기록할 수 있어요)';
+  }
+  async function rLoadHist() {
+    if (!loggedIn()) return;
+    try { const rows = await rpc('my_trip_logs', { p_name: cfg.n, p_token: cfg.tok, p_limit: 20 }); if (Array.isArray(rows)) { const pendKeys = new Set(R.pend.map((x) => x.date + x.shift + x.vehicle)); R.hist = rows.map((h) => ({ ...h, sent: !pendKeys.has(h.date + h.shift + h.vehicle) })); R.pend.forEach((x) => { if (!R.hist.some((h) => h.date === x.date && h.shift === x.shift && h.vehicle === x.vehicle)) R.hist.unshift({ ...x, sent: false }); }); const vs = new Set(vlist()); rows.forEach((h) => vs.add(h.vehicle)); if (vs.size && !cfg.v) { cfg.v = [...vs].join(', '); localStorage.setItem(LS, JSON.stringify(cfg)); } localStorage.setItem(LS + '-hist', JSON.stringify(R.hist)); rUi(); } }
+    catch (e) { log('기록 불러오기 실패 ' + e.message); }
+  }
+  async function rFlush() {
+    if (!R.pend.length || !loggedIn()) return;
+    const rest = [];
+    for (const row of R.pend) { try { await rpc('push_trip_log', { p_name: cfg.n, p_token: cfg.tok, p_row: row }); const h = R.hist.find((x) => x.date === row.date && x.shift === row.shift && x.vehicle === row.vehicle); if (h) h.sent = true; } catch (e) { if (/로그인/.test(e.message)) { localStorage.setItem(LS + '-pend', JSON.stringify(R.pend)); alert('다시 로그인해 주세요'); cfg = { n: cfg.n, v: cfg.v }; localStorage.setItem(LS, JSON.stringify(cfg)); location.reload(); return; } rest.push(row); log('퇴근 기록 전송 실패 ' + e.message); } }
+    R.pend = rest; localStorage.setItem(LS + '-pend', JSON.stringify(R.pend)); localStorage.setItem(LS + '-hist', JSON.stringify(R.hist)); rUi();
+  }
+  $('r-save').onclick = async () => {
+    const vehicle = $('r-v').value, km = Number(String($('r-km').value).replace(/[^\d]/g, '')), fuel = Number(String($('r-fuel').value).replace(/[^\d]/g, '')) || null, l = null, note = $('r-note').value.trim();
+    const w = $('r-warn'), ok = $('r-ok'); w.hidden = true; ok.hidden = true;
+    if (!vehicle || vehicle === '__other') { w.hidden = false; w.textContent = '차량번호를 골라 주세요.'; return; }
+    if (!km || km < 1000) { w.hidden = false; w.textContent = '계기판 누적 km를 넣어 주세요 (예: 246720).'; return; }
+    const last = R.hist.find((h) => h.vehicle === vehicle);
+    if (last && km < Number(last.odo_km)) { w.hidden = false; w.textContent = `지난 기록(${won(last.odo_km)} km)보다 작아요. 숫자를 다시 확인해 주세요.`; return; }
+    if (last && km - Number(last.odo_km) > 1500 && !confirm(`지난 기록보다 ${won(km - Number(last.odo_km))} km 많아요. 맞나요?`)) return;
+    const row = { date: today(), shift: R.shift, vehicle, odo_km: km, fuel_won: fuel, fuel_l: l, note: note || null, at: new Date().toISOString() };
+    R.hist = [{ ...row, driver: cfg.n, sent: false }, ...R.hist.filter((h) => !(h.date === row.date && h.shift === row.shift && h.vehicle === row.vehicle))].slice(0, 60);
+    R.pend = [row, ...R.pend.filter((x) => !(x.date === row.date && x.shift === row.shift && x.vehicle === row.vehicle))];
+    localStorage.setItem(LS + '-pend', JSON.stringify(R.pend)); localStorage.setItem(LS + '-hist', JSON.stringify(R.hist));
+    $('r-save').disabled = true; $('r-save').textContent = '보내는 중…';
+    await rFlush();
+    $('r-save').disabled = false; $('r-save').textContent = '퇴근 기록 저장';
+    rUi();
+    if (R.pend.length) { w.hidden = false; w.textContent = '지금은 서버에 못 보냈어요. 기록은 폰에 저장됐고, 다음에 이 화면을 열면 자동으로 보내요.'; }
+    else { if (!CVS()) punch('out').then(aUi).catch(() => { /* noop */ }); if (APP && !CVS()) { try { window.WeRoadApp.stop(); } catch (e) { /* noop */ } } ok.hidden = false; ok.innerHTML = `<b>저장됐어요.</b> ${row.date.slice(5).replace('-', '/')} ${row.shift} · ${vehicle} · ${won(km)} km${fuel ? ' · 주유 ' + won(fuel) + '원' : ''}`; $('r-km').value = ''; $('r-fuel').value = ''; $('r-note').value = ''; }
+  };
+  // 10/30: 계기판 km·주유 금액은 입력하면서 1,234,567 처럼 쉼표 표시 (저장할 때는 숫자만)
+  ['r-km', 'r-fuel'].forEach((id) => { const el = $(id); el.addEventListener('input', () => { const d = el.value.replace(/[^\d]/g, ''); el.value = d ? Number(d).toLocaleString('ko-KR') : ''; }); });
+  // ---- 11/11 소모품 교체 알림: 위로드 차량관리에서 교체 시기가 지난 내 차 소모품 → [교체 완료] + 계기판 km → 위로드로 돌아감
+  const PDS = { rows: [], open: '' };
+  function pdUi() {
+    const box = $('pd'); if (!box) return;
+    const veh = CVS() ? csWefun() : isCorp();   // 11/13 v22: 지입 기사에게는 차량정비 카드 안 보임
+    box.hidden = !PDS.rows.length || !veh;
+    if (box.hidden) { box.innerHTML = ''; return; }
+    box.innerHTML = PDS.rows.map((r, i) => { const id = r.plate + '|' + r.part + '|' + r.due_km, op = PDS.open === id;
+      return `<div class="card warn f pd-c"><div><b>🔧 ${r.label} 교체할 때가 됐어요</b><br><span style="font-size:13px">${r.plate} · 교체 기준 ${won(r.due_km)} km${r.est_km ? ' · 지금 약 ' + won(r.est_km) + ' km' : ''}</span><br><span style="font-size:12px;opacity:.85">지정 정비업체(오토대안·HJ모터스)에서 교체한 뒤 아래 버튼을 눌러 주세요.</span></div>`
+        + (op ? `<label style="display:block;margin-top:8px;font-size:13px">교체할 때 계기판 km</label><input class="num pd-km" inputmode="numeric" placeholder="예: 246,720" value="${r.est_km ? won(r.est_km) : ''}" style="width:100%"><input class="pd-note" placeholder="메모 (선택) · 정비업체 등" style="width:100%;margin-top:6px"><div style="display:flex;gap:8px;margin-top:8px"><button class="big save pd-ok" data-i="${i}" style="flex:1">교체 완료 보내기</button><button class="sh-lo pd-x" style="flex:0 0 72px">취소</button></div>`
+          : `<button class="big save pd-go" data-id="${id}" style="margin-top:8px;width:100%">교체 완료</button>`) + '</div>'; }).join('');
+    box.querySelectorAll('.pd-go').forEach((b) => { b.onclick = () => { PDS.open = b.dataset.id; pdUi(); }; });
+    box.querySelectorAll('.pd-x').forEach((b) => { b.onclick = () => { PDS.open = ''; pdUi(); }; });
+    box.querySelectorAll('.pd-km').forEach((el) => el.addEventListener('input', () => { const d = el.value.replace(/[^\d]/g, ''); el.value = d ? Number(d).toLocaleString('ko-KR') : ''; }));
+    box.querySelectorAll('.pd-ok').forEach((b) => { b.onclick = async () => {
+      const r = PDS.rows[+b.dataset.i], c = b.closest('.pd-c'), km = Number(String(c.querySelector('.pd-km').value).replace(/[^\d]/g, '')), note = c.querySelector('.pd-note').value.trim();
+      if (!km || km < 1000) return alert('교체할 때 계기판 누적 km를 넣어 주세요 (예: 246720)');
+      b.disabled = true; b.textContent = '보내는 중…';
+      try { await rpc('part_due_done', { p_name: cfg.n, p_token: cfg.tok, p_plate: r.plate, p_part: r.part, p_due_km: r.due_km, p_km: km, p_note: note || null }); PDS.rows = PDS.rows.filter((x) => x !== r); PDS.open = ''; pdUi(); alert('보냈어요. 위로드 차량관리에 교체 완료로 기록됐어요.'); }
+      catch (e) { b.disabled = false; b.textContent = '교체 완료 보내기'; alert('못 보냈어요: ' + e.message); }
+    }; });
+  }
+  async function pdLoad() { if (!loggedIn() || isMaster()) return; try { const r = await rpc('my_part_due', { p_name: cfg.n, p_token: cfg.tok }); PDS.rows = Array.isArray(r) ? r : []; pdUi(); } catch (e) { log('소모품 알림 조회 실패 ' + e.message); } }
+  if (!$('main').hidden) { pdLoad(); setInterval(pdLoad, 30 * 60e3); document.addEventListener('visibilitychange', () => { if (!document.hidden) pdLoad(); }); }
+  var A = null;
+  if (!$('main').hidden) { applyType(true); rUi(); rLoadVeh(); rFlush().then(rLoadHist); }
+  // ---- 출근 체크 + 위치 앱(Traccar) 수신 확인 (v9)
+  A = { st: null };
+  const hm = (x) => x ? new Date(x).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' }) : '—';
+  function aUi() {
+    const st = A.st || {}, att = st.att || {};
+    $('a-in-t').textContent = hm(att.in_at); $('a-out-t').textContent = hm(att.out_at);
+    const age = st.last_age_min;
+    $('a-last').textContent = age == null ? '없음' : age < 1 ? '방금' : age < 60 ? age + '분 전' : age < 1440 ? Math.floor(age / 60) + '시간 전' : Math.floor(age / 1440) + '일 전';
+    const good = age != null && age <= 10;
+    $('a-app').textContent = good ? '정상' : age == null ? '미설정' : '끊김';
+    $('a-app').style.color = good ? '#86EFAC' : '#FDE68A';
+    $('stt').textContent = good ? '위치 앱 정상 수신 중' : age == null ? '위치 앱 설정이 필요해요 (아래 안내)' : '위치가 ' + $('a-last').textContent + ' 이후 안 와요 — 앱 켜져 있는지 확인';
+    $('st').classList.toggle('on', good);
+    $('a-in').textContent = att.in_at ? '출근 완료 ' + hm(att.in_at) + ' · 다시 누르면 시각 유지' : '출근';
+    $('a-out').hidden = isCorp() || !att.in_at; $('a-out').textContent = att.out_at ? '퇴근 완료 ' + hm(att.out_at) : '퇴근';
+    $('tmp-help').hidden = APP; $('tc-help').hidden = APP || IS_ANDROID; $('app-help').hidden = !APP; $('apk-help').hidden = APP || !IS_ANDROID;
+    if (!good && !APP && !IS_ANDROID) $('tc-help').open = true;
+    $('tc-id').textContent = cfg.n || '—'; $('tc-url').textContent = TRACCAR_URL;
+    if (APP) {
+      const a = A.app || {};
+      $('a-app').textContent = a.running ? (good ? '정상' : '켜짐 · ' + (a.status || '')) : '꺼짐 (출근 전)';
+      $('a-app').style.color = a.running && good ? '#86EFAC' : a.running ? '#FDE68A' : '#EAF0FF';
+      $('stt').textContent = a.running ? '출근 중 · 위로드 앱이 위치 전송 중' + (good ? '' : ' (' + (a.status || '대기') + ')') : '출근 버튼을 누르면 위치 전송이 시작돼요';
+      $('st').classList.toggle('on', !!a.running);
+      $('app-st').innerHTML = `위치 서비스: <b>${a.running ? '켜짐' : '꺼짐'}</b> · ${a.status || ''}<br>권한: 위치(앱 사용 중) ${a.fine ? '✓' : '<b style="color:#FDE68A">✗ 설정 필요</b>'} · 배터리 제한 없음 ${a.battOk ? '✓' : '<b style="color:#FDE68A">✗</b>'}`;
+    }
+  }
+  window.onWeRoadApp = (st) => { A.app = st || {}; aUi(); };
+  if (APP) { try { A.app = JSON.parse(window.WeRoadApp.status() || '{}'); if (cfg.n && window.WeRoadApp.setAuth && cfg.tok) window.WeRoadApp.setAuth(cfg.n, cfg.tok); else if (cfg.n && A.app.driver !== cfg.n) window.WeRoadApp.setDriver(cfg.n); if (loggedIn() && !A.app.fine && !sessionStorage.getItem('wr-prep')) { sessionStorage.setItem('wr-prep', '1'); if (window.WeRoadApp.prepare) setTimeout(() => window.WeRoadApp.prepare(), 600); } } catch (e) { /* noop */ } }
+  try { if (APP && window.WeRoadApp.version && window.WeRoadApp.version() < '1.3') $('app-old').hidden = false; } catch (e) { /* noop */ }   // 11/17 예전 앱(1.2) 안내
+  $('app-batt').onclick = () => { try { window.WeRoadApp.battery(); } catch (e) { /* noop */ } };
+  $('app-perm').onclick = () => { try { window.WeRoadApp.openSettings(); } catch (e) { /* noop */ } };
+  async function aLoad() { if (!loggedIn()) return; try { A.st = await rpc('my_status', { p_name: cfg.n, p_token: cfg.tok }); aUi(); } catch (e) { log('출근 상태 조회 실패 ' + e.message); } }
+  async function punch(kind) { try { const r = await rpc('punch', { p_name: cfg.n, p_token: cfg.tok, p_kind: kind }); A.st = { ...(A.st || {}), att: r }; return r; } catch (e) { if (/로그인/.test(e.message)) { alert('다시 로그인해 주세요'); cfg = { n: cfg.n, v: cfg.v }; localStorage.setItem(LS, JSON.stringify(cfg)); location.reload(); } throw e; } }
+  $('a-in').onclick = async () => {
+    const ok = $('a-ok'), w = $('a-warn'); ok.hidden = true; w.hidden = true; $('a-in').disabled = true;
+    if (APP) { try { if (window.WeRoadApp.setAuth && cfg.tok) window.WeRoadApp.setAuth(cfg.n, cfg.tok); else window.WeRoadApp.setDriver(cfg.n); window.WeRoadApp.start(); } catch (e) { /* noop */ } }
+    try { const r = await punch('in'); await aLoad(); if (r && r.in_at) A.st = { ...(A.st || {}), att: r }; ok.hidden = false; ok.innerHTML = `<b>출근 ${hm((A.st.att || {}).in_at)}</b> — 수고하세요!` + ((A.st.last_age_min != null && A.st.last_age_min <= 10) ? '' : '<br>위치 앱이 아직 안 보내고 있어요. 아래 안내대로 켜 주세요.'); }
+    catch (e) { w.hidden = false; w.textContent = '출근 체크 실패: ' + e.message; }
+    $('a-in').disabled = false; aUi();
+  };
+  $('a-out').onclick = async () => {
+    const ok = $('a-ok'), w = $('a-warn'); ok.hidden = true; w.hidden = true;
+    if (((A.st || {}).att || {}).out_at && !confirm('이미 퇴근 처리됐어요. 퇴근 시각을 지금으로 바꿀까요?')) return;
+    $('a-out').disabled = true;
+    try { await punch('out'); if (APP) { try { window.WeRoadApp.stop(); } catch (e) { /* noop */ } } await aLoad(); ok.hidden = false; ok.innerHTML = `<b>퇴근 ${hm(((A.st || {}).att || {}).out_at)}</b> — 오늘도 수고하셨어요! 위치 전송도 꺼졌어요.`; }
+    catch (e) { w.hidden = false; w.textContent = '퇴근 체크 실패: ' + e.message; }
+    $('a-out').disabled = false; aUi();
+  };
+  // ---- 로케이션 (v15): 위펀풀필먼트 WEB(wf-full) 그날 내 거래처 · 상온/저온 로케이션 · 상차 체크 → 서버 함수 drv
+  const L = { d: today(), recs: [], drivers: [], drv: '', busy: false, auto: true, departed: null, prog: null };
+  const esc = (x) => String(x == null ? '' : x).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const addDay = (d, n) => { const t = new Date(d + 'T00:00:00'); t.setDate(t.getDate() + n); return t.toLocaleDateString('sv-SE'); };
+  const dLbl = (d) => { const t = new Date(d + 'T00:00:00'); const w = '일월화수목금토'[t.getDay()]; return `${t.getMonth() + 1}/${t.getDate()} (${w})` + (d === today() ? ' 오늘' : d === addDay(today(), 1) ? ' 내일' : ''); };
+  async function drv(body) {
+    const r = await fetch(SERVER + '/functions/v1/drv', { method: 'POST', headers: { 'Content-Type': 'application/json', apikey: KEY }, body: JSON.stringify({ name: cfg.n, token: cfg.tok, ...body }) });
+    const j = await r.json().catch(() => ({ ok: false, error: 'HTTP ' + r.status }));
+    if (r.status === 401) throw new Error('로그인이 만료됐어요. 맨 아래 "다른 이름으로 로그인"으로 다시 로그인해 주세요.');
+    if (!j.ok) throw new Error(j.error || ('HTTP ' + r.status));
+    return j;
+  }
+  function lcUi() {
+    $('lc-d').textContent = dLbl(L.d);
+    $('lc-mb').hidden = !isMaster();
+    if (isMaster()) { const s = $('lc-drv'); s.innerHTML = '<option value="">기사 선택 (' + L.drivers.length + '명)</option>' + L.drivers.map((n) => `<option ${n === L.drv ? 'selected' : ''}>${esc(n)}</option>`).join(''); }
+    const p = L.prog, n = L.recs.length;
+    $('lc-prog').innerHTML = n ? `<div class="kv"><label>거래처</label><b>${n}<i>곳</i></b></div><div class="kv"><label>상온 상차</label><b>${p ? p.ambient_done + '/' + p.ambient_total : '—'}</b></div><div class="kv"><label>저온 상차</label><b>${p ? p.chilled_done + '/' + p.chilled_total : '—'}</b></div>` : '';
+    $('lc-sub').textContent = L.departed ? '출차 완료 · 체크 변경은 관리자에게' : (isMaster() && !L.drv ? '관리자 — 기사를 고르면 그 기사 로케이션이 보여요' : '풀필먼트 로케이션 · 배송 순번대로');
+    const q = $('lc-q').value.trim().toLowerCase();
+    const rs = L.recs.filter((r) => !q || [r.name, r.amb, r.chl, r.code].some((x) => String(x || '').toLowerCase().includes(q)));
+    const can = !L.departed && (!isMaster() || !!L.drv);
+    const multi = new Set(L.recs.map((r) => r.course)).size > 1;
+    const row = (r, t) => { const a = t === 'a', loc = a ? r.amb : r.chl, need = a ? r.needA : r.needC, ck = a ? r.ckA : r.ckC;
+      return `<div class="lc-r ${a ? 'a' : 'c'} ${ck ? 'ck' : ''}"><label>${a ? '상온' : '저온'}</label><span class="loc ${loc ? '' : 'none'}">${loc ? esc(loc) : (need ? '로케이션 없음 — 도크장 앞 파레트 확인' : '상품 없음')}</span>${need ? `<button class="cb" data-ck="${r.id}" data-t="${a ? 'ambient' : 'chilled'}" ${can ? '' : 'disabled'}>${ck ? '✓' : ''}</button>` : ''}</div>`; };
+    $('lc-list').innerHTML = rs.map((r) => { const done = (!r.needA || r.ckA) && (!r.needC || r.ckC);
+      return `<div class="lc ${done && (r.needA || r.needC) ? 'done' : ''}"><div class="lc-h"><span class="sq">${r.seq != null ? esc(r.seq) : '·'}</span><b>${esc(r.name)}</b>${multi ? `<span class="lc-tg" style="background:#334155;color:#E2E8F0">${esc(String(r.course || '').replace(/^스\)/, ''))}</span>` : ''}${r.frozen ? '<span class="lc-tg fz">냉동</span>' : ''}${r.ice ? '<span class="lc-tg ic">얼음</span>' : ''}</div>${row(r, 'a')}${row(r, 'c')}${r.note ? `<div class="lc-nt">📝 ${esc(r.note)}</div>` : ''}</div>`; }).join('')
+      || (L.busy ? '<div class="card msg">불러오는 중…</div>' : `<div class="card msg">${isMaster() && !L.drv ? '위에서 기사를 골라 주세요.' : q ? '검색 결과가 없어요.' : dLbl(L.d) + ' 배정된 거래처가 아직 없어요. 풀필먼트 담당자가 로케이션을 넣으면 여기 떠요.'}</div>`);
+  }
+  async function lcLoad(fresh) {
+    if (!loggedIn() || L.busy) return;
+    L.busy = true; $('lc-warn').hidden = true; lcUi();
+    try {
+      let j = await drv({ act: 'list', date: L.d, driver: L.drv, fresh: fresh === true });
+      // 오늘 배정이 없고 처음 열었으면 → 내일 것을 자동으로
+      if (L.auto && !isMaster() && !j.records.length && L.d === today()) { const j2 = await drv({ act: 'list', date: addDay(L.d, 1) }); if (j2.records.length) { L.d = addDay(L.d, 1); j = j2; } }
+      L.auto = false; L.recs = j.records || []; L.prog = j.progress; L.departed = j.departed; if (j.drivers) L.drivers = j.drivers;
+    } catch (e) { $('lc-warn').hidden = false; $('lc-warn').textContent = '로케이션을 못 불러왔어요: ' + e.message; L.recs = []; }
+    L.busy = false; lcUi();
+  }
+  $('lc-prev').onclick = () => { L.d = addDay(L.d, -1); L.auto = false; lcLoad(); };
+  $('lc-next').onclick = () => { L.d = addDay(L.d, 1); L.auto = false; lcLoad(); };
+  $('lc-re').onclick = () => lcLoad(true);
+  $('lc-drv').onchange = () => { L.drv = $('lc-drv').value; lcLoad(); };
+  $('lc-q').oninput = () => lcUi();
+  $('lc-list').onclick = async (ev) => {
+    const b = ev.target.closest('button[data-ck]'); if (!b || b.disabled) return;
+    const r = L.recs.find((x) => String(x.id) === b.dataset.ck); if (!r) return;
+    const t = b.dataset.t, now = t === 'ambient' ? !r.ckA : !r.ckC;
+    if (t === 'ambient') r.ckA = now; else r.ckC = now; lcUi();   // 먼저 화면에 반영
+    try { const j = await drv({ act: 'check', date: L.d, driver: L.drv, id: r.id, temp: t, checked: now }); L.recs = j.records || L.recs; L.prog = j.progress; L.departed = j.departed; }
+    catch (e) { if (t === 'ambient') r.ckA = !now; else r.ckC = !now; $('lc-warn').hidden = false; $('lc-warn').textContent = '상차 체크 실패: ' + e.message; }
+    lcUi();
+  };
+  document.querySelectorAll('button[data-copy]').forEach((b) => { b.onclick = async () => { const t = $(b.dataset.copy).textContent; try { await navigator.clipboard.writeText(t); b.textContent = '복사됨'; setTimeout(() => { b.textContent = '복사'; }, 1500); } catch (e) { prompt('복사해 주세요', t); } }; });
+
+  // ---- 11/6 일일실적표 · 카드 필수 확인 · 배송 탭 잠금 (상차 체크 전부 + 카드 확인)
+  const SH = { flags: {}, reads: new Set(), fd: '', busy: false, addr: {} };
+  async function shFlags(force) {
+    if (!force && SH.fd === L.d) return;
+    try { const j = await rpc('day_flags_get', { p_name: cfg.n, p_token: cfg.tok, p_date: L.d }); SH.flags = (j && j.flags) || {}; SH.reads = new Set((j && j.reads) || []); SH.fd = L.d; }
+    catch (e) { SH.flags = {}; SH.fd = ''; }
+  }
+  // 주소: 풀필먼트 주소가 비면 위펀오피스 거래처 주소록(위로드가 올림)에서 점포코드 → 거래처명 순으로 찾음
+  const nk = (s) => 'n:' + String(s || '').replace(/[\s()\[\]·.,\-_/]/g, '').toLowerCase();
+  async function shAddr() {
+    const need = L.recs.filter((r) => !r.addr && !SH.addr[r.code] && !SH.addr[nk(r.name)]);
+    if (!need.length) return;
+    const keys = [...new Set(need.flatMap((r) => [String(r.code), nk(r.name)]))].slice(0, 200);
+    try { const m = await rpc('client_addr_get', { p_name: cfg.n, p_token: cfg.tok, p_keys: keys }); Object.assign(SH.addr, m || {}); } catch (e) { /* 주소 없이 */ }
+  }
+  const addrOf = (r) => r.addr || SH.addr[String(r.code)] || SH.addr[nk(r.name)] || (fOf(r) || {}).addr || '';
+  async function shLoad(fresh) {
+    if (!loggedIn() || SH.busy) return; SH.busy = true; $('sh-warn').hidden = true; shUi();
+    try { if (fresh || !L.recs.length || L.loadedFor !== L.d) { await lcLoad(fresh); L.loadedFor = L.d; } await shFlags(true); await shAddr(); }
+    catch (e) { $('sh-warn').hidden = false; $('sh-warn').textContent = '실적표를 못 불러왔어요: ' + e.message; }
+    SH.busy = false; shUi();
+  }
+  const fOf = (r) => SH.flags[String(r.code)] || null;
+  const reqOf = (r) => { const f = fOf(r); if (!f) return false; return f.card !== undefined ? !!(f.card && f.pub) : !!(f.req && f.pub); };   // 11/8: 물류팀이 요약카드를 작성한 거래처만 필수
+  const noLoc = (r) => (r.needA && !r.amb) || (r.needC && !r.chl);
+  function shPending() {
+    if (isMaster() || !L.recs.length) return { cards: [], loads: 0 };
+    const cards = Object.keys(SH.flags).length ? L.recs.filter((r) => reqOf(r) && !SH.reads.has(String(r.code))) : [];   // 카드 확인은 위로드가 주의 표시를 올린 날만, 상차 체크는 항상
+    const loads = L.recs.reduce((n, r) => n + (r.needA && !r.ckA ? 1 : 0) + (r.needC && !r.ckC ? 1 : 0), 0);
+    return { cards, loads };
+  }
+  function shUi() {
+    $('sh-d').textContent = dLbl(L.d);
+    const rs = L.recs, won = (n) => Number(n || 0).toLocaleString('ko-KR'), pend = shPending();
+    // 매출: 풀필먼트 상온·저온 판매금액 (없으면 위로드가 올린 합계만)
+    const am = (r) => { const f = fOf(r) || {}; const a = Number(r.amtA || 0), c = Number(r.amtC || 0); return a || c ? { a, c, s: a + c } : { a: null, c: null, s: Number(f.amt || 0) }; };
+    const T = rs.reduce((o, r) => { const m = am(r); o.a += m.a || 0; o.c += m.c || 0; o.s += m.s || 0; return o; }, { a: 0, c: 0, s: 0 });
+    const cell = (v) => v == null ? '—' : v ? won(v) : '0';
+    $('sh-prog').innerHTML = rs.length ? `<div class="kv"><label>거래처</label><b>${rs.length}<i>곳</i></b></div><div class="kv"><label>상온</label><b>${won(T.a)}<i>원</i></b></div><div class="kv"><label>저온</label><b>${won(T.c)}<i>원</i></b></div><div class="kv"><label>합계</label><b style="color:#FDE68A">${won(T.s)}<i>원</i></b></div>${pend.cards.length ? `<div class="kv"><label>카드 확인</label><b>${pend.cards.length}곳 남음</b></div>` : ''}` : '';
+    if (!rs.length) { $('sh-list').innerHTML = SH.busy || L.busy ? '<div class="card msg">불러오는 중…</div>' : `<div class="card msg">${dLbl(L.d)} 배정된 거래처가 아직 없어요.</div>`; return; }
+    // 착지 수에 맞춰 글씨 크기 자동 (8곳 이하 크게 → 20곳이면 작게)
+    const n = rs.length, z = n <= 8 ? 1 : n >= 20 ? 0.78 : 1 - (n - 8) * 0.22 / 12;
+    const body = rs.map((r, i) => { const f = fOf(r) || {}, need = reqOf(r), rd = SH.reads.has(String(r.code)), m = am(r);
+      const tg = [f.new ? '<span class="t-new">첫 배송</span>' : '', f.chg ? `<span class="t-chg">담당 변경 (평소 ${esc(f.chg)})</span>` : '', f.voc ? '<span class="t-voc">최근 VOC</span>' : '', f.conf ? '<span class="t-conf">혼동 주의</span>' : '', r.frozen ? '<span class="t-fz">냉동 배송 있음</span>' : '', noLoc(r) ? '<span class="t-nol">로케이션 없음</span>' : ''].join('');
+      const ex = [f.voc ? f.voc.map((v) => `<div><b>VOC ${esc(String(v.d || '').slice(5).replace('-', '/'))}</b> ${esc(v.t)}</div>`).join('') : '', f.conf ? `<div>⚠ 같은 건물에 다른 거래처: ${f.conf.map(esc).join(' · ')} — 층·호 꼭 확인</div>` : '', noLoc(r) ? '<div>📦 로케이션 없음 — <b style="color:#FDE68A">도크장 앞 파레트 확인</b></div>' : ''].join('');
+      const ad = addrOf(r);
+      return `<div class="shr ${need && !rd ? 'req' : ''}"><div class="shn"><i>${i + 1}</i><b>${esc(r.name)}</b></div>
+        <div class="sha">${ad ? esc(ad) : '<span style="opacity:.5">주소 정보 없음</span>'}</div>
+        <div class="shm"><span><label>상온</label>${cell(m.a)}</span><span><label>저온</label>${cell(m.c)}</span><span class="t"><label>합계</label>${won(m.s)}</span></div>
+        ${tg ? `<div class="sh-tg">${tg}</div>` : ''}${ex ? `<div class="sh-x">${ex}</div>` : ''}${need || f.pub ? `<button class="sh-btn ${rd || !need ? 'ok' : ''}" data-card="${esc(r.code)}">${need ? (rd ? '✓ 카드 확인함' : '카드 확인 (필수)') : '거래처 카드'}</button>` : ''}</div>`; }).join('');
+    $('sh-list').innerHTML = `<div class="card shl" style="--z:${z.toFixed(3)}">${body}<div class="shr tot"><div class="shn"><b>합계 ${n}곳</b></div><div class="shm"><span><label>상온</label>${won(T.a)}</span><span><label>저온</label>${won(T.c)}</span><span class="t"><label>합계</label>${won(T.s)}</span></div></div></div>`;
+  }
+  $('sh-prev').onclick = () => { L.d = addDay(L.d, -1); L.auto = false; shLoad(true); };
+  $('sh-next').onclick = () => { L.d = addDay(L.d, 1); L.auto = false; shLoad(true); };
+  $('sh-re').onclick = () => shLoad(true);
+  let shCur = null;
+  $('sh-list').onclick = (ev) => {
+    const b = ev.target.closest('button[data-card]'); if (!b) return;
+    const r = L.recs.find((x) => String(x.code) === b.dataset.card); if (!r) return;
+    const f = fOf(r) || {}; shCur = r;
+    $('sh-ovt').textContent = r.name;
+    if (f.pub) { $('sh-ovf').hidden = false; $('sh-ovf').src = 'card.html?c=' + encodeURIComponent(f.pub); $('sh-ovb').hidden = true; }
+    else { $('sh-ovf').hidden = true; $('sh-ovf').removeAttribute('src'); $('sh-ovb').hidden = false;
+      $('sh-ovb').innerHTML = `<p><b>${esc(r.name)}</b><br>${esc(r.addr || '')}</p>${f.new ? '<p>★ <b>오늘 첫 배송</b>인 거래처예요. 주소·출입 방법을 꼭 확인하세요.</p>' : ''}${f.chg ? `<p>↺ 평소 <b>${esc(f.chg)}</b> 기사님 담당이에요. 진열 위치를 확인하세요.</p>` : ''}${f.voc ? f.voc.map((v) => `<p>⚠ <b>VOC ${esc(String(v.d || '').slice(5).replace('-', '/'))}</b> ${esc(v.t)}</p>`).join('') : ''}${f.conf ? `<p>🏢 같은 건물: ${f.conf.map(esc).join(' · ')}</p>` : ''}${r.note ? `<p>📝 ${esc(r.note)}</p>` : ''}<p style="opacity:.7">아직 요약카드가 없는 거래처예요. 위 내용을 확인했으면 오른쪽 위 [확인했어요]를 눌러 주세요.</p>`; }
+    $('sh-ov').hidden = false;
+  };
+  $('sh-ovx').onclick = async () => {
+    $('sh-ov').hidden = true; $('sh-ovf').removeAttribute('src');
+    const r = shCur; shCur = null; if (!r) return;
+    if (reqOf(r) && !SH.reads.has(String(r.code))) { SH.reads.add(String(r.code)); shUi(); try { await rpc('card_read', { p_name: cfg.n, p_token: cfg.tok, p_date: L.d, p_code: String(r.code) }); } catch (e) { /* 다음에 다시 기록 */ } }
+  };
+  async function dlGate() {
+    if (isMaster()) { $('dl-lock').hidden = true; dlOpen(); return; }
+    if (!L.recs.length || L.loadedFor !== L.d) { try { await lcLoad(); L.loadedFor = L.d; } catch (e) { /* 아래에서 판단 */ } }
+    await shFlags();
+    const p = shPending();
+    if (!p.cards.length && !p.loads) { $('dl-lock').hidden = true; $('dl-w').hidden = false; dlOpen(); return; }
+    $('dl-w').hidden = true; $('dl-lock').hidden = false;
+    $('dl-lock').innerHTML = `<b>배송 시작 전에 끝내 주세요</b>${p.loads ? `· 상차 체크 <b style="display:inline">${p.loads}건</b> 남음 (상차 탭에서 ☐ 체크)<br>` : ''}${p.cards.length ? `· 카드 확인 <b style="display:inline">${p.cards.length}곳</b> 남음: ${p.cards.slice(0, 4).map((r) => esc(r.name)).join(', ')}${p.cards.length > 4 ? ' 외' : ''}<br>` : ''}${p.loads ? '<button data-go="lc">상차 탭으로</button>' : ''}${p.cards.length ? '<button data-go="sh">실적표로</button>' : ''}<button data-go="dl">다시 확인</button>`;
+  }
+  $('dl-lock').onclick = (ev) => { const b = ev.target.closest('button[data-go]'); if (b) showTab(b.dataset.go); };
+  if (!$('main').hidden) { aUi(); aLoad(); }
+  // ===== 11/11 편의점 팀 — 일일실적표(내 점포·매출) → 업무시작 → 점포별 배송완료사진 → 특이사항 → 업무종료 · 위풀 정직원은 퇴근 탭(주행거리)
+  const CS = { d: '', j: null, busy: false, up: {} };
+  const csDK = (d) => (d && (d.kind === '저온' || d.kind === '야간') ? '야간' : '주간');
+  const CS_HD = [['강남', '현대 강남사옥'], ['양재', '현대 양재사옥'], ['에셋', '현대 더에셋'], ['선릉', '현대 선릉사옥']];
+  const csHd = (lab) => { const L = String(lab || ''); if (!/현대|^H_/.test(L)) return ''; const h = CS_HD.find(([k]) => L.includes(k)); return h ? h[1] : ''; };
+  const csCarry = (kind, lab) => kind === '저온' && /\(상\)/.test(String(lab || ''));
+  function csDrvOf(cfg, kind, lab) {   // 위로드 관리화면 cvDrvOf 와 같은 규칙
+    const L = String(lab || '').replace(/\s+/g, ''), labels = cfg.labels || {};
+    const mapped = labels[kind + '|' + L] || labels['*|' + L]; if (mapped) return mapped;
+    const hd = csHd(L); if (hd) return hd;
+    const list = (cfg.list || []).filter((d) => d.on !== false);
+    if (csCarry(kind, L)) { const base = L.replace(/^[A-Z]*\(상\)/, '').replace(/\[\d+\]$/, '').replace(/\d+[AB]?$/, ''); const d = list.find((x) => csDK(x) === '주간' && x.name === base) || list.find((x) => x.name === base); return d ? d.name : ''; }
+    const want = kind === '상온' ? '주간' : '야간';
+    if (kind === '저온') { const m = L.match(/\[(\d+)\]/); if (m) { const d = list.find((x) => csDK(x) === '야간' && x.code && String(+x.code) === String(+m[1])); if (d) return d.name; } }
+    const base = kind === '상온' ? L.replace(/^[^)]*\)/, '').replace(/\d+[AB]?$/, '').replace(/[AB]$/, '') : L.replace(/^(A|B|DY|D|F)(?=[가-힣])/, '').replace(/\[\d+\]$/, '');
+    const d = list.find((x) => csDK(x) === want && x.name === base) || list.find((x) => x.name === base);
+    return d ? d.name : '';
+  }
+  function csStops(j) {   // 내 점포만 · 같은 점포 상온+저온 합침 · (상)은 매출만(착지 아님) · 순서는 관리자가 바꾼 순번 → 판매실적표 순서
+    const me = String(cfg.n || '').replace(/\s/g, ''), cfg2 = j.cfg || {}, M = new Map();
+    for (const kind of ['상온', '저온']) (j.rows[kind] || []).forEach((r, i) => {
+      const key = kind + '|' + r.c, fix = (cfg2.fix || {})[key], auto = fix || csDrvOf(cfg2, kind, r.lab), to = (j.asg || {})[key] || auto || r.lab;
+      if (String(to || '').replace(/\s/g, '') !== me || (j.skip || {})[key]) return;
+      let st = M.get(r.c); const carry = csCarry(kind, r.lab) && !(j.asg || {})[key];
+      if (!st) { st = { c: r.c, n: r.n, a: { 상온: 0, 저온: 0 }, kinds: [], keys: [], carry, i: i + (kind === '저온' ? 1e5 : 0), o: (j.ord || {})[key], x: {} }; M.set(r.c, st); }
+      else { st.carry = st.carry && carry; if (st.o == null && (j.ord || {})[key] != null) st.o = j.ord[key]; }
+      st.a[kind] += r.a || 0; if (!st.kinds.includes(kind)) st.kinds.push(kind); st.keys.push(key); Object.assign(st.x, r.x || {});
+    });
+    const out = [...M.values()].sort((a, b) => (a.o == null ? 1e6 + a.i : a.o) - (b.o == null ? 1e6 + b.i : b.o));
+    out.forEach((st) => { const c = (j.cust || {})[st.keys.find((k) => (j.cust || {})[k])] || null; st.nm = st.n || (c && c[0]) || ''; st.addr = c ? c[1] : ''; st.tel = c ? c[2] : ''; st.tot = st.a.상온 + st.a.저온; });
+    return out;
+  }
+  const csWefun = () => /위풀|위펀/.test(String(((CS.j || {}).me || {}).aff || ''));
+  const csNight = () => csDK((CS.j || {}).me || (() => { try { return JSON.parse(localStorage.getItem(LS + '-csme') || 'null'); } catch (e) { return null; } })()) === '야간';
+  function csApply(first) {
+    try { pdUi(); } catch (e) { /* noop */ }
+    ['sh', 'loc', 'lc', 'dl'].forEach((t) => { tabBtn(t).hidden = true; });
+    tabBtn('cs').hidden = false; tabBtn('cw').hidden = false; tabBtn('rec').hidden = !csWefun(); $('dg-rec').hidden = true; $('cw-rec').hidden = !csWefun();
+    const cur = document.querySelector('.tabs button.on');
+    if (first) { let t = ''; try { t = sessionStorage.getItem('wr-tab') || ''; } catch (e) { /* noop */ } if (!['cs', 'cw', 'rec'].includes(t) || tabBtn(t).hidden) t = 'cs'; hmKeep = hmWant(); showTab(t); hmKeep = false; if (hmWant()) goHome(); }
+    else if (!cur || cur.hidden) { hmKeep = document.body.classList.contains('hm'); showTab('cs'); hmKeep = false; }
+    if (document.body.classList.contains('hm')) hmRender();
+  }
+  const csHm = (x) => x ? new Date(x).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' }) : '—';
+  const csPhotos = (code) => ((CS.j || {}).photos || []).filter((p) => p.code === code);
+  const csUrl = (p) => SERVER + '/storage/v1/object/public/notify/' + p.path;
+  function csUi() {
+    const j = CS.j, d = CS.d;
+    $('cs-nm').textContent = cfg.n || '—'; $('cw-nm').textContent = cfg.n || '—';
+    $('cs-d').textContent = dLbl(d); $('cw-d').textContent = dLbl(d) + ' 업무';
+    const sts = j ? csStops(j) : [], n = sts.filter((x) => !x.carry).length, sum = (k) => sts.reduce((a, x) => a + (k ? x.a[k] : x.tot), 0);
+    $('cs-sub').textContent = j && j.me ? `${csDK(j.me)} · ${j.me.aff || ''}${j.me.plate ? ' · ' + j.me.plate : ''} · 거래처 정보 · 상온/저온/합계 매출` : '일일실적표 · 거래처 정보 · 상온/저온/합계 매출';
+    $('cs-prog').innerHTML = j ? `<div class="kv"><label>착지</label><b>${n}<i>곳</i></b></div><div class="kv"><label>상온 매출</label><b>${won(sum('상온'))}</b></div><div class="kv"><label>저온 매출</label><b>${won(sum('저온'))}</b></div>` : '';
+    const none = !j ? (CS.busy ? '불러오는 중…' : '') : !(j.has || {}).상온 && !(j.has || {}).저온 ? `${dLbl(d)} 판매실적표가 아직 안 들어왔어요 (매일 오후 3시쯤 들어와요).` : !sts.length ? `${dLbl(d)} 나한테 배정된 점포가 없어요. ◀ ▶ 로 다른 날을 보세요.` : '';
+    const canOrd = !!j && sts.length > 1;
+    $('cs-list').innerHTML = none ? `<div class="card msg">${esc(none)}</div>` : (canOrd ? `<div class="card msg cs-ordh">· <b>▲ ▼</b>로 방문 순서를 바꿀 수 있어요. 바꾼 순서는 물류팀 관제 지도에도 그대로 번호로 보여요.${CS.ordBusy ? ' <i>저장 중…</i>' : ''}</div>` : '') + sts.map((x, i) => `<div class="card cs-st"><b><span class="cs-sq">${i + 1}</span>${esc(x.nm)}${x.kinds.length > 1 ? '<span class="cs-tg">상온·저온</span>' : `<span class="cs-tg">${esc(x.kinds[0])}</span>`}${x.carry ? '<span class="cs-tg" style="background:#7C3AED">합적재 · 매출만</span>' : ''}${canOrd ? `<span class="cs-ord"><button type="button" data-ord="${esc(x.c)}" data-dir="-1" ${i === 0 || CS.ordBusy ? 'disabled' : ''} aria-label="위로">▲</button><button type="button" data-ord="${esc(x.c)}" data-dir="1" ${i === sts.length - 1 || CS.ordBusy ? 'disabled' : ''} aria-label="아래로">▼</button></span>` : ''}</b>
+        <span class="ad">${x.addr ? esc(x.addr) : '주소록에 주소가 없어요'} · 코드 ${esc(x.c)}</span>${x.tel ? `<a class="tel" href="tel:${esc(x.tel.replace(/[^\d]/g, ''))}">📞 ${esc(x.tel)}</a>` : ''}${csLiqBtn(x)}
+        <div class="cs-am"><div class="kv"><label>상온</label><b>${won(x.a.상온)}</b></div><div class="kv"><label>저온</label><b>${won(x.a.저온)}</b></div><div class="kv"><label>합계</label><b style="color:#FDE68A">${won(x.tot)}</b></div></div></div>`).join('')
+      + (sts.length ? `<div class="card"><div class="cs-am"><div class="kv"><label>상온 합계</label><b>${won(sum('상온'))}</b></div><div class="kv"><label>저온 합계</label><b>${won(sum('저온'))}</b></div><div class="kv"><label>전체 합계</label><b style="color:#FDE68A">${won(sum())}</b></div></div></div>` : '');
+    $('cs-list').querySelectorAll('[data-ord]').forEach((el) => { el.onclick = () => csReorder(el.dataset.ord, +el.dataset.dir); });
+    $('cs-list').querySelectorAll('[data-liq]').forEach((el) => { el.onclick = () => csLiqShow(el.dataset.liq); });
+    // 업무 탭
+    const w = (j && j.work) || {}, need = sts.filter((x) => !x.carry), got = need.filter((x) => csPhotos(x.c).length).length;
+    $('cw-s').textContent = csHm(w.start_at); $('cw-e').textContent = csHm(w.end_at); $('cw-p').textContent = need.length ? `${got}/${need.length}` : '—';
+    $('cw-l').textContent = APP ? (((A || {}).app || {}).running ? '켜짐' : '꺼짐') : (on ? '켜짐 (이 화면)' : '꺼짐');
+    $('cw-start').textContent = w.start_at ? `업무시작 ${csHm(w.start_at)} ✓` : '업무시작'; $('cw-start').disabled = !!w.start_at && !w.end_at && false;
+    $('cw-end').textContent = w.end_at ? `업무종료 ${csHm(w.end_at)} ✓ (다시 누르면 시각·특이사항 고침)` : '업무종료';
+    if (w.note && document.activeElement !== $('cw-note') && !CS.noteTouched) $('cw-note').value = w.note;
+    $('cw-list').innerHTML = !w.start_at ? (need.length ? `<div class="card msg">업무시작을 누르면 점포마다 배송완료사진을 올릴 수 있어요. (오늘 ${need.length}곳)</div>` : '')
+      : need.map((x, i) => { const ps = csPhotos(x.c), busy = CS.up[x.c];
+        return `<div class="card cs-st ${ps.length ? 'ok' : ''}"><b><span class="cs-sq">${i + 1}</span>${esc(x.nm)}</b><span class="ad">${esc(x.addr || '')}</span>
+          <div class="cs-ph">${ps.map((p) => `<a href="${csUrl(p)}" target="_blank" rel="noopener"><img src="${csUrl(p)}" alt="배송사진"></a>`).join('')}
+          <label class="pbtn ${ps.length ? 'done' : ''}">${busy ? '올리는 중…' : ps.length ? '✓ 사진 추가' : '📷 배송완료사진'}<input type="file" accept="image/*" capture="environment" data-code="${esc(x.c)}" ${busy ? 'disabled' : ''}></label></div></div>`; }).join('');
+    $('cw-list').querySelectorAll('input[type=file]').forEach((el) => { el.onchange = () => { const f = el.files && el.files[0]; if (f) csUpload(el.dataset.code, f); el.value = ''; }; });
+  }
+  // 11/19 방문 순서 바꾸기 (▲▼) → 서버 그날 배차 기록의 순번(ord)에 저장 → 관제 지도 번호도 같이 바뀜
+  async function csReorder(code, dir) {
+    if (!CS.j || CS.ordBusy) return;
+    const sts = csStops(CS.j), i = sts.findIndex((x) => x.c === code), k = i + dir; if (i < 0 || k < 0 || k >= sts.length) return;
+    const arr = sts.slice(); [arr[i], arr[k]] = [arr[k], arr[i]];
+    const ord = Object.assign({}, CS.j.ord || {}); arr.forEach((x, n) => x.keys.forEach((key) => { ord[key] = n + 1; }));
+    const prev = CS.j.ord; CS.j.ord = ord; CS.ordBusy = true; csUi();
+    try { const r = await rpc('cvs_my_order', { p_name: cfg.n, p_token: cfg.tok, p_d: CS.d, p_codes: arr.map((x) => x.c) }); if (r && typeof r === 'object') CS.j.ord = r; }
+    catch (e) { CS.j.ord = prev; alert('순서를 저장하지 못했어요: ' + e.message); }
+    CS.ordBusy = false; csUi();
+  }
+  // 11/20 주류확인: 시너지 주류 출고리스트 + EMP 판매취소(결품) — 결품·취소가 있으면 빨간 버튼
+  const csLiqOf = (c) => (((CS.liq || {}).stores || {})[c]) || null;
+  function csLiqBtn(x) {
+    const L = csLiqOf(x.c); if (!L || !L.length) return '';
+    const bad = L.filter((r) => +r.cq > 0).length;
+    return `<div><button type="button" class="cs-liq ${bad ? 'bad' : ''}" data-liq="${esc(x.c)}">주류확인${bad ? ` · 결품/취소 ${bad}건` : ` · ${L.length}품목`}</button></div>`;
+  }
+  function csLiqShow(c) {
+    const L = csLiqOf(c) || [], st = (CS.j ? csStops(CS.j) : []).find((x) => x.c === c) || {};
+    const ov = document.createElement('div'); ov.className = 'lq-ov';
+    ov.innerHTML = `<div class="lq-bx"><div class="lq-h"><b>${esc(st.nm || c)} 주류</b><button type="button">닫기</button></div>`
+      + L.map((r) => { const cq = +r.cq || 0, ea = +r.ea || 0, left = Math.max(0, ea - cq);
+        return `<div class="lq-r ${cq > 0 ? 'bad' : ''}"><span>${esc(r.item || '')}${r.box ? ` <small style="opacity:.7">(${esc(r.box)}박스)</small>` : ''}</span><em>${cq > 0 ? `${ea ? `${ea} → ${left}` : `취소 ${cq}`}<small>${esc(r.st || '취소')} ${cq}개 · 싣지 마세요</small>` : `${ea}개`}</em></div>`; }).join('')
+      + `<div class="lq-n">· 빨간 줄은 주문이 취소되거나 결품된 주류예요. 표시된 수량만 배송해 주세요.<br>· 자료: 시너지 주류 출고리스트 + EMP 주문취소 현황${(CS.liq || {}).at ? ' (' + new Date(CS.liq.at).toLocaleString('ko-KR', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' }) + ' 기준)' : ''}</div></div>`;
+    ov.onclick = (e) => { if (e.target === ov || e.target.tagName === 'BUTTON') ov.remove(); };
+    document.body.appendChild(ov);
+  }
+  async function csLoad(force) {
+    if (!CVS() || CS.busy) return;
+    if (!CS.d) CS.d = csNight() && new Date().getHours() >= 15 ? addDay(today(), 1) : today();   // 야간은 오후 3시 이후면 내일 실적표
+    if (CS.j && CS.j._d === CS.d && !force && Date.now() - CS.j._at < 60e3) return csUi();
+    CS.busy = true; $('cs-warn').hidden = true; csUi();
+    try { const j = await rpc('cvs_my_day', { p_name: cfg.n, p_token: cfg.tok, p_d: CS.d }); j._d = CS.d; j._at = Date.now(); CS.j = j; try { localStorage.setItem(LS + '-csme', JSON.stringify(j.me || null)); } catch (e) { /* noop */ }
+      try { CS.liq = ((j.rows || {}).저온 || []).length ? await rpc('cvs_my_liquor', { p_name: cfg.n, p_token: cfg.tok, p_d: CS.d }) : null; } catch (e) { CS.liq = null; } }   // 11/20 주류확인 (결품·취소 포함)
+    catch (e) { CS.j = null; $('cs-warn').hidden = false; $('cs-warn').textContent = /로그인/.test(e.message) ? '로그인이 만료됐어요. [팀 바꾸기]를 눌러 다시 로그인해 주세요.' : e.message; }
+    CS.busy = false; csUi(); csApply(false);
+  }
+  async function csShrink(f) {   // 사진을 긴 변 1600px JPEG로 줄여서 올림 (데이터 절약)
+    try { const img = await new Promise((ok, no) => { const i = new Image(); i.onload = () => ok(i); i.onerror = no; i.src = URL.createObjectURL(f); });
+      const k = Math.min(1, 1600 / Math.max(img.width, img.height)), c = document.createElement('canvas'); c.width = Math.round(img.width * k); c.height = Math.round(img.height * k);
+      c.getContext('2d').drawImage(img, 0, 0, c.width, c.height); const b = await new Promise((ok) => c.toBlob(ok, 'image/jpeg', 0.82)); return b || f; } catch (e) { return f; }
+  }
+  async function csUpload(code, f) {
+    CS.up[code] = true; csUi();
+    try { const b = await csShrink(f), fd = new FormData(); fd.append('name', cfg.n); fd.append('token', cfg.tok); fd.append('d', CS.d); fd.append('code', code); fd.append('file', b, code + '.jpg');
+      const r = await fetch(SERVER + '/functions/v1/cvsphoto', { method: 'POST', headers: { apikey: KEY }, body: fd }), j = await r.json().catch(() => ({}));
+      if (!j.ok) throw new Error(j.error || 'HTTP ' + r.status);
+      (CS.j.photos = CS.j.photos || []).push({ code, path: j.path, at: new Date().toISOString() }); }
+    catch (e) { alert('사진을 못 올렸어요: ' + e.message + '\n잠시 뒤 다시 눌러 주세요.'); }
+    delete CS.up[code]; csUi();
+  }
+  async function csWork(kind) {
+    const ok = $('cw-ok'), w = $('cw-warn'); ok.hidden = true; w.hidden = true;
+    try { const r = await rpc('cvs_work_put', { p_name: cfg.n, p_token: cfg.tok, p_d: CS.d, p_kind: kind, p_note: kind === 'end' ? ($('cw-note').value.trim() || '없음') : null }); if (CS.j) CS.j.work = r; return r; }
+    catch (e) { w.hidden = false; w.textContent = (kind === 'start' ? '업무시작' : '업무종료') + ' 기록 실패: ' + e.message; throw e; }
+  }
+  $('cw-note').addEventListener('input', () => { CS.noteTouched = true; });
+  $('cw-start').onclick = async () => {
+    if (!CS.j) await csLoad(true); if (!CS.j) return;
+    $('cw-start').disabled = true;
+    if (APP) { try { if (window.WeRoadApp.setAuth && cfg.tok) window.WeRoadApp.setAuth(cfg.n, cfg.tok); else window.WeRoadApp.setDriver(cfg.n); window.WeRoadApp.start(); } catch (e) { /* noop */ } }
+    else if (!on) start();
+    try { const r = await csWork('start'); $('cw-ok').hidden = false; $('cw-ok').innerHTML = `<b>업무시작 ${csHm(r.start_at)}</b> — 점포마다 배송을 마치면 아래에서 사진을 올려 주세요.`; } catch (e) { /* 위에 표시 */ }
+    $('cw-start').disabled = false; csUi();
+  };
+  $('cw-end').onclick = async () => {
+    if (!CS.j) return;
+    const w = CS.j.work || {}; if (!w.start_at) return alert('업무시작을 먼저 눌러 주세요.');
+    const need = csStops(CS.j).filter((x) => !x.carry), miss = need.filter((x) => !csPhotos(x.c).length);
+    if (miss.length && !confirm(`배송완료사진이 없는 점포가 ${miss.length}곳 있어요:\n${miss.slice(0, 8).map((x) => '· ' + x.nm).join('\n')}${miss.length > 8 ? '\n…' : ''}\n\n그래도 업무종료할까요?`)) return;
+    if (w.end_at && !confirm('이미 업무종료했어요. 종료 시각과 특이사항을 지금 것으로 고칠까요?')) return;
+    $('cw-end').disabled = true;
+    try { const r = await csWork('end'); CS.noteTouched = false; if (APP) { try { window.WeRoadApp.stop(); } catch (e) { /* noop */ } } if (on) stop();
+      $('cw-ok').hidden = false; $('cw-ok').innerHTML = `<b>업무종료 ${csHm(r.end_at)}</b> — 오늘도 수고하셨어요! 위치 전송도 꺼졌어요.${csWefun() ? '<br>퇴근 탭에서 계기판 km도 적어 주세요.' : ''}`; } catch (e) { /* 위에 표시 */ }
+    $('cw-end').disabled = false; csUi();
+  };
+  $('cs-prev').onclick = () => { CS.d = addDay(CS.d, -1); csLoad(true); };
+  $('cs-next').onclick = () => { CS.d = addDay(CS.d, 1); csLoad(true); };
+  $('cs-re').onclick = () => csLoad(true);
+  const csOut = (e) => { if (e) e.preventDefault(); if (APP) { try { window.WeRoadApp.stop(); } catch (x) { /* noop */ } } if (on) stop(); localStorage.setItem(LS, JSON.stringify({ n: cfg.n, v: cfg.v || '' })); localStorage.removeItem(LS + '-on'); localStorage.removeItem(LS + '-csme'); try { sessionStorage.removeItem('wr-tab'); } catch (x) { /* noop */ } location.reload(); };
+  $('cs-lo').onclick = csOut; $('cw-lo').onclick = csOut;
+  // 11/19 모든 화면 오른쪽 위 로그아웃 (스낵↔편의점 운행 바꿀 때 다시 로그인)
+  $('top-lo').hidden = $('main').hidden;
+  $('top-lo').onclick = (e) => { if (confirm('정말 로그아웃을 하시겠어요?')) csOut(e); };
+  if (CVS() && !$('main').hidden) { csApply(true); csLoad(false); }
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') { rFlush(); aLoad(); } });
+})();
+</script>
+</body>
+</html>
