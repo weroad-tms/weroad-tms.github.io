@@ -63,6 +63,10 @@
   .cs-st .tel{display:inline-block;margin-top:6px;color:#9CB4FF;font-weight:700;font-size:14px;text-decoration:none}
   .cs-am{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-top:10px}.cs-am .kv{padding:8px 10px}.cs-am .kv b{font-size:14.5px}
   .cs-sq{display:inline-flex;width:26px;height:26px;border-radius:50%;background:#334155;align-items:center;justify-content:center;font-size:13px;font-weight:800;margin-right:8px;vertical-align:middle}
+  .cs-liq{display:inline-block;margin-top:8px;padding:6px 12px;border:0;border-radius:8px;background:#F59E0B;color:#111;font:inherit;font-size:14px;font-weight:800;cursor:pointer}.cs-liq.bad{background:#EF4444;color:#fff}
+  .lq-ov{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9999;display:flex;align-items:flex-end;justify-content:center}.lq-bx{background:#111827;color:#F3F4F6;width:100%;max-width:560px;max-height:85vh;overflow:auto;border-radius:16px 16px 0 0;padding:16px 16px 24px}
+  .lq-h{display:flex;align-items:center;gap:8px;margin-bottom:10px}.lq-h b{font-size:17px;flex:1}.lq-h button{border:0;background:#374151;color:#fff;border-radius:8px;padding:6px 12px;font:inherit;font-weight:700}
+  .lq-r{display:flex;align-items:center;gap:10px;padding:10px 4px;border-top:1px solid #374151;font-size:15px}.lq-r span{flex:1;line-height:1.35}.lq-r em{font-style:normal;font-weight:800;white-space:nowrap}.lq-r.bad span,.lq-r.bad em{color:#FCA5A5}.lq-r.bad em small{display:block;font-size:12px;font-weight:700}.lq-n{font-size:12.5px;opacity:.7;margin-top:10px;line-height:1.5}
   .cs-tg{display:inline-block;margin-left:6px;padding:1px 7px;border-radius:6px;font-size:11.5px;font-weight:800;background:#334155;color:#E2E8F0;vertical-align:middle}
   .cs-ph{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;align-items:center}.cs-ph img{width:64px;height:64px;object-fit:cover;border-radius:10px;border:1px solid rgba(255,255,255,.2)}
   .cs-ph label.pbtn{display:inline-flex;align-items:center;gap:6px;border-radius:12px;padding:11px 14px;font-weight:800;font-size:15px;background:#3E6AF2;color:#fff}.cs-ph label.pbtn.done{background:rgba(34,197,94,.2);color:#86EFAC}
@@ -845,10 +849,11 @@
     const none = !j ? (CS.busy ? '불러오는 중…' : '') : !(j.has || {}).상온 && !(j.has || {}).저온 ? `${dLbl(d)} 판매실적표가 아직 안 들어왔어요 (매일 오후 3시쯤 들어와요).` : !sts.length ? `${dLbl(d)} 나한테 배정된 점포가 없어요. ◀ ▶ 로 다른 날을 보세요.` : '';
     const canOrd = !!j && sts.length > 1;
     $('cs-list').innerHTML = none ? `<div class="card msg">${esc(none)}</div>` : (canOrd ? `<div class="card msg cs-ordh">· <b>▲ ▼</b>로 방문 순서를 바꿀 수 있어요. 바꾼 순서는 물류팀 관제 지도에도 그대로 번호로 보여요.${CS.ordBusy ? ' <i>저장 중…</i>' : ''}</div>` : '') + sts.map((x, i) => `<div class="card cs-st"><b><span class="cs-sq">${i + 1}</span>${esc(x.nm)}${x.kinds.length > 1 ? '<span class="cs-tg">상온·저온</span>' : `<span class="cs-tg">${esc(x.kinds[0])}</span>`}${x.carry ? '<span class="cs-tg" style="background:#7C3AED">합적재 · 매출만</span>' : ''}${canOrd ? `<span class="cs-ord"><button type="button" data-ord="${esc(x.c)}" data-dir="-1" ${i === 0 || CS.ordBusy ? 'disabled' : ''} aria-label="위로">▲</button><button type="button" data-ord="${esc(x.c)}" data-dir="1" ${i === sts.length - 1 || CS.ordBusy ? 'disabled' : ''} aria-label="아래로">▼</button></span>` : ''}</b>
-        <span class="ad">${x.addr ? esc(x.addr) : '주소록에 주소가 없어요'} · 코드 ${esc(x.c)}</span>${x.tel ? `<a class="tel" href="tel:${esc(x.tel.replace(/[^\d]/g, ''))}">📞 ${esc(x.tel)}</a>` : ''}
+        <span class="ad">${x.addr ? esc(x.addr) : '주소록에 주소가 없어요'} · 코드 ${esc(x.c)}</span>${x.tel ? `<a class="tel" href="tel:${esc(x.tel.replace(/[^\d]/g, ''))}">📞 ${esc(x.tel)}</a>` : ''}${csLiqBtn(x)}
         <div class="cs-am"><div class="kv"><label>상온</label><b>${won(x.a.상온)}</b></div><div class="kv"><label>저온</label><b>${won(x.a.저온)}</b></div><div class="kv"><label>합계</label><b style="color:#FDE68A">${won(x.tot)}</b></div></div></div>`).join('')
       + (sts.length ? `<div class="card"><div class="cs-am"><div class="kv"><label>상온 합계</label><b>${won(sum('상온'))}</b></div><div class="kv"><label>저온 합계</label><b>${won(sum('저온'))}</b></div><div class="kv"><label>전체 합계</label><b style="color:#FDE68A">${won(sum())}</b></div></div></div>` : '');
     $('cs-list').querySelectorAll('[data-ord]').forEach((el) => { el.onclick = () => csReorder(el.dataset.ord, +el.dataset.dir); });
+    $('cs-list').querySelectorAll('[data-liq]').forEach((el) => { el.onclick = () => csLiqShow(el.dataset.liq); });
     // 업무 탭
     const w = (j && j.work) || {}, need = sts.filter((x) => !x.carry), got = need.filter((x) => csPhotos(x.c).length).length;
     $('cw-s').textContent = csHm(w.start_at); $('cw-e').textContent = csHm(w.end_at); $('cw-p').textContent = need.length ? `${got}/${need.length}` : '—';
@@ -874,12 +879,30 @@
     catch (e) { CS.j.ord = prev; alert('순서를 저장하지 못했어요: ' + e.message); }
     CS.ordBusy = false; csUi();
   }
+  // 11/20 주류확인: 시너지 주류 출고리스트 + EMP 판매취소(결품) — 결품·취소가 있으면 빨간 버튼
+  const csLiqOf = (c) => (((CS.liq || {}).stores || {})[c]) || null;
+  function csLiqBtn(x) {
+    const L = csLiqOf(x.c); if (!L || !L.length) return '';
+    const bad = L.filter((r) => +r.cq > 0).length;
+    return `<div><button type="button" class="cs-liq ${bad ? 'bad' : ''}" data-liq="${esc(x.c)}">🍺 주류확인${bad ? ` · 결품/취소 ${bad}건` : ` · ${L.length}품목`}</button></div>`;
+  }
+  function csLiqShow(c) {
+    const L = csLiqOf(c) || [], st = (CS.j ? csStops(CS.j) : []).find((x) => x.c === c) || {};
+    const ov = document.createElement('div'); ov.className = 'lq-ov';
+    ov.innerHTML = `<div class="lq-bx"><div class="lq-h"><b>🍺 ${esc(st.nm || c)} 주류</b><button type="button">닫기</button></div>`
+      + L.map((r) => { const cq = +r.cq || 0, ea = +r.ea || 0, left = Math.max(0, ea - cq);
+        return `<div class="lq-r ${cq > 0 ? 'bad' : ''}"><span>${esc(r.item || '')}${r.box ? ` <small style="opacity:.7">(${esc(r.box)}박스)</small>` : ''}</span><em>${cq > 0 ? `${ea ? `${ea} → ${left}` : `취소 ${cq}`}<small>${esc(r.st || '취소')} ${cq}개 · 싣지 마세요</small>` : `${ea}개`}</em></div>`; }).join('')
+      + `<div class="lq-n">· 빨간 줄은 주문이 취소되거나 결품된 주류예요. 표시된 수량만 배송해 주세요.<br>· 자료: 시너지 주류 출고리스트 + EMP 주문취소 현황${(CS.liq || {}).at ? ' (' + new Date(CS.liq.at).toLocaleString('ko-KR', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' }) + ' 기준)' : ''}</div></div>`;
+    ov.onclick = (e) => { if (e.target === ov || e.target.tagName === 'BUTTON') ov.remove(); };
+    document.body.appendChild(ov);
+  }
   async function csLoad(force) {
     if (!CVS() || CS.busy) return;
     if (!CS.d) CS.d = csNight() && new Date().getHours() >= 15 ? addDay(today(), 1) : today();   // 야간은 오후 3시 이후면 내일 실적표
     if (CS.j && CS.j._d === CS.d && !force && Date.now() - CS.j._at < 60e3) return csUi();
     CS.busy = true; $('cs-warn').hidden = true; csUi();
-    try { const j = await rpc('cvs_my_day', { p_name: cfg.n, p_token: cfg.tok, p_d: CS.d }); j._d = CS.d; j._at = Date.now(); CS.j = j; try { localStorage.setItem(LS + '-csme', JSON.stringify(j.me || null)); } catch (e) { /* noop */ } }
+    try { const j = await rpc('cvs_my_day', { p_name: cfg.n, p_token: cfg.tok, p_d: CS.d }); j._d = CS.d; j._at = Date.now(); CS.j = j; try { localStorage.setItem(LS + '-csme', JSON.stringify(j.me || null)); } catch (e) { /* noop */ }
+      try { CS.liq = ((j.rows || {}).저온 || []).length ? await rpc('cvs_my_liquor', { p_name: cfg.n, p_token: cfg.tok, p_d: CS.d }) : null; } catch (e) { CS.liq = null; } }   // 11/20 주류확인 (결품·취소 포함)
     catch (e) { CS.j = null; $('cs-warn').hidden = false; $('cs-warn').textContent = /로그인/.test(e.message) ? '로그인이 만료됐어요. [팀 바꾸기]를 눌러 다시 로그인해 주세요.' : e.message; }
     CS.busy = false; csUi(); csApply(false);
   }
