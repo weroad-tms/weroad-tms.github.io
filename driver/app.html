@@ -142,6 +142,7 @@
   .dm-grp{font-size:14px;font-weight:900;color:#93B4FF;margin:16px 0 6px}.dm-grp span{font-weight:600;opacity:.7;color:#D7DADF}
   .dm-li{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.07)}.dm-li.bad{background:rgba(248,113,113,.12);box-shadow:-6px 0 0 rgba(248,113,113,.12),6px 0 0 rgba(248,113,113,.12)}
   .dm-li .t{flex:1;min-width:0}.dm-li .t b{display:block;font-size:15px;line-height:1.35}.dm-li .t span{display:block;font-size:12.5px;opacity:.7;margin-top:2px}.dm-li .t span b{display:inline;font-size:inherit;color:#FDE68A}
+  .dm-li.hit{background:rgba(62,106,242,.14);box-shadow:-6px 0 0 rgba(62,106,242,.14),6px 0 0 rgba(62,106,242,.14)}
   .dm-li .q{display:flex;gap:6px;flex:none;align-items:center}.dm-li .q button{border:1px solid rgba(255,255,255,.2);border-radius:9px;padding:9px 8px;font:inherit;font-size:13px;font-weight:800;background:transparent;color:#fff}.dm-li .q button.on{background:#3E6AF2;border-color:#3E6AF2}
   .dm-li .q input{width:58px;border:1px solid rgba(255,255,255,.2);border-radius:9px;padding:9px 4px;font:inherit;font-size:16px;font-weight:800;text-align:center;background:rgba(255,255,255,.06);color:#fff}
   .dm-ck{display:flex;gap:10px;align-items:flex-start;padding:11px 0;font-size:15px;line-height:1.4;border-bottom:1px solid rgba(255,255,255,.07)}.dm-ck input{width:22px;height:22px;flex:none;margin:0}
@@ -650,7 +651,7 @@
 
 
   // 11/20 앱 안 업데이트: 서버의 새 index.html 빌드 번호가 다르면 [업데이트] 버튼 → 새로 불러오기 (홈 화면에 다시 추가할 필요 없음)
-  const BUILD = '20261121-20';
+  const BUILD = '20261121-21';
   async function updCheck() {
     try {
       const r = await fetch('app.html?chk=' + Date.now(), { cache: 'no-store' }); if (!r.ok) return;
@@ -837,12 +838,21 @@
     } catch (e) { DM.det[id] = { _err: e.message }; dmUi(); }
   }
   // ===== 11/21 2단계 — 출발·작업 시작·사진·검수·재고조사·케어서비스·완료를 위로드 안에서 (딜리버리웹과 같은 순서·같은 서버 요청)
-  //  · 단계 순서는 딜리버리웹의 stepCase 표 그대로. 서버가 알려주는 현재 단계(curStep)부터 이어감
+  //  · 단계 순서: 딜리버리웹 표에서 재고조사만 맨 앞으로 (11/21 상진님: 현장에선 재고조사 → 진열이 맞는 순서)
+  //    중간 '진열 완료' 화면은 없애고 마지막에 한 번만 완료(done-task)
+  //  · 이어하기: 서버 tasks 의 사진·검수·재고조사 기록을 보고 아직 안 한 첫 단계부터 (서버 curStep 은 딜리버리웹 순서 기준이라 안 씀)
   //  · 안 되는 경우는 언제든 [기존 배송화면]으로 같은 작업을 이어서 할 수 있음 (서버 기록은 하나)
   const DM_STEPS = (() => { const B = ['img', 'BEFORE_DISPLAY'], A = ['img', 'AFTER_DISPLAY'], I = ['insp', 'INSPECTION'], FD = ['fin', 'DISPLAY'], S = ['stock', 'STOCK_SURVEY'], FS = ['fin', 'STOCK_SURVEY'], BC = ['img', 'BEFORE_COFFEE'], CC = ['coffee', 'CLEANING'], AC = ['img', 'AFTER_COFFEE'], FC = ['fin', 'CLEANING'];
-    return { D: [B, A, FD], DE: [B, I, A, FD], DS: [B, A, FD, S, FS], DES: [B, I, A, FD, S, FS], DC: [B, A, FD, BC, CC, AC, FC], DEC: [B, I, A, FD, BC, CC, AC, FC], S: [S, FS], C: [BC, CC, AC, FC] }; })();
+    const F = ['fin', 'ALL']; void FD; void FS; void FC;
+    return { D: [B, A, F], DE: [B, I, A, F], DS: [S, B, A, F], DES: [S, B, I, A, F], DC: [B, A, BC, CC, AC, F], DEC: [B, I, A, BC, CC, AC, F], S: [S, F], C: [BC, CC, AC, F] }; })();
+  const DM_DONE = { BEFORE_DISPLAY: 'displayBeforeImages', AFTER_DISPLAY: 'displayAfterImages', BEFORE_COFFEE: 'coffeeBeforeImages', AFTER_COFFEE: 'coffeeAfterImages', INSPECTION: 'displayInspections', CLEANING: 'coffeeInspections', STOCK_SURVEY: 'stockSurveys' };
+  function dmFirstTodo(steps, t) {   // 서버에 이미 기록된 단계는 건너뜀
+    if (!t || !Array.isArray(t.displayBeforeImages)) return 0;
+    const i = steps.findIndex(([k, ty]) => k === 'fin' || !(Array.isArray(t[DM_DONE[ty]]) && t[DM_DONE[ty]].length));
+    return i < 0 ? steps.length - 1 : i;
+  }
   const DM_IMG = { BEFORE_DISPLAY: ['진열전', '진열 전'], AFTER_DISPLAY: ['진열후', '진열 후'], BEFORE_COFFEE: ['청소전', '케어서비스 전'], AFTER_COFFEE: ['청소후', '케어서비스 후'] };
-  const DM_LBL = (k, t) => k === 'img' ? DM_IMG[t][1] + ' 사진' : k === 'insp' ? '진열 검수' : k === 'stock' ? '재고조사' : k === 'coffee' ? '케어서비스 체크' : (t === 'DISPLAY' ? '진열' : t === 'STOCK_SURVEY' ? '재고조사' : '케어서비스') + ' 완료';
+  const DM_LBL = (k, t) => k === 'img' ? DM_IMG[t][1] + ' 사진' : k === 'insp' ? '진열 검수' : k === 'stock' ? '재고조사' : k === 'coffee' ? '케어서비스 체크' : '작업 완료';
   const DM_MAXIMG = 11;
   const dmDraft = (k, v) => { try { if (v === undefined) return JSON.parse(localStorage.getItem('wr-dm-' + k) || 'null'); if (v === null) localStorage.removeItem('wr-dm-' + k); else localStorage.setItem('wr-dm-' + k, JSON.stringify(v)); } catch (e) { /* noop */ } return null; };
   const dmIsToday = () => (DM.d || dmToday()) === dmToday();
@@ -886,7 +896,7 @@
       if (sd.doneYN === 'Y') { DM.wk = null; alert('이미 완료된 일정이에요.'); return dmReload(); }
       const steps = DM_STEPS[sd.stepCase];
       if (!steps) { DM.wk.busy = ''; DM.wk.err = `이 작업 유형(${sd.stepCase || '-'})은 아직 위로드에서 못 해요. [기존 배송화면]으로 진행해 주세요.`; return dmUi(); }
-      DM.wk.steps = steps; DM.wk.idx = Math.max(0, Math.min(steps.length - 1, ((t.stepInfo && +t.stepInfo.curStep) || 1) - 1));
+      DM.wk.steps = steps; DM.wk.idx = dmFirstTodo(steps, t);
       await dmWkStep();
     } catch (e) { if (DM.wk) { DM.wk.busy = ''; DM.wk.err = e.message; dmUi(); } }
   }
@@ -900,10 +910,9 @@
           return { id: x.orderItemId, name: it.name || '', cap: it.capacity || '', brand: it.brandName || '', grp: (it.category && it.category.group) || '기타', max, qty: q }; });
         if (!W.insp.length) throw new Error('검수할 품목이 없다고 나와요');
       }
-      else if (k === 'stock') { W.stock = dmDraft('stock-' + W.id) || []; W.sold = true; W.bc = ''; }
+      else if (k === 'stock') { W.stock = dmDraft('stock-' + W.id) || []; W.sold = true; W.q = []; W.miss = ''; W.hit = null; }
       else if (k === 'coffee') { const d = await dmGet('task-inspections/coffee'); W.chk = (Array.isArray(d) ? d : []).map((x) => ({ id: x.id, label: String(x.content || ''), on: false })); W.memo = { m: false, t: false, text: '' }; if (!W.chk.length) throw new Error('체크리스트를 못 불러왔어요'); }
-      else if (k === 'fin') { W.fin = { last: W.idx === W.steps.length - 1, done: false };
-        if (W.fin.last) { await dmCall('PATCH', `schedules/details/${W.id}/done-task`); W.fin.done = true; dmDraft('insp-' + W.id, null); dmDraft('stock-' + W.id, null); dmReload(); } }
+      else if (k === 'fin') { await dmCall('PATCH', `schedules/details/${W.id}/done-task`); dmDraft('insp-' + W.id, null); dmDraft('stock-' + W.id, null); dmReload(); }
       W.busy = '';
     } catch (e) { W.busy = ''; W.err = e.message; }
     dmUi();
@@ -941,15 +950,36 @@
     await Promise.all(fs.map(async (f, i) => { const e = { url: URL.createObjectURL(f), st: 'up' }; W.imgs.push(e); dmUi();
       try { e.r = await dmUp(f, i); e.st = 'ok'; } catch (er) { e.st = 'err'; e.msg = er.message; } if (DM.wk === W) dmUi(); }));
   }
-  async function dmWkScan() {   // 재고조사: 바코드로 상품 찾기 (같은 상품이면 수량 +1)
-    const W = DM.wk, bc = String(W.bc || '').replace(/\s/g, ''); if (!bc) return;
-    try { const it = await dmCall('GET', 'items', { barcode: bc, detailId: W.id, soldOnly: W.sold });
-      if (!it || !it.id) throw new Error('not found');
-      const cur = W.stock.find((x) => x.id === it.id);
-      if (cur) cur.quantity = (+cur.quantity || 0) + 1; else W.stock.unshift({ id: it.id, name: it.name || '', cap: it.capacity || '', brand: it.brandName || '', barcode: it.barcode || bc, grp: (it.category && it.category.group) || '기타', quantity: 1 });
-      dmDraft('stock-' + W.id, W.stock);
-    } catch (e) { alert(W.sold ? '최근 판매내역에 이 바코드 상품이 없어요.\n판매내역에 없는 상품이면 [판매내역에서 재고조회] 체크를 풀고 다시 찾아 주세요.' : '바코드에 해당하는 상품이 없어요.\n다시 확인하거나 위펀 직원에게 문의해 주세요.'); }
-    W.bc = ''; dmUi(); const i = $('dm-bc'); if (i) i.focus();
+  // 재고조사: USB 바코드 스캐너(키보드처럼 숫자+Enter 입력) 기준
+  //  · Enter 가 오면 칸을 바로 비우고 대기열에 넣음 → 빨리 연달아 찍어도 안 섞임
+  //  · 찾는 동안 입력칸은 다시 그리지 않음 (목록만 갱신) · 수량 고친 뒤에도 입력칸으로 포커스가 돌아감
+  const dmBcFocus = () => { const i = $('dm-bc'); if (i && document.activeElement !== i) i.focus({ preventScroll: true }); };
+  function dmWkScanPush(v) { const W = DM.wk, bc = String(v || '').replace(/\D/g, ''); if (!W || !bc) return; (W.q = W.q || []).push(bc); dmWkScanRun(); }
+  async function dmWkScanRun() {
+    const W = DM.wk; if (!W || W.scanning) return; W.scanning = true; dmStockRefresh();
+    while (W.q && W.q.length && DM.wk === W) {
+      const bc = W.q.shift();
+      try { const it = await dmCall('GET', 'items', { barcode: bc, detailId: W.id, soldOnly: W.sold });
+        if (!it || !it.id) throw new Error('not found');
+        const cur = W.stock.find((x) => x.id === it.id);
+        if (cur) { cur.quantity = (+cur.quantity || 0) + 1; W.hit = cur.id; } else { W.stock.unshift({ id: it.id, name: it.name || '', cap: it.capacity || '', brand: it.brandName || '', barcode: it.barcode || bc, grp: (it.category && it.category.group) || '기타', quantity: 1 }); W.hit = it.id; }
+        dmDraft('stock-' + W.id, W.stock); W.miss = '';
+      } catch (e) { W.miss = bc; try { navigator.vibrate && navigator.vibrate([120, 60, 120]); } catch (er) { /* noop */ } }
+      dmStockRefresh();
+    }
+    W.scanning = false; dmStockRefresh(); dmBcFocus();
+  }
+  function dmStockHtml() {
+    const W = DM.wk, g = {}; W.stock.forEach((x) => { (g[x.grp] = g[x.grp] || []).push(x); });
+    return (W.miss ? `<div class="card warn">바코드 <b>${esc(W.miss)}</b> 상품을 못 찾았어요. ${W.sold ? '판매내역에 없는 상품이면 위 [판매내역에서 재고조회] 체크를 풀고 다시 찍어 주세요.' : '다시 찍거나 위펀 직원에게 문의해 주세요.'}</div>` : '')
+      + `<div class="card msg">재고 상품 <b>${W.stock.length}</b>개 (낱개 ${W.stock.reduce((a, x) => a + (+x.quantity || 0), 0)}개)${W.scanning || (W.q && W.q.length) ? ' · 찾는 중…' : ''}</div>`
+      + Object.keys(g).map((gr) => `<div class="dm-grp">${esc(gr)} <span>${g[gr].length}개</span></div>` + g[gr].map((x) => `<div class="dm-li${W.hit === x.id ? ' hit' : ''}"><div class="t"><b>${esc(x.name)}</b><span>${esc([x.brand, x.cap, x.barcode].filter(Boolean).join(' · '))}</span></div>
+          <div class="q"><input type="number" inputmode="numeric" min="1" max="999" value="${esc(x.quantity)}" data-stock="${esc(x.id)}"><button type="button" data-dm="stx" data-id="${esc(x.id)}" aria-label="삭제">삭제</button></div></div>`).join('')).join('');
+  }
+  function dmStockRefresh() {   // 목록·완료 버튼만 갱신 (입력칸·포커스는 그대로)
+    const box = $('dm-stock'); if (!box || !DM.wk) return; const keep = document.activeElement && document.activeElement.dataset && document.activeElement.dataset.stock;
+    box.innerHTML = dmStockHtml(); const go = $('dm-stock-go'); if (go) go.disabled = !DM.wk.stock.length || DM.wk.scanning;
+    if (keep) { const i = box.querySelector(`[data-stock="${keep}"]`); if (i) i.focus(); }
   }
   function dmWkUi() {
     const w = $('dm-w'), W = DM.wk;
@@ -972,13 +1002,10 @@
           <div class="q"><button type="button" data-dm="all" data-id="${esc(x.id)}" class="${x.qty === x.max ? 'on' : ''}">전체 진열</button><input type="number" inputmode="numeric" min="0" max="${x.max}" value="${x.qty || ''}" placeholder="0" data-insp="${esc(x.id)}"></div></div>`).join('')).join('')
         + `<button type="button" class="dm-go" data-dm="send">검수 저장하고 다음</button>`;
     } else if (k === 'stock') {
-      const g = {}; W.stock.forEach((x) => { (g[x.grp] = g[x.grp] || []).push(x); });
-      body = `<div class="dm-row"><input id="dm-bc" type="text" inputmode="numeric" maxlength="13" placeholder="바코드 스캔 또는 숫자 직접 입력" value="${esc(W.bc || '')}" autocomplete="off"><button type="button" class="dm-btn y" data-dm="scan">검색</button></div>
+      body = `<div class="dm-row"><input id="dm-bc" type="text" inputmode="numeric" maxlength="20" placeholder="USB 스캐너로 찍거나 숫자 입력 후 Enter" autocomplete="off" enterkeyhint="search"><button type="button" class="dm-btn y" data-dm="scan">검색</button></div>
         <label class="dm-ck"><input type="checkbox" id="dm-sold" ${W.sold ? 'checked' : ''}> 판매내역에서 재고조회</label>
-        <div class="card msg" id="dm-stock-sum">재고 상품 <b>${W.stock.length}</b>개 (낱개 ${W.stock.reduce((a, x) => a + (+x.quantity || 0), 0)}개)</div>`
-        + Object.keys(g).map((gr) => `<div class="dm-grp">${esc(gr)} <span>${g[gr].length}개</span></div>` + g[gr].map((x) => `<div class="dm-li"><div class="t"><b>${esc(x.name)}</b><span>${esc([x.brand, x.cap, x.barcode].filter(Boolean).join(' · '))}</span></div>
-          <div class="q"><input type="number" inputmode="numeric" min="1" max="999" value="${esc(x.quantity)}" data-stock="${esc(x.id)}"><button type="button" data-dm="stx" data-id="${esc(x.id)}" aria-label="삭제">삭제</button></div></div>`).join('')).join('')
-        + `<button type="button" class="dm-go" data-dm="send" ${W.stock.length ? '' : 'disabled'}>재고조사 완료하기</button>`;
+        <div id="dm-stock">${dmStockHtml()}</div>
+        <button type="button" class="dm-go" id="dm-stock-go" data-dm="send" ${W.stock.length && !W.scanning ? '' : 'disabled'}>재고조사 완료하기</button>`;
     } else if (k === 'coffee') {
       body = `<div class="dm-grp">체크리스트 <span>(필수)</span></div>` + W.chk.map((c, i) => `<label class="dm-ck"><input type="checkbox" data-chk="${i}" ${c.on ? 'checked' : ''}> ${esc(c.label)}</label>`).join('')
         + `<div class="dm-grp">메모 <span>(선택 · 고객에게 알림톡으로 안내돼요)</span></div>
@@ -987,11 +1014,10 @@
         ${W.memo.t ? `<textarea id="dm-memo" rows="3" placeholder="전달사항이나 특이사항을 남겨주세요.">${esc(W.memo.text)}</textarea>` : ''}
         <button type="button" class="dm-go" data-dm="send">케어서비스 작업 내용 등록하기</button>`;
     } else if (k === 'fin') {
-      const nm = ty === 'DISPLAY' ? '진열이' : ty === 'STOCK_SURVEY' ? '재고조사가' : '케어서비스가', nx = W.steps[W.idx + 1];
-      body = W.fin.last ? `<div class="card msg" style="text-align:center;font-size:17px">✅ ${nm} 완료되었습니다.<br><b>${esc(W.name)}</b> 작업 끝!</div><button type="button" class="dm-go" data-dm="wkx">목록으로</button>`
-        : `<div class="card msg" style="text-align:center;font-size:17px">✅ ${nm} 완료되었습니다.<br>다음 작업을 시작해 주세요.</div><button type="button" class="dm-go" data-dm="next">${nx ? esc(DM_LBL(nx[0], nx[1])) + ' 시작' : '다음'}</button>`;
+      void ty; body = `<div class="card msg" style="text-align:center;font-size:17px">✅ 작업이 완료되었습니다.<br><b>${esc(W.name)}</b> 끝!</div><button type="button" class="dm-go" data-dm="wkx">목록으로</button>`;
     }
     w.innerHTML = head + bar + body;
+    if (k === 'stock') setTimeout(dmBcFocus, 50);
   }
   function dmUi() {
     const w = $('dm-w'); if (!w || w.hidden) return;
@@ -1004,7 +1030,7 @@
     const list = (DM.sch && Array.isArray(DM.sch.details)) ? DM.sch.details.slice().sort((a, b) => (+a.sequence || 999) - (+b.sequence || 999)) : [];
     if (!list.length) { w.innerHTML = top('배송') + `<div class="card msg">${DM.busy || (dmLbl(dd) + ' 배송이 없어요.' + (wk ? ` <button type="button" class="dm-btn" data-dm="nb" style="margin-left:6px">다음 배송일(${dmLbl(dmNextBiz(dd))}) 보기</button>` : ''))}</div>`; return; }
     const done = list.filter((x) => x.doneYN === 'Y').length, cur = list.find((x) => x.doneYN !== 'Y');
-    const today = dmIsToday(), uni = today && DM.sch.uniformYN === 'N' && done < list.length;   // 오늘 출근 복장 사진이 아직이면 출발 전에 먼저
+    const today = dmIsToday(), uni = false;   // 11/21 출근 복장 사진은 생략 (상진님) — 다시 쓰려면 DM.sch.uniformYN === 'N' 로
     w.innerHTML = top(`배송 ${list.length}곳 · 완료 ${done}`) + (DM.busy ? `<div class="card msg">${DM.busy}</div>` : '')
       + (uni ? `<div class="card warn"><b>오늘의 출근 복장 사진</b>을 먼저 등록해 주세요. (등록해야 출발할 수 있어요)<br><label class="dm-btn y" style="display:inline-block;margin-top:8px" data-uni="1">📷 출근 복장 촬영<input type="file" accept="image/*" capture hidden></label></div>` : '')
       + list.map((x, i) => {
@@ -1066,8 +1092,8 @@
       if (a === 'imgx') { const e = W.imgs[+id]; if (e) { try { URL.revokeObjectURL(e.url); } catch (er) { /* noop */ } W.imgs.splice(+id, 1); } return dmUi(); }
       if (a === 'all') { const x = W.insp.find((q) => String(q.id) === id); if (!x) return; x.qty = x.max; dmInspSave();
         const row = b.closest('.dm-li'); row.querySelector('input').value = x.max; b.classList.add('on'); row.classList.remove('bad'); const sm = $('dm-insp-sum'); if (sm) sm.lastElementChild.textContent = W.insp.filter((q) => !q.qty).length; return; }
-      if (a === 'scan') return dmWkScan();
-      if (a === 'stx') { W.stock = W.stock.filter((q) => String(q.id) !== id); dmDraft('stock-' + W.id, W.stock); return dmUi(); }
+      if (a === 'scan') { const i = $('dm-bc'); if (i) { dmWkScanPush(i.value); i.value = ''; } return dmBcFocus(); }
+      if (a === 'stx') { W.stock = W.stock.filter((q) => String(q.id) !== id); dmDraft('stock-' + W.id, W.stock); dmStockRefresh(); return dmBcFocus(); }
     }
     if (a === 'cand') { try { await dmLogin(id); DM.cand = null; dmOpen(true); } catch (e) { alert(e.message); } return; }
     if (a === 'nav') { const d = DM.det[id] || {}, co = d.coordinate || {}, br = dmBr(d); return nvRaw(br.branchName || br.companyName || '거래처', +co.latitude, +co.longitude, br.address || ''); }
@@ -1083,30 +1109,32 @@
       b.textContent = ok ? '복사됨 — 대화창에 붙여 주세요' : '복사 실패';
     }
   };
-  const dmStockSum = () => { const sm = $('dm-stock-sum'); if (sm) sm.innerHTML = `재고 상품 <b>${DM.wk.stock.length}</b>개 (낱개 ${DM.wk.stock.reduce((q, x) => q + (+x.quantity || 0), 0)}개)`; };
   const dmInspSave = () => { const o = {}; DM.wk.insp.forEach((x) => { if (x.qty) o[x.id] = x.qty; }); dmDraft('insp-' + DM.wk.id, o); };
   $('dm-w').addEventListener('change', (ev) => {
     const t = ev.target, W = DM.wk;
     if (t.type === 'file') { const fs = [...(t.files || [])]; const lab = t.closest('label'); if (!fs.length) return;
       if (lab && lab.dataset.uni) dmUniform(fs[0], lab); else dmWkFiles(fs); t.value = ''; return; }
     if (!W) return;
-    if (t.id === 'dm-sold') { W.sold = t.checked; return; }
+    if (t.id === 'dm-sold') { W.sold = t.checked; return dmBcFocus(); }
     if (t.dataset.chk != null) { W.chk[+t.dataset.chk].on = t.checked; return; }
     if (t.dataset.memo) { W.memo[t.dataset.memo] = t.checked; if (t.dataset.memo === 't') dmUi(); return; }
     if (t.dataset.insp != null) { t.value = (W.insp.find((q) => String(q.id) === t.dataset.insp) || {}).qty || ''; return; }   // 화면을 다시 그리지 않음 (다음 칸을 누른 손가락이 헛돌지 않게)
-    if (t.dataset.stock != null) { const x = W.stock.find((q) => String(q.id) === t.dataset.stock); if (x) { x.quantity = Math.max(1, +x.quantity || 1); t.value = x.quantity; dmDraft('stock-' + W.id, W.stock); dmStockSum(); } }
+    if (t.dataset.stock != null) { const x = W.stock.find((q) => String(q.id) === t.dataset.stock); if (x) { x.quantity = Math.max(1, +x.quantity || 1); dmDraft('stock-' + W.id, W.stock); } t.blur(); dmStockRefresh(); dmBcFocus(); }
   });
   $('dm-w').addEventListener('input', (ev) => {   // 숫자 입력 중에는 화면을 다시 그리지 않음 (커서 유지)
     const t = ev.target, W = DM.wk; if (!W) return;
-    if (t.id === 'dm-bc') { W.bc = t.value; return; }
     if (t.id === 'dm-memo') { W.memo.text = t.value; return; }
     if (t.dataset.insp != null) { const x = W.insp.find((q) => String(q.id) === t.dataset.insp); if (!x) return;
       let v = Math.floor(+t.value || 0); if (v > x.max) { v = x.max; t.value = v; } if (v < 0) { v = 0; t.value = ''; } x.qty = v; dmInspSave();
       const sm = $('dm-insp-sum'); if (sm) sm.lastElementChild.textContent = W.insp.filter((q) => !q.qty).length;
       const row = t.closest('.dm-li'); if (row) { row.querySelector('[data-dm=all]').classList.toggle('on', v === x.max); if (W.mark) row.classList.toggle('bad', v !== x.max); } return; }
-    if (t.dataset.stock != null) { const x = W.stock.find((q) => String(q.id) === t.dataset.stock); if (!x) return; let v = Math.floor(+t.value || 0); if (v > 999) { v = 999; t.value = v; } x.quantity = v; dmDraft('stock-' + W.id, W.stock); dmStockSum(); }
+    if (t.dataset.stock != null) { const x = W.stock.find((q) => String(q.id) === t.dataset.stock); if (!x) return; let v = Math.floor(+t.value || 0); if (v > 999) { v = 999; t.value = v; } x.quantity = v; dmDraft('stock-' + W.id, W.stock); }
   });
-  $('dm-w').addEventListener('keydown', (ev) => { if (ev.key === 'Enter' && ev.target.id === 'dm-bc') { ev.preventDefault(); DM.wk.bc = ev.target.value; dmWkScan(); } });
+  $('dm-w').addEventListener('keydown', (ev) => {
+    if (ev.key !== 'Enter' || !DM.wk) return;
+    if (ev.target.id === 'dm-bc') { ev.preventDefault(); dmWkScanPush(ev.target.value); ev.target.value = ''; return; }
+    if (ev.target.dataset && ev.target.dataset.stock != null) { ev.preventDefault(); ev.target.blur(); dmBcFocus(); }   // 수량 고치고 Enter → 다시 스캔 대기
+  });
   function dlOpen() {
     dlPhUi();
     if (dmOn() && !DM.iframe && !isMaster()) { $('dl-w').hidden = true; $('dm-w').hidden = false; $('dl-app').hidden = true; return dmOpen(); }
