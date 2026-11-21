@@ -129,7 +129,23 @@
   .dm-d .sec{margin-top:10px}.dm-d .sec>label{display:block;font-size:12.5px;font-weight:800;opacity:.65;margin-bottom:4px}
   .dm-d .memo{white-space:pre-wrap;line-height:1.5;font-size:14.5px;background:rgba(242,194,48,.08);border-radius:10px;padding:9px 10px}
   .dm-d .acts{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}.dm-d .acts a,.dm-d .acts button{border:0;border-radius:10px;padding:10px 12px;font:inherit;font-size:14px;font-weight:700;background:rgba(255,255,255,.1);color:#fff;text-decoration:none}
-  .dm-d .acts .y{background:#F2C230;color:#17191C}
+  .dm-d .acts .y,.dm-btn.y{background:#F2C230;color:#17191C}
+  .dm-d .acts.main button{flex:1;padding:14px 12px;font-size:16px;font-weight:800}.dm-d .acts button:disabled{opacity:.5}
+  .dm-hint{font-size:13px;opacity:.7;margin:8px 0}
+  .dm-pg{margin-bottom:12px}.dm-pg b{display:block;font-size:17px;margin-bottom:8px}.dm-pg div{display:flex;gap:4px}.dm-pg i{flex:1;height:5px;border-radius:3px;background:rgba(255,255,255,.12)}.dm-pg i.d{background:#3E6AF2}.dm-pg i.c{background:#F2C230}
+  .dm-go{display:block;width:100%;border:0;border-radius:14px;padding:16px;margin:14px 0 30px;font:inherit;font-size:17px;font-weight:900;background:#F2C230;color:#17191C}.dm-go:disabled{opacity:.4}
+  .dm-row{display:flex;gap:8px;margin-bottom:10px}.dm-row label{flex:1;text-align:center;padding:14px 12px;font-size:16px}
+  .dm-row input[type=text]{flex:1;min-width:0;border:1px solid rgba(255,255,255,.15);border-radius:10px;padding:12px;font:inherit;font-size:16px;background:rgba(255,255,255,.06);color:#fff}
+  .dm-ph{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px}.dm-ph div{position:relative;aspect-ratio:1;border-radius:12px;overflow:hidden;background:rgba(255,255,255,.06)}
+  .dm-ph img{width:100%;height:100%;object-fit:cover}.dm-ph .up img{opacity:.4}.dm-ph .err{outline:2px solid #F87171}.dm-ph em{position:absolute;left:0;right:0;bottom:0;font-style:normal;font-size:12px;font-weight:800;text-align:center;padding:3px;background:rgba(0,0,0,.6)}
+  .dm-ph button{position:absolute;top:4px;right:4px;width:28px;height:28px;border:0;border-radius:50%;background:rgba(0,0,0,.65);color:#fff;font-size:18px;line-height:1}
+  .dm-grp{font-size:14px;font-weight:900;color:#93B4FF;margin:16px 0 6px}.dm-grp span{font-weight:600;opacity:.7;color:#D7DADF}
+  .dm-li{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.07)}.dm-li.bad{background:rgba(248,113,113,.12);box-shadow:-6px 0 0 rgba(248,113,113,.12),6px 0 0 rgba(248,113,113,.12)}
+  .dm-li .t{flex:1;min-width:0}.dm-li .t b{display:block;font-size:15px;line-height:1.35}.dm-li .t span{display:block;font-size:12.5px;opacity:.7;margin-top:2px}.dm-li .t span b{display:inline;font-size:inherit;color:#FDE68A}
+  .dm-li .q{display:flex;gap:6px;flex:none;align-items:center}.dm-li .q button{border:1px solid rgba(255,255,255,.2);border-radius:9px;padding:9px 8px;font:inherit;font-size:13px;font-weight:800;background:transparent;color:#fff}.dm-li .q button.on{background:#3E6AF2;border-color:#3E6AF2}
+  .dm-li .q input{width:58px;border:1px solid rgba(255,255,255,.2);border-radius:9px;padding:9px 4px;font:inherit;font-size:16px;font-weight:800;text-align:center;background:rgba(255,255,255,.06);color:#fff}
+  .dm-ck{display:flex;gap:10px;align-items:flex-start;padding:11px 0;font-size:15px;line-height:1.4;border-bottom:1px solid rgba(255,255,255,.07)}.dm-ck input{width:22px;height:22px;flex:none;margin:0}
+  #dm-memo{width:100%;margin-top:8px;border:1px solid rgba(255,255,255,.15);border-radius:10px;padding:12px;font:inherit;font-size:16px;background:rgba(255,255,255,.06);color:#fff}
   .dm-note{font-size:14px;line-height:1.5;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.06)}.dm-note i{font-style:normal;font-size:12px;opacity:.6;margin-right:6px}
   #t-dl iframe{width:100%;height:100%;border:0;display:block}
   .dl-bar{display:flex;justify-content:space-between;align-items:center;font-size:13px;opacity:.8;margin:2px 2px 8px}
@@ -634,7 +650,7 @@
 
 
   // 11/20 앱 안 업데이트: 서버의 새 index.html 빌드 번호가 다르면 [업데이트] 버튼 → 새로 불러오기 (홈 화면에 다시 추가할 필요 없음)
-  const BUILD = '20261121-19';
+  const BUILD = '20261121-20';
   async function updCheck() {
     try {
       const r = await fetch('app.html?chk=' + Date.now(), { cache: 'no-store' }); if (!r.ok) return;
@@ -751,7 +767,7 @@
     } catch (e) { alert(e.message); } finally { $('dl-ph-ok').disabled = false; }
   };
   // ===== 11/21 위로드 배송 화면 — 딜리버리웹과 같은 서버를 중계 함수(dmproxy)로 불러 위로드 안에서 보여줌
-  //  · 1단계: 조회만 (오늘 목록·상태, 연락 가능 고객, 주차/출입, 거래명세서, 배송 참고사항). 출발·작업·사진·검수·재고조사는 [기존 배송화면]
+  //  · 1단계: 조회 (오늘 목록·상태, 연락 가능 고객, 주차/출입, 거래명세서, 배송 참고사항) · 2단계: 출발·작업·사진·검수·재고조사·완료 (아래 '2단계')
   //  · 테스트 주소 ?dm=1 로 한 번 열면 그 폰에 기억, ?dm=0 이면 끔 · 서버가 바뀌어 안 되면 자동으로 기존 화면 버튼 안내
   //  · 동작 정리: docs/delivery-manager-api.md
   try { const v = new URLSearchParams(location.search).get('dm'); if (v === '1') localStorage.setItem('wr-dm', '1'); else if (v === '0') localStorage.setItem('wr-dm', '0'); } catch (e) { /* noop */ }
@@ -782,14 +798,16 @@
     const t = { n: cfg.n, ph: cfg.ph, gt: d.grantType || 'Bearer', at: d.accessToken, rt: d.refreshToken || '', mid: mid || '' };
     dmTokSet(t); DM.cand = null; return t;
   }
-  async function dmGet(path, query) {
+  async function dmCall(method, path, query, body, extra) {   // 2단계: 쓰기·사진도 같은 길로 (토큰 갱신·재로그인 공통)
     let t = dmTokGet() || await dmLogin(); if (!t) return null;
-    let j = await dmPost({ path, query, auth: `${t.gt} ${t.at}`, at: t.at, rt: t.rt });
+    const mk = () => ({ method, path, query, body, ...(extra || {}), auth: `${t.gt} ${t.at}`, at: t.at, rt: t.rt });
+    let j = await dmPost(mk());
     if (j.tok && j.tok.accessToken) { t = { ...t, gt: j.tok.grantType || t.gt, at: j.tok.accessToken, rt: j.tok.refreshToken || t.rt }; dmTokSet(t); }
-    if (j.status === 401) { dmTokSet(null); t = await dmLogin(t.mid); if (!t) return null; j = await dmPost({ path, query, auth: `${t.gt} ${t.at}`, at: t.at, rt: t.rt }); }
+    if (j.status === 401) { dmTokSet(null); t = await dmLogin(t.mid); if (!t) return null; j = await dmPost(mk()); }
     if (!j.ok) throw new Error((j.data && (j.data.message || j.data.error)) || j.error || ('오류 ' + (j.status || '')));
-    return j.data;
+    return j.data == null ? true : j.data;
   }
+  const dmGet = (path, query) => dmCall('GET', path, query);
   const dmHm = (v) => { if (!v) return ''; const d = new Date(v); return isNaN(d) ? String(v).slice(11, 16) : d.toTimeString().slice(0, 5); };
   const dmId = (x) => x && (x.detailId || x.id);
   const dmBr = (x) => (x && x.branch) || {};
@@ -818,8 +836,166 @@
       if (bid && !DM.ref[bid]) { try { DM.ref[bid] = await dmGet('reference', { branchId: bid }); } catch (e) { DM.ref[bid] = { err: e.message }; } dmUi(); }
     } catch (e) { DM.det[id] = { _err: e.message }; dmUi(); }
   }
+  // ===== 11/21 2단계 — 출발·작업 시작·사진·검수·재고조사·케어서비스·완료를 위로드 안에서 (딜리버리웹과 같은 순서·같은 서버 요청)
+  //  · 단계 순서는 딜리버리웹의 stepCase 표 그대로. 서버가 알려주는 현재 단계(curStep)부터 이어감
+  //  · 안 되는 경우는 언제든 [기존 배송화면]으로 같은 작업을 이어서 할 수 있음 (서버 기록은 하나)
+  const DM_STEPS = (() => { const B = ['img', 'BEFORE_DISPLAY'], A = ['img', 'AFTER_DISPLAY'], I = ['insp', 'INSPECTION'], FD = ['fin', 'DISPLAY'], S = ['stock', 'STOCK_SURVEY'], FS = ['fin', 'STOCK_SURVEY'], BC = ['img', 'BEFORE_COFFEE'], CC = ['coffee', 'CLEANING'], AC = ['img', 'AFTER_COFFEE'], FC = ['fin', 'CLEANING'];
+    return { D: [B, A, FD], DE: [B, I, A, FD], DS: [B, A, FD, S, FS], DES: [B, I, A, FD, S, FS], DC: [B, A, FD, BC, CC, AC, FC], DEC: [B, I, A, FD, BC, CC, AC, FC], S: [S, FS], C: [BC, CC, AC, FC] }; })();
+  const DM_IMG = { BEFORE_DISPLAY: ['진열전', '진열 전'], AFTER_DISPLAY: ['진열후', '진열 후'], BEFORE_COFFEE: ['청소전', '케어서비스 전'], AFTER_COFFEE: ['청소후', '케어서비스 후'] };
+  const DM_LBL = (k, t) => k === 'img' ? DM_IMG[t][1] + ' 사진' : k === 'insp' ? '진열 검수' : k === 'stock' ? '재고조사' : k === 'coffee' ? '케어서비스 체크' : (t === 'DISPLAY' ? '진열' : t === 'STOCK_SURVEY' ? '재고조사' : '케어서비스') + ' 완료';
+  const DM_MAXIMG = 11;
+  const dmDraft = (k, v) => { try { if (v === undefined) return JSON.parse(localStorage.getItem('wr-dm-' + k) || 'null'); if (v === null) localStorage.removeItem('wr-dm-' + k); else localStorage.setItem('wr-dm-' + k, JSON.stringify(v)); } catch (e) { /* noop */ } return null; };
+  const dmIsToday = () => (DM.d || dmToday()) === dmToday();
+  const dmItem = (id) => ((DM.sch && DM.sch.details) || []).find((x) => String(dmId(x)) === String(id));
+  async function dmReload() {   // 목록만 다시 (열어 둔 카드는 그대로)
+    try { const d = await dmGet('schedules', dmIsToday() ? undefined : { deliveryDate: DM.d }); if (d) { DM.sch = d; DM.at = Date.now(); } } catch (e) { DM.err = e.message; }
+    dmUi();
+  }
+  function dmPos() {   // 출발은 현재 위치가 필요 (딜리버리웹과 같음)
+    if (lastPos && Date.now() - lastPos.t < 120e3) return Promise.resolve({ latitude: lastPos.lat, longitude: lastPos.lng });
+    return new Promise((ok, no) => { if (!navigator.geolocation) return no(new Error('위치 기능을 쓸 수 없어요'));
+      navigator.geolocation.getCurrentPosition((p) => ok({ latitude: p.coords.latitude, longitude: p.coords.longitude }), () => no(new Error('현재 위치를 못 잡았어요. 위치 권한을 확인하고 다시 눌러 주세요.')), { enableHighAccuracy: true, timeout: 12000, maximumAge: 60000 }); });
+  }
+  async function dmUp(f, i) {   // 사진 1장: 줄여서(긴 변 1600) 중계 함수로 올림 → 올린 주소를 돌려받음
+    const b = await csShrink(f);
+    const b64 = await new Promise((ok, no) => { const r = new FileReader(); r.onload = () => ok(String(r.result).split(',')[1] || ''); r.onerror = () => no(new Error('사진을 못 읽었어요')); r.readAsDataURL(b); });
+    return dmCall('POST', '', undefined, undefined, { op: 'upload', b64, contentType: b.type || 'image/jpeg', fileName: `wr_${Date.now()}_${i || 0}.jpg` });
+  }
+  async function dmAct(a, id, btn) {   // 목록 카드의 버튼: 출발·출발 취소·작업 시작
+    const old = btn.textContent; btn.disabled = true;
+    try {
+      if (a === 'go') { btn.textContent = '위치 확인 중…'; const pos = await dmPos(); await dmCall('PATCH', `schedules/details/${id}/start-delivery`, undefined, pos); }
+      else if (a === 'goX') { if (!confirm('출발을 취소할까요?')) return; await dmCall('DELETE', `schedules/details/${id}/cancel-delivery`); }
+      else if (a === 'task') { await dmCall('PATCH', `schedules/details/${id}/start-task`); await dmReload(); return dmWkOpen(id); }
+      await dmReload();
+    } catch (e) { alert((e.message || '안 됐어요') + '\n\n계속 안 되면 [기존 배송화면]에서 진행해 주세요.'); }
+    finally { btn.disabled = false; btn.textContent = old; }
+  }
+  async function dmUniform(f, lab) {   // 출근 복장 사진 (오늘 첫 출발 전에 1장)
+    const t0 = lab.firstChild.textContent; lab.firstChild.textContent = '올리는 중…';
+    try { const r = await dmUp(f, 0); const j = await dmCall('PATCH', `schedules/${DM.sch.id}/uniformV2`, undefined, { contentLength: r.contentLength, originalFileName: r.originalFileName, preSignedUrl: r.uploadUrl, type: r.type });
+      DM.sch.uniformYN = (j && j.uniformYN) || 'Y'; dmUi(); }
+    catch (e) { lab.firstChild.textContent = t0; alert('출근 복장 등록이 안 됐어요: ' + e.message + '\n\n[기존 배송화면]에서 등록해 주세요.'); }
+  }
+  async function dmWkOpen(id) {
+    const x = dmItem(id) || {}, b = dmBr(x);
+    DM.wk = { id: String(id), name: b.branchName || b.companyName || '거래처', busy: '불러오는 중…', err: '', steps: null, idx: 0 }; dmUi(); window.scrollTo(0, 0);
+    try {
+      const t = await dmGet(`schedules/details/${id}/tasks`), sd = (t && t.scheduleDetail) || {};
+      if (!DM.wk || DM.wk.id !== String(id)) return;
+      if (sd.doneYN === 'Y') { DM.wk = null; alert('이미 완료된 일정이에요.'); return dmReload(); }
+      const steps = DM_STEPS[sd.stepCase];
+      if (!steps) { DM.wk.busy = ''; DM.wk.err = `이 작업 유형(${sd.stepCase || '-'})은 아직 위로드에서 못 해요. [기존 배송화면]으로 진행해 주세요.`; return dmUi(); }
+      DM.wk.steps = steps; DM.wk.idx = Math.max(0, Math.min(steps.length - 1, ((t.stepInfo && +t.stepInfo.curStep) || 1) - 1));
+      await dmWkStep();
+    } catch (e) { if (DM.wk) { DM.wk.busy = ''; DM.wk.err = e.message; dmUi(); } }
+  }
+  async function dmWkStep() {   // 현재 단계에 필요한 자료 준비
+    const W = DM.wk; if (!W) return; const [k] = W.steps[W.idx]; W.busy = '불러오는 중…'; W.err = ''; dmUi(); window.scrollTo(0, 0);
+    try {
+      if (k === 'img') W.imgs = [];
+      else if (k === 'insp') {
+        const d = await dmGet(`task-inspections/details/${W.id}/display`), dr = dmDraft('insp-' + W.id) || {};
+        W.insp = (Array.isArray(d) ? d : []).map((x) => { const it = x.item || {}, max = (+x.orderUnit || 1) * (+x.quantity || 0); const q = Math.min(max, Math.max(0, +dr[x.orderItemId] || 0));
+          return { id: x.orderItemId, name: it.name || '', cap: it.capacity || '', brand: it.brandName || '', grp: (it.category && it.category.group) || '기타', max, qty: q }; });
+        if (!W.insp.length) throw new Error('검수할 품목이 없다고 나와요');
+      }
+      else if (k === 'stock') { W.stock = dmDraft('stock-' + W.id) || []; W.sold = true; W.bc = ''; }
+      else if (k === 'coffee') { const d = await dmGet('task-inspections/coffee'); W.chk = (Array.isArray(d) ? d : []).map((x) => ({ id: x.id, label: String(x.content || ''), on: false })); W.memo = { m: false, t: false, text: '' }; if (!W.chk.length) throw new Error('체크리스트를 못 불러왔어요'); }
+      else if (k === 'fin') { W.fin = { last: W.idx === W.steps.length - 1, done: false };
+        if (W.fin.last) { await dmCall('PATCH', `schedules/details/${W.id}/done-task`); W.fin.done = true; dmDraft('insp-' + W.id, null); dmDraft('stock-' + W.id, null); dmReload(); } }
+      W.busy = '';
+    } catch (e) { W.busy = ''; W.err = e.message; }
+    dmUi();
+  }
+  const dmWkNext = () => { DM.wk.idx += 1; return dmWkStep(); };
+  async function dmWkSend(btn) {   // 현재 단계 저장 → 다음 단계
+    const W = DM.wk, [k, ty] = W.steps[W.idx], old = btn.textContent; btn.disabled = true; btn.textContent = '저장 중…';
+    try {
+      if (k === 'img') {
+        const ok = W.imgs.filter((e) => e.st === 'ok'); if (!ok.length) throw new Error('사진을 1장 이상 올려 주세요');
+        await dmCall('POST', `schedules/details/${W.id}/images`, undefined, { fileRequests: ok.map((e) => ({ contentLength: e.r.contentLength, originalFileName: e.r.originalFileName, preSignedUrl: e.r.uploadUrl, type: e.r.type })), type: DM_IMG[ty][0] });
+      } else if (k === 'insp') {
+        const diff = W.insp.filter((x) => x.qty !== x.max).length;
+        if (diff && !confirm(`주문 수량과 다른 품목이 ${diff}개 있어요.\n그대로 진행할까요?\n\n(취소하면 다른 품목을 빨갛게 표시해요)`)) { W.mark = true; return dmUi(); }
+        await dmCall('POST', `task-inspections/details/${W.id}/display`, undefined, { items: W.insp.map((x) => ({ allDisplayYN: x.qty === x.max ? 'Y' : 'N', displayQuantity: x.qty, orderItemId: x.id })) });
+        dmDraft('insp-' + W.id, null);
+      } else if (k === 'stock') {
+        if (!W.stock.length) throw new Error('상품을 1개 이상 넣어 주세요');
+        if (!confirm('재고조사를 완료할까요?')) return;
+        await dmCall('POST', `schedules/details/${W.id}/stock-survey`, undefined, { stockItems: W.stock.map((x) => ({ itemId: x.id, quantity: Math.max(1, +x.quantity || 1) })) });
+        dmDraft('stock-' + W.id, null);
+      } else if (k === 'coffee') {
+        if (!W.chk.every((c) => c.on)) throw new Error('체크리스트를 모두 확인해 주세요');
+        if (W.memo.t && !W.memo.text.trim()) throw new Error('기타 메모 내용을 적어 주세요');
+        const memos = []; if (W.memo.m) memos.push('머신 관리 부탁드려요. 매일 1회 이상 세척 관리 필요해요.'); if (W.memo.t) memos.push('기타 추가 메모');
+        await dmCall('POST', `task-inspections/details/${W.id}/coffee`, undefined, { checkedChecklistIds: W.chk.map((c) => c.id), memoText: W.memo.t ? W.memo.text.trim() : undefined, memos });
+      }
+      return dmWkNext();
+    } catch (e) { alert((e.message || '저장이 안 됐어요') + '\n\n계속 안 되면 [기존 배송화면]에서 이어서 진행해 주세요.'); }
+    finally { if (btn.isConnected) { btn.disabled = false; btn.textContent = old; } }
+  }
+  async function dmWkFiles(files) {
+    const W = DM.wk; if (!W || !W.imgs) return;
+    const fs = [...files].slice(0, DM_MAXIMG - W.imgs.length); if (fs.length < files.length) alert(`사진은 ${DM_MAXIMG}장까지 올릴 수 있어요`);
+    await Promise.all(fs.map(async (f, i) => { const e = { url: URL.createObjectURL(f), st: 'up' }; W.imgs.push(e); dmUi();
+      try { e.r = await dmUp(f, i); e.st = 'ok'; } catch (er) { e.st = 'err'; e.msg = er.message; } if (DM.wk === W) dmUi(); }));
+  }
+  async function dmWkScan() {   // 재고조사: 바코드로 상품 찾기 (같은 상품이면 수량 +1)
+    const W = DM.wk, bc = String(W.bc || '').replace(/\s/g, ''); if (!bc) return;
+    try { const it = await dmCall('GET', 'items', { barcode: bc, detailId: W.id, soldOnly: W.sold });
+      if (!it || !it.id) throw new Error('not found');
+      const cur = W.stock.find((x) => x.id === it.id);
+      if (cur) cur.quantity = (+cur.quantity || 0) + 1; else W.stock.unshift({ id: it.id, name: it.name || '', cap: it.capacity || '', brand: it.brandName || '', barcode: it.barcode || bc, grp: (it.category && it.category.group) || '기타', quantity: 1 });
+      dmDraft('stock-' + W.id, W.stock);
+    } catch (e) { alert(W.sold ? '최근 판매내역에 이 바코드 상품이 없어요.\n판매내역에 없는 상품이면 [판매내역에서 재고조회] 체크를 풀고 다시 찾아 주세요.' : '바코드에 해당하는 상품이 없어요.\n다시 확인하거나 위펀 직원에게 문의해 주세요.'); }
+    W.bc = ''; dmUi(); const i = $('dm-bc'); if (i) i.focus();
+  }
+  function dmWkUi() {
+    const w = $('dm-w'), W = DM.wk;
+    const head = `<div class="dm-top"><button type="button" data-dm="wkx">← 목록</button><b>${esc(W.name)}</b><button type="button" data-dm="old">기존 배송화면</button></div>`;
+    if (!W.steps) { w.innerHTML = head + `<div class="card ${W.err ? 'warn' : 'msg'}">${esc(W.err || W.busy)}</div>`; return; }
+    const [k, ty] = W.steps[W.idx];
+    const bar = `<div class="dm-pg"><b>${W.idx + 1}/${W.steps.length} · ${esc(DM_LBL(k, ty))}</b><div>${W.steps.map((st, i) => `<i class="${i < W.idx ? 'd' : i === W.idx ? 'c' : ''}"></i>`).join('')}</div></div>`;
+    if (W.busy || W.err) { w.innerHTML = head + bar + `<div class="card ${W.err ? 'warn' : 'msg'}">${esc(W.err || W.busy)}${W.err ? '<br><button type="button" class="dm-btn" data-dm="wkre" style="margin-top:8px">다시 시도</button>' : ''}</div>`; return; }
+    let body = '';
+    if (k === 'img') {
+      const n = W.imgs.length, ok = W.imgs.filter((e) => e.st === 'ok').length, up = W.imgs.some((e) => e.st === 'up');
+      body = `<div class="dm-ph">${W.imgs.map((e, i) => `<div class="${e.st}"><img src="${e.url}" alt=""><button type="button" data-dm="imgx" data-id="${i}" aria-label="사진 삭제">×</button>${e.st === 'up' ? '<em>올리는 중</em>' : e.st === 'err' ? '<em>실패</em>' : ''}</div>`).join('')}</div>
+        ${n < DM_MAXIMG ? `<div class="dm-row"><label class="dm-btn y">📷 촬영<input type="file" accept="image/*" capture="environment" hidden></label><label class="dm-btn">앨범에서<input type="file" accept="image/*" multiple hidden></label></div>` : ''}
+        <p class="dm-hint">최대 ${DM_MAXIMG}장${W.imgs.some((e) => e.st === 'err') ? ' · 실패한 사진은 ×로 지우고 다시 올려 주세요' : ''}</p>
+        <button type="button" class="dm-go" data-dm="send" ${ok && !up ? '' : 'disabled'}>${esc(DM_IMG[ty][1])} 사진 등록하기${ok ? ` (${ok}장)` : ''}</button>`;
+    } else if (k === 'insp') {
+      const left = W.insp.filter((x) => !x.qty).length, pcs = W.insp.reduce((a, x) => a + x.max, 0), g = {};
+      W.insp.forEach((x) => { (g[x.grp] = g[x.grp] || []).push(x); });
+      body = `<div class="card msg" id="dm-insp-sum">진열할 품목 <b>${W.insp.length}</b>개 (낱개 ${pcs}개) · 남은 품목 <b>${left}</b>개</div>` + Object.keys(g).map((gr) => `<div class="dm-grp">${esc(gr)} <span>${g[gr].length}개</span></div>` + g[gr].sort((a, b) => b.max - a.max).map((x) => `<div class="dm-li${W.mark && x.qty !== x.max ? ' bad' : ''}" data-row="${esc(x.id)}"><div class="t"><b>${esc(x.name)}</b><span>${esc([x.brand, x.cap].filter(Boolean).join(' · '))} · 주문 <b>${x.max}</b>개</span></div>
+          <div class="q"><button type="button" data-dm="all" data-id="${esc(x.id)}" class="${x.qty === x.max ? 'on' : ''}">전체 진열</button><input type="number" inputmode="numeric" min="0" max="${x.max}" value="${x.qty || ''}" placeholder="0" data-insp="${esc(x.id)}"></div></div>`).join('')).join('')
+        + `<button type="button" class="dm-go" data-dm="send">검수 저장하고 다음</button>`;
+    } else if (k === 'stock') {
+      const g = {}; W.stock.forEach((x) => { (g[x.grp] = g[x.grp] || []).push(x); });
+      body = `<div class="dm-row"><input id="dm-bc" type="text" inputmode="numeric" maxlength="13" placeholder="바코드 스캔 또는 숫자 직접 입력" value="${esc(W.bc || '')}" autocomplete="off"><button type="button" class="dm-btn y" data-dm="scan">검색</button></div>
+        <label class="dm-ck"><input type="checkbox" id="dm-sold" ${W.sold ? 'checked' : ''}> 판매내역에서 재고조회</label>
+        <div class="card msg" id="dm-stock-sum">재고 상품 <b>${W.stock.length}</b>개 (낱개 ${W.stock.reduce((a, x) => a + (+x.quantity || 0), 0)}개)</div>`
+        + Object.keys(g).map((gr) => `<div class="dm-grp">${esc(gr)} <span>${g[gr].length}개</span></div>` + g[gr].map((x) => `<div class="dm-li"><div class="t"><b>${esc(x.name)}</b><span>${esc([x.brand, x.cap, x.barcode].filter(Boolean).join(' · '))}</span></div>
+          <div class="q"><input type="number" inputmode="numeric" min="1" max="999" value="${esc(x.quantity)}" data-stock="${esc(x.id)}"><button type="button" data-dm="stx" data-id="${esc(x.id)}" aria-label="삭제">삭제</button></div></div>`).join('')).join('')
+        + `<button type="button" class="dm-go" data-dm="send" ${W.stock.length ? '' : 'disabled'}>재고조사 완료하기</button>`;
+    } else if (k === 'coffee') {
+      body = `<div class="dm-grp">체크리스트 <span>(필수)</span></div>` + W.chk.map((c, i) => `<label class="dm-ck"><input type="checkbox" data-chk="${i}" ${c.on ? 'checked' : ''}> ${esc(c.label)}</label>`).join('')
+        + `<div class="dm-grp">메모 <span>(선택 · 고객에게 알림톡으로 안내돼요)</span></div>
+        <label class="dm-ck"><input type="checkbox" data-memo="m" ${W.memo.m ? 'checked' : ''}> 머신 관리 부탁드려요. 매일 1회 이상 세척 관리 필요해요.</label>
+        <label class="dm-ck"><input type="checkbox" data-memo="t" ${W.memo.t ? 'checked' : ''}> 기타 추가 메모</label>
+        ${W.memo.t ? `<textarea id="dm-memo" rows="3" placeholder="전달사항이나 특이사항을 남겨주세요.">${esc(W.memo.text)}</textarea>` : ''}
+        <button type="button" class="dm-go" data-dm="send">케어서비스 작업 내용 등록하기</button>`;
+    } else if (k === 'fin') {
+      const nm = ty === 'DISPLAY' ? '진열이' : ty === 'STOCK_SURVEY' ? '재고조사가' : '케어서비스가', nx = W.steps[W.idx + 1];
+      body = W.fin.last ? `<div class="card msg" style="text-align:center;font-size:17px">✅ ${nm} 완료되었습니다.<br><b>${esc(W.name)}</b> 작업 끝!</div><button type="button" class="dm-go" data-dm="wkx">목록으로</button>`
+        : `<div class="card msg" style="text-align:center;font-size:17px">✅ ${nm} 완료되었습니다.<br>다음 작업을 시작해 주세요.</div><button type="button" class="dm-go" data-dm="next">${nx ? esc(DM_LBL(nx[0], nx[1])) + ' 시작' : '다음'}</button>`;
+    }
+    w.innerHTML = head + bar + body;
+  }
   function dmUi() {
     const w = $('dm-w'); if (!w || w.hidden) return;
+    if (DM.wk) return dmWkUi();
     const dd = DM.d || dmToday(), wk = [0, 6].includes(new Date(dd + 'T00:00:00Z').getUTCDay());
     const top = (txt) => `<div class="dm-top"><button type="button" data-dm="dp" aria-label="전날">◀</button><b style="text-align:center">${dmLbl(dd)}</b><button type="button" data-dm="dn" aria-label="다음날">▶</button></div>
       <div class="dm-top"><b>${txt}</b><button type="button" data-dm="re">새로고침</button><button type="button" data-dm="old">기존 배송화면</button></div>`;
@@ -828,7 +1004,10 @@
     const list = (DM.sch && Array.isArray(DM.sch.details)) ? DM.sch.details.slice().sort((a, b) => (+a.sequence || 999) - (+b.sequence || 999)) : [];
     if (!list.length) { w.innerHTML = top('배송') + `<div class="card msg">${DM.busy || (dmLbl(dd) + ' 배송이 없어요.' + (wk ? ` <button type="button" class="dm-btn" data-dm="nb" style="margin-left:6px">다음 배송일(${dmLbl(dmNextBiz(dd))}) 보기</button>` : ''))}</div>`; return; }
     const done = list.filter((x) => x.doneYN === 'Y').length, cur = list.find((x) => x.doneYN !== 'Y');
-    w.innerHTML = top(`배송 ${list.length}곳 · 완료 ${done}`) + (DM.busy ? `<div class="card msg">${DM.busy}</div>` : '') + list.map((x, i) => {
+    const today = dmIsToday(), uni = today && DM.sch.uniformYN === 'N' && done < list.length;   // 오늘 출근 복장 사진이 아직이면 출발 전에 먼저
+    w.innerHTML = top(`배송 ${list.length}곳 · 완료 ${done}`) + (DM.busy ? `<div class="card msg">${DM.busy}</div>` : '')
+      + (uni ? `<div class="card warn"><b>오늘의 출근 복장 사진</b>을 먼저 등록해 주세요. (등록해야 출발할 수 있어요)<br><label class="dm-btn y" style="display:inline-block;margin-top:8px" data-uni="1">📷 출근 복장 촬영<input type="file" accept="image/*" capture hidden></label></div>` : '')
+      + list.map((x, i) => {
       const id = dmId(x), b = dmBr(x), [sc, st] = dmState(x), open = DM.open === String(id), d = DM.det[id] || null, db = dmBr(d || x);
       const tags = [x.stockSurveyYN === 'Y' && '<span class="w">재고조사</span>', x.examineYN === 'Y' && '<span class="w">검수</span>', x.coffeeMachineYN === 'Y' && '<span>커피머신</span>', b.entranceType === '보안카드' && '<span>출입증 카드지참</span>', b.unableDeliveryTime && `<span>배송 불가 ${esc(b.unableDeliveryTime)}</span>`, x.meridiem === 'AM' && '<span>오전</span>', x.meridiem === 'PM' && '<span>오후</span>'].filter(Boolean).join('');
       let det = '';
@@ -847,10 +1026,16 @@
             ${d.stepCase ? `<div class="sec"><label>작업 단계</label>${esc(DM_STEP[d.stepCase] || d.stepCase)}</div>` : ''}
             ${d.notice ? `<div class="sec"><label>공지</label><div class="memo">${esc(d.notice)}</div></div>` : ''}
             <div class="sec"><label>배송 참고사항</label>${ref && ref.err ? '못 불러왔어요' : notes.length ? notes.map((n) => `<div class="dm-note"><i>${esc(String(n.createAt || '').slice(0, 10))}${n.topFixed ? ' · 고정' : ''}</i>${esc(n.contents || '')}</div>`).join('') : '등록된 배송 참고사항이 없어요.'}</div>
+            ${!today || x.doneYN === 'Y' ? '' : `<div class="acts main">${
+              x.taskStartAt ? `<button type="button" class="y" data-dm="wk" data-id="${esc(id)}">▶ 작업 이어하기</button>`
+              : x.deliveryStartAt ? `<button type="button" class="y" data-dm="task" data-id="${esc(id)}">작업 시작</button><button type="button" data-dm="goX" data-id="${esc(id)}">출발 취소</button>`
+              : uni ? '<span class="dm-hint">출근 복장 사진을 먼저 등록해 주세요</span>'
+              : x.startDeliveryAvailable === false ? '<span class="dm-hint">진행 중인 배송을 끝내면 출발할 수 있어요</span>'
+              : `<button type="button" class="y" data-dm="go" data-id="${esc(id)}">🚚 출발</button>`}</div>`}
             <div class="acts">
               ${isFinite(lat) && lat ? `<button type="button" class="y" data-dm="nav" data-id="${esc(id)}">🧭 내비</button>` : ''}
               ${d.orderUrl ? `<a href="${esc(d.orderUrl)}" target="_blank" rel="noopener">거래명세서 ↗</a>` : ''}
-              <button type="button" data-dm="old">작업은 기존 배송화면</button>
+              <button type="button" data-dm="old">기존 배송화면</button>
               ${dmRaw() ? `<button type="button" data-dm="raw" data-id="${esc(id)}">원본 복사 (점검용)</button>` : ''}
             </div></div>`;
         }
@@ -870,7 +1055,20 @@
     ev.stopPropagation();
     if (a === 're') { DM.det = {}; DM.ref = {}; return dmOpen(true); }
     if (a === 'dp' || a === 'dn' || a === 'nb') { const d0 = DM.d || dmToday(); DM.d = a === 'nb' ? dmNextBiz(d0) : dmAdd(d0, a === 'dp' ? -1 : 1); DM.sch = null; return dmOpen(true); }
-    if (a === 'old') { DM.iframe = true; return dlOpen(); }
+    if (a === 'old') { DM.iframe = true; DM.wk = null; return dlOpen(); }
+    if (a === 'go' || a === 'goX' || a === 'task') return dmAct(a, id, b);
+    if (a === 'wk') return dmWkOpen(id);
+    if (DM.wk) { const W = DM.wk;
+      if (a === 'wkx') { DM.wk = null; dmUi(); return dmReload(); }
+      if (a === 'wkre') return W.steps ? dmWkStep() : dmWkOpen(W.id);
+      if (a === 'next') return dmWkNext();
+      if (a === 'send') return dmWkSend(b);
+      if (a === 'imgx') { const e = W.imgs[+id]; if (e) { try { URL.revokeObjectURL(e.url); } catch (er) { /* noop */ } W.imgs.splice(+id, 1); } return dmUi(); }
+      if (a === 'all') { const x = W.insp.find((q) => String(q.id) === id); if (!x) return; x.qty = x.max; dmInspSave();
+        const row = b.closest('.dm-li'); row.querySelector('input').value = x.max; b.classList.add('on'); row.classList.remove('bad'); const sm = $('dm-insp-sum'); if (sm) sm.lastElementChild.textContent = W.insp.filter((q) => !q.qty).length; return; }
+      if (a === 'scan') return dmWkScan();
+      if (a === 'stx') { W.stock = W.stock.filter((q) => String(q.id) !== id); dmDraft('stock-' + W.id, W.stock); return dmUi(); }
+    }
     if (a === 'cand') { try { await dmLogin(id); DM.cand = null; dmOpen(true); } catch (e) { alert(e.message); } return; }
     if (a === 'nav') { const d = DM.det[id] || {}, co = d.coordinate || {}, br = dmBr(d); return nvRaw(br.branchName || br.companyName || '거래처', +co.latitude, +co.longitude, br.address || ''); }
     if (a === 'raw') {   // 점검용: 데이터 모양 확인 (전화번호는 가림)
@@ -885,6 +1083,30 @@
       b.textContent = ok ? '복사됨 — 대화창에 붙여 주세요' : '복사 실패';
     }
   };
+  const dmStockSum = () => { const sm = $('dm-stock-sum'); if (sm) sm.innerHTML = `재고 상품 <b>${DM.wk.stock.length}</b>개 (낱개 ${DM.wk.stock.reduce((q, x) => q + (+x.quantity || 0), 0)}개)`; };
+  const dmInspSave = () => { const o = {}; DM.wk.insp.forEach((x) => { if (x.qty) o[x.id] = x.qty; }); dmDraft('insp-' + DM.wk.id, o); };
+  $('dm-w').addEventListener('change', (ev) => {
+    const t = ev.target, W = DM.wk;
+    if (t.type === 'file') { const fs = [...(t.files || [])]; const lab = t.closest('label'); if (!fs.length) return;
+      if (lab && lab.dataset.uni) dmUniform(fs[0], lab); else dmWkFiles(fs); t.value = ''; return; }
+    if (!W) return;
+    if (t.id === 'dm-sold') { W.sold = t.checked; return; }
+    if (t.dataset.chk != null) { W.chk[+t.dataset.chk].on = t.checked; return; }
+    if (t.dataset.memo) { W.memo[t.dataset.memo] = t.checked; if (t.dataset.memo === 't') dmUi(); return; }
+    if (t.dataset.insp != null) { t.value = (W.insp.find((q) => String(q.id) === t.dataset.insp) || {}).qty || ''; return; }   // 화면을 다시 그리지 않음 (다음 칸을 누른 손가락이 헛돌지 않게)
+    if (t.dataset.stock != null) { const x = W.stock.find((q) => String(q.id) === t.dataset.stock); if (x) { x.quantity = Math.max(1, +x.quantity || 1); t.value = x.quantity; dmDraft('stock-' + W.id, W.stock); dmStockSum(); } }
+  });
+  $('dm-w').addEventListener('input', (ev) => {   // 숫자 입력 중에는 화면을 다시 그리지 않음 (커서 유지)
+    const t = ev.target, W = DM.wk; if (!W) return;
+    if (t.id === 'dm-bc') { W.bc = t.value; return; }
+    if (t.id === 'dm-memo') { W.memo.text = t.value; return; }
+    if (t.dataset.insp != null) { const x = W.insp.find((q) => String(q.id) === t.dataset.insp); if (!x) return;
+      let v = Math.floor(+t.value || 0); if (v > x.max) { v = x.max; t.value = v; } if (v < 0) { v = 0; t.value = ''; } x.qty = v; dmInspSave();
+      const sm = $('dm-insp-sum'); if (sm) sm.lastElementChild.textContent = W.insp.filter((q) => !q.qty).length;
+      const row = t.closest('.dm-li'); if (row) { row.querySelector('[data-dm=all]').classList.toggle('on', v === x.max); if (W.mark) row.classList.toggle('bad', v !== x.max); } return; }
+    if (t.dataset.stock != null) { const x = W.stock.find((q) => String(q.id) === t.dataset.stock); if (!x) return; let v = Math.floor(+t.value || 0); if (v > 999) { v = 999; t.value = v; } x.quantity = v; dmDraft('stock-' + W.id, W.stock); dmStockSum(); }
+  });
+  $('dm-w').addEventListener('keydown', (ev) => { if (ev.key === 'Enter' && ev.target.id === 'dm-bc') { ev.preventDefault(); DM.wk.bc = ev.target.value; dmWkScan(); } });
   function dlOpen() {
     dlPhUi();
     if (dmOn() && !DM.iframe && !isMaster()) { $('dl-w').hidden = true; $('dm-w').hidden = false; $('dl-app').hidden = true; return dmOpen(); }
