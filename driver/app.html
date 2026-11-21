@@ -216,6 +216,11 @@
   .hm-st i{width:9px;height:9px;border-radius:50%;background:#6B7178}.hm-st.on i{background:#34C27A}
   .hm-car{display:flex;justify-content:center;margin:26px -8px 0}.hm-car svg{width:100%;max-width:360px;height:auto;display:block}
   .hm-chg{display:block;margin:6px auto 14px;border:0;background:none;color:#8D939A;font:inherit;font-size:14px;text-decoration:underline;padding:10px}
+  .hm-q{display:grid;gap:8px;padding:22px 0 18px}.hm-q button{display:flex;flex-direction:column;align-items:center;gap:8px;background:none;border:0;color:#C9CED3;font:inherit;font-size:13px;cursor:pointer}
+  .hm-q button span{width:56px;height:56px;border-radius:28px;background:#22262B;display:grid;place-items:center}.hm-q button.on span{background:#1F6F4A}
+  .hm-day{background:#202327;border-radius:14px;padding:16px 18px;margin:0 0 8px;display:flex;flex-direction:column;gap:8px;cursor:pointer}.hm-day[hidden]{display:none}
+  .hm-day .l{font-size:14px;color:#9AA0A6}.hm-day .v{display:flex;gap:20px;align-items:baseline}.hm-day .v b{font-size:26px;font-weight:800}.hm-day .v b.m{font-size:18px;font-weight:700}.hm-day .v i{font-style:normal;font-size:14px;font-weight:500;color:#9AA0A6}
+  .hm-day .bg{display:flex;gap:8px;flex-wrap:wrap}.hm-day .bg span{font-size:13px;font-weight:700;padding:4px 10px;border-radius:7px;background:#2C3136;color:#D5D9DD}.hm-day .bg .g{background:#2F9E5B;color:#fff}.hm-day .bg .r{background:#C2372F;color:#fff}.hm-day .bg .y{background:#F2C230;color:#17191C}
   .hm-rows{margin:0 -18px}
   .hm-row{display:flex;align-items:center;gap:20px;width:100%;border:0;background:none;color:#EDEFF1;font:inherit;text-align:left;padding:16px 26px;min-height:64px;cursor:pointer}
   .hm-row:active{background:rgba(255,255,255,.05)}
@@ -301,7 +306,7 @@
 <button class="top-lo" id="top-lo" hidden>로그아웃</button>
 <div id="main" hidden>
   <div id="pd" hidden></div>
-  <div id="home"><div class="hm-nm" id="hm-nm">—</div><div class="hm-sub" id="hm-sub"></div><div class="hm-st" id="hm-st"><i></i><span id="hm-stt">—</span></div><div class="hm-car" id="hm-car"></div><button class="hm-chg" id="hm-chg">내 차 바꾸기</button><div class="hm-rows" id="hm-rows"></div><button class="hm-chg" id="hm-loc">위치정보 동의 관리</button></div>
+  <div id="home"><div class="hm-nm" id="hm-nm">—</div><div class="hm-sub" id="hm-sub"></div><div class="hm-st" id="hm-st"><i></i><span id="hm-stt">—</span></div><div class="hm-car" id="hm-car"></div><button class="hm-chg" id="hm-chg">내 차 바꾸기</button><div class="hm-q" id="hm-q"></div><div class="hm-day" id="hm-day" hidden></div><div class="hm-rows" id="hm-rows"></div><button class="hm-chg" id="hm-loc">위치정보 동의 관리</button></div>
   <div id="hbk"><button id="hbk-b" aria-label="홈으로"><svg width="26" height="26" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" stroke="#EDEFF1" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></button><b id="hbk-t"></b></div>
   <div class="tabs"><button data-tab="cs" hidden>실적표</button><button data-tab="cw" hidden>업무</button><button data-tab="sh">실적표</button><button data-tab="loc">운행 시작</button><button data-tab="lc">상차</button><button data-tab="dl">배송</button><button data-tab="mm" hidden>내 운행 기록</button><button class="on" data-tab="rec">퇴근</button></div>
   <div id="t-cs" hidden>
@@ -657,7 +662,7 @@
 
 
   // 11/20 앱 안 업데이트: 서버의 새 index.html 빌드 번호가 다르면 [업데이트] 버튼 → 새로 불러오기 (홈 화면에 다시 추가할 필요 없음)
-  const BUILD = '20261121-25';
+  const BUILD = '20261121-26';
   async function updCheck() {
     try {
       const r = await fetch('app.html?chk=' + Date.now(), { cache: 'no-store' }); if (!r.ok) return;
@@ -749,15 +754,63 @@
     $('hm-nm').textContent = cfg.n || '—';
     $('hm-sub').textContent = isMaster() ? '관리자 계정' : (TNAME[TEAM] || '') + ' 기사';
     $('hm-car').innerHTML = carSvg(carGet()); if (!carTier || carTier.n !== cfg.n || Date.now() - (carTier.at || 0) > 6 * 3600e3) setTimeout(carTierLoad, 1500);
-    $('hm-rows').innerHTML = [...document.querySelectorAll('.tabs button')].filter((b) => !b.hidden).map((b) => { const l = hmLbl(b.dataset.tab);
+    hmExtra();
+    $('hm-rows').innerHTML = [...document.querySelectorAll('.tabs button')].filter((b) => !b.hidden).map((b) => { const l = hmLbl(b.dataset.tab); const live = hmLive(b.dataset.tab); if (live) l.s = live;
       return `<button class="hm-row" data-hm="${b.dataset.tab}"><svg width="26" height="26" viewBox="0 0 24 24" aria-hidden="true"><path d="${l.d}" stroke="#A9AFB6" stroke-width="1.9" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg><span><b>${l.t}</b>${l.s ? `<small>${l.s}</small>` : ''}</span><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7" stroke="#6B7178" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></button>`; }).join('');
     hmStat();
+  }
+  // 11/21 홈 시안 나머지 (상진님): 바로가기 4개 · 오늘 일정 카드 · 메뉴 밑 그날 숫자
+  const HM_Q = { snack: [['loc', '운행 시작'], ['lc', '상차'], ['sh', '배송'], ['rec', '퇴근']], cvs: [['cw', '업무시작'], ['cs', '실적표'], ['cw', '배송사진'], ['rec', '퇴근']] };
+  const hmW = (n) => Number(n || 0).toLocaleString('ko-KR');
+  function hmDayData() {   // 오늘(또는 다음) 일정 요약
+    try {
+      if (CVS()) {
+        const j = CS.j; if (!j) return null; const sts = csStops(j).filter((x) => !x.carry);
+        const liq = sts.filter((x) => (csLiqOf(x.c) || []).length).length, bad = sts.filter((x) => (csLiqOf(x.c) || []).some((r) => +r.cq > 0)).length;
+        const w = j.work || {}, ph = sts.filter((x) => csPhotos(x.c).length).length;
+        return { d: CS.d, n: sts.length, amt: sts.reduce((a, x) => a + (+x.tot || 0), 0), lbl: csNight() ? '저온' : '매출', badges: [liq && ['g', `주류확인 ${liq}곳`], bad && ['r', `결품/취소 ${bad}곳`]].filter(Boolean), ph, work: w };
+      }
+      if (!L.recs.length) return null;
+      const amt = L.recs.reduce((a, r) => a + Number(r.amtA || 0) + Number(r.amtC || 0), 0), pend = shPending();
+      const ls = (DM.sch && DM.d === L.d && Array.isArray(DM.sch.details)) ? DM.sch.details : [];
+      return { d: L.d, n: L.recs.length, amt, lbl: '매출', loads: pend.loads, badges: [pend.cards.length && ['y', `요약카드 확인 ${pend.cards.length}곳`], pend.loads && ['k', `상차 체크 ${pend.loads}건 남음`], ls.length && ['k', `배송 완료 ${ls.filter((x) => x.doneYN === 'Y').length} / ${ls.length}`]].filter(Boolean) };
+    } catch (e) { return null; }
+  }
+  function hmLive(t) {   // 메뉴 밑 작은 글씨를 그날 숫자로
+    try {
+      const D = hmDayData();
+      if (t === 'loc' || (t === 'cw' && false)) return (document.getElementById('stt') || {}).textContent || '';
+      if (!D) return '';
+      if (t === 'sh') return `${D.n}곳 · ${hmW(D.amt)}원${shDmOn() ? ' · 출발·배송 사진' : ''}`;
+      if (t === 'lc') return D.loads ? `상차 체크 ${D.loads}건 남음` : '상차 체크 다 했어요';
+      if (t === 'cs') return `${D.n}곳 · ${hmW(D.amt)}원${D.badges.length ? ' · ' + D.badges[0][1] : ''}`;
+      if (t === 'cw') return D.work && D.work.end_at ? '업무종료 ✓' : D.work && D.work.start_at ? `업무 중 · 배송사진 ${D.ph} / ${D.n}` : `업무시작 전 · 배송사진 0 / ${D.n}`;
+    } catch (e) { /* 기본 문구 */ }
+    return '';
+  }
+  function hmExtra() {
+    const team = CVS() ? 'cvs' : 'snack', ic = (t) => hmLbl(t).d;
+    const q = isMaster() ? [] : HM_Q[team].filter(([t]) => !tabBtn(t).hidden);
+    $('hm-q').innerHTML = q.map(([t, l], i) => `<button type="button" data-hm="${t}" class="${i === 0 ? 'on' : ''}"><span><svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path d="${ic(t)}" stroke="#EDEFF1" stroke-width="1.9" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span>${l}</button>`).join('');
+    $('hm-q').style.gridTemplateColumns = `repeat(${Math.max(q.length, 1)}, minmax(0, 1fr))`;
+    const D = isMaster() ? null : hmDayData();
+    $('hm-day').hidden = !D;
+    if (D) $('hm-day').innerHTML = `<div class="l">${esc(dLbl(D.d))} 일정</div><div class="v"><b>${D.n}<i> 곳</i></b><b class="m">${D.lbl} ${hmW(D.amt)}<i>원</i></b></div>${D.badges.length ? `<div class="bg">${D.badges.map(([k, t]) => `<span class="${k}">${esc(t)}</span>`).join('')}</div>` : ''}`;
+    if (!D && !isMaster()) setTimeout(hmPrefetch, 300);
+  }
+  let hmPre = 0;
+  async function hmPrefetch() {   // 홈에서 일정 숫자를 채우려고 실적표 자료를 한 번 읽음
+    if (Date.now() - hmPre < 120e3) return; hmPre = Date.now();
+    try { if (CVS()) await csLoad(false); else { if (!L.recs.length || L.loadedFor !== L.d) { await lcLoad(); L.loadedFor = L.d; } await shFlags(); if (shDmOn()) await shDm(false); } } catch (e) { /* 다음에 */ }
+    if (document.body.classList.contains('hm')) hmRender();
   }
   function goHome() {
     document.body.classList.add('hm'); hmRender(); window.scrollTo(0, 0);
     try { sessionStorage.setItem('wr-hm', '1'); } catch (e) { /* noop */ }
   }
   $('hm-rows').onclick = (ev) => { const b = ev.target.closest('[data-hm]'); if (b) showTab(b.dataset.hm); };
+  $('hm-q').onclick = (ev) => { const b = ev.target.closest('[data-hm]'); if (b) showTab(b.dataset.hm); };
+  $('hm-day').onclick = () => showTab(CVS() ? 'cs' : 'sh');
   $('hbk-b').onclick = () => { if (history.state && history.state.wr) history.back(); else goHome(); };
   window.addEventListener('popstate', () => { if (!$('car-ov').hidden) { $('car-ov').hidden = true; return; } if (!$('main').hidden && !document.body.classList.contains('hm')) goHome(); });
   setInterval(() => { if (document.body.classList.contains('hm')) hmStat(); }, 15000);
