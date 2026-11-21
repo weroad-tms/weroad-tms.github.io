@@ -634,7 +634,7 @@
 
 
   // 11/20 앱 안 업데이트: 서버의 새 index.html 빌드 번호가 다르면 [업데이트] 버튼 → 새로 불러오기 (홈 화면에 다시 추가할 필요 없음)
-  const BUILD = '20261121-12';
+  const BUILD = '20261121-13';
   async function updCheck() {
     try {
       const r = await fetch('app.html?chk=' + Date.now(), { cache: 'no-store' }); if (!r.ok) return;
@@ -823,12 +823,12 @@
       <div class="dm-top"><b>${txt}</b><button type="button" data-dm="re">새로고침</button><button type="button" data-dm="old">기존 배송화면</button></div>`;
     if (DM.cand) { w.innerHTML = top('담당자 선택') + `<div class="card msg">이 번호에 배송 담당자가 여럿이에요. 본인을 골라 주세요.</div>` + DM.cand.map((c) => `<button type="button" class="dm-btn" style="display:block;width:100%;margin-bottom:8px;text-align:left" data-dm="cand" data-id="${esc(c.id || c.deliveryManagerId || '')}">${esc(c.name || c.deliveryManagerName || c.id || '')} ${esc(c.companyName || c.branchName || '')}</button>`).join(''); return; }
     if (DM.err) { w.innerHTML = top('배송') + `<div class="card warn">배송 정보를 못 불러왔어요: ${esc(DM.err)}<br>[기존 배송화면]으로 진행해 주세요.</div>`; return; }
-    const list = (DM.sch && Array.isArray(DM.sch.details)) ? DM.sch.details : [];
+    const list = (DM.sch && Array.isArray(DM.sch.details)) ? DM.sch.details.slice().sort((a, b) => (+a.sequence || 999) - (+b.sequence || 999)) : [];
     if (!list.length) { w.innerHTML = top('배송') + `<div class="card msg">${DM.busy || (dmLbl(dd) + ' 배송이 없어요.' + (wk ? ` <button type="button" class="dm-btn" data-dm="nb" style="margin-left:6px">다음 배송일(${dmLbl(dmNextBiz(dd))}) 보기</button>` : ''))}</div>`; return; }
     const done = list.filter((x) => x.doneYN === 'Y').length, cur = list.find((x) => x.doneYN !== 'Y');
     w.innerHTML = top(`배송 ${list.length}곳 · 완료 ${done}`) + (DM.busy ? `<div class="card msg">${DM.busy}</div>` : '') + list.map((x, i) => {
       const id = dmId(x), b = dmBr(x), [sc, st] = dmState(x), open = DM.open === String(id), d = DM.det[id] || null, db = dmBr(d || x);
-      const tags = [x.stockSurveyYN === 'Y' && '<span class="w">재고조사</span>', x.examineYN === 'Y' && '<span class="w">검수</span>', x.coffeeMachineYN === 'Y' && '<span>커피머신</span>', b.entranceType === '보안카드' && '<span>출입증 카드지참</span>', b.unableDeliveryTime != null && b.unableDeliveryTime !== undefined && '<span>시간 엄수</span>', x.meridiem === 'AM' && '<span>오전</span>', x.meridiem === 'PM' && '<span>오후</span>'].filter(Boolean).join('');
+      const tags = [x.stockSurveyYN === 'Y' && '<span class="w">재고조사</span>', x.examineYN === 'Y' && '<span class="w">검수</span>', x.coffeeMachineYN === 'Y' && '<span>커피머신</span>', b.entranceType === '보안카드' && '<span>출입증 카드지참</span>', b.unableDeliveryTime && `<span>배송 불가 ${esc(b.unableDeliveryTime)}</span>`, x.meridiem === 'AM' && '<span>오전</span>', x.meridiem === 'PM' && '<span>오후</span>'].filter(Boolean).join('');
       let det = '';
       if (open) {
         if (!d) det = '<div class="dm-d">불러오는 중…</div>';
@@ -839,9 +839,9 @@
           const co = d.coordinate || {}, lat = +co.latitude, lng = +co.longitude;
           det = `<div class="dm-d">
             <div class="sec"><label>주소</label>${esc(db.address || '-')}</div>
-            ${db.workingTime ? `<div class="sec"><label>근무 시간</label>${esc(db.workingTime)}</div>` : ''}
+            ${db.workingTime || db.unableDeliveryTime ? `<div class="sec"><label>근무 시간</label>${esc(db.workingTime || '-')}${db.unableDeliveryTime ? ` · <b style="color:#FDE68A">배송 불가 ${esc(db.unableDeliveryTime)}</b>` : ''}</div>` : ''}
             <div class="sec"><label>주차/출입 참고사항</label><div class="memo">${db.parkingMemo ? esc(String(db.parkingMemo).replace(/\r\n/g, '\n')) : '등록된 주차/출입 참고사항이 없어요.'}</div></div>
-            <div class="sec"><label>연락 가능 고객</label>${mem.length ? mem.map((m, k) => `<a class="dm-btn" style="display:inline-block;margin:0 6px 6px 0;text-decoration:none" href="tel:${esc(String(m.cellphone).replace(/[^0-9]/g, ''))}">📞 ${esc(m.name || ('담당 ' + (k + 1)))}</a>`).join('') : '-'}</div>
+            <div class="sec"><label>연락 가능 고객</label>${mem.length ? mem.map((m, k) => `<a class="dm-btn" style="display:inline-block;margin:0 6px 6px 0;text-decoration:none" href="tel:${esc(String(m.cellphone).replace(/[^0-9]/g, ''))}">📞 ${esc(m.branchMemberName || m.name || ('담당 ' + (k + 1)))}</a>`).join('') : '-'}</div>
             ${d.stepCase ? `<div class="sec"><label>작업 단계</label>${esc(DM_STEP[d.stepCase] || d.stepCase)}</div>` : ''}
             ${d.notice ? `<div class="sec"><label>공지</label><div class="memo">${esc(d.notice)}</div></div>` : ''}
             <div class="sec"><label>배송 참고사항</label>${ref && ref.err ? '못 불러왔어요' : notes.length ? notes.map((n) => `<div class="dm-note"><i>${esc(String(n.createAt || '').slice(0, 10))}${n.topFixed ? ' · 고정' : ''}</i>${esc(n.contents || '')}</div>`).join('') : '등록된 배송 참고사항이 없어요.'}</div>
