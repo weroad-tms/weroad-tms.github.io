@@ -114,6 +114,23 @@
   .lc-r.ck .cb{background:#22C55E;border-color:#22C55E}
   .lc-r .cb:disabled{opacity:.35}
   #t-dl .dlw{border-radius:16px;overflow:hidden;background:#fff;height:calc(100dvh - 190px);min-height:520px}
+  /* 11/21 위로드 배송 화면 (딜리버리웹 중계, 1단계 조회) */
+  .dm-top{display:flex;align-items:center;gap:8px;margin-bottom:10px}.dm-top b{flex:1;font-size:16px}
+  .dm-top button,.dm-btn{border:0;border-radius:10px;padding:9px 12px;font:inherit;font-size:14px;font-weight:700;background:rgba(255,255,255,.1);color:#fff}
+  .dm-it{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:14px;margin-bottom:10px}
+  .dm-it.done{opacity:.5}.dm-it.cur{border:1.5px solid #F2C230}
+  .dm-h{display:flex;align-items:flex-start;gap:10px}.dm-h .n{min-width:28px;height:28px;border-radius:9px;background:#3E6AF2;display:grid;place-items:center;font-weight:900;font-size:13px;flex:none}
+  .dm-h .t{flex:1;min-width:0}.dm-h .t b{display:block;font-size:16.5px;line-height:1.3}.dm-h .t span{display:block;font-size:13px;opacity:.7;margin-top:2px}
+  .dm-st{flex:none;font-size:12.5px;font-weight:800;border-radius:999px;padding:4px 9px;background:rgba(255,255,255,.1)}
+  .dm-st.go{background:#3E6AF2}.dm-st.work{background:#F2C230;color:#17191C}.dm-st.ok{background:rgba(34,197,94,.25);color:#86EFAC}
+  .dm-tg{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}.dm-tg span{font-size:11.5px;font-weight:800;border-radius:999px;padding:2px 8px;background:rgba(255,255,255,.1);color:#D7DADF}
+  .dm-tg .w{background:rgba(242,194,48,.2);color:#FDE68A}
+  .dm-d{margin-top:12px;border-top:1px solid rgba(255,255,255,.08);padding-top:10px}
+  .dm-d .sec{margin-top:10px}.dm-d .sec>label{display:block;font-size:12.5px;font-weight:800;opacity:.65;margin-bottom:4px}
+  .dm-d .memo{white-space:pre-wrap;line-height:1.5;font-size:14.5px;background:rgba(242,194,48,.08);border-radius:10px;padding:9px 10px}
+  .dm-d .acts{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}.dm-d .acts a,.dm-d .acts button{border:0;border-radius:10px;padding:10px 12px;font:inherit;font-size:14px;font-weight:700;background:rgba(255,255,255,.1);color:#fff;text-decoration:none}
+  .dm-d .acts .y{background:#F2C230;color:#17191C}
+  .dm-note{font-size:14px;line-height:1.5;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.06)}.dm-note i{font-style:normal;font-size:12px;opacity:.6;margin-right:6px}
   #t-dl iframe{width:100%;height:100%;border:0;display:block}
   .dl-bar{display:flex;justify-content:space-between;align-items:center;font-size:13px;opacity:.8;margin:2px 2px 8px}
   .dl-bar a{color:#9CB4FF;font-weight:700}
@@ -306,6 +323,7 @@
     <div class="card warn dl-lock" id="dl-lock" hidden></div>
     <div class="dl-bar"><span>배송매니저 (출발·도착·배송사진 → 위펀오피스)</span><a href="https://delivery-manager.wefun.kr/" target="_blank" rel="noopener">새 창 ↗</a></div>
     <div class="card msg" id="dl-ph" hidden><b>배송 자동 로그인</b><br>위로드에 로그인한 휴대폰번호를 한 번만 넣으면, 다음부터 배송 화면이 자동으로 로그인돼요.<div style="display:flex;gap:8px;margin-top:10px"><input id="dl-ph-in" type="tel" inputmode="numeric" placeholder="01012345678" autocomplete="off" style="flex:1;margin:0"><button class="sm" id="dl-ph-ok" style="flex:none">저장</button></div></div>
+    <div id="dm-w" hidden></div>
     <div class="dlw" id="dl-w"></div>
     <div class="card msg" id="dl-app" hidden style="margin-top:10px">· 사진 첨부가 안 되면 위로드 앱을 새 버전으로 업데이트해 주세요: <a href="https://ridvdsluzfjxonqlavgm.supabase.co/storage/v1/object/public/notify/app/weroad.apk" style="color:#9CB4FF;font-weight:700">위로드 앱 최신 버전 내려받기</a></div>
   </div>
@@ -616,7 +634,7 @@
 
 
   // 11/20 앱 안 업데이트: 서버의 새 index.html 빌드 번호가 다르면 [업데이트] 버튼 → 새로 불러오기 (홈 화면에 다시 추가할 필요 없음)
-  const BUILD = '20261121-8';
+  const BUILD = '20261121-9';
   async function updCheck() {
     try {
       const r = await fetch('app.html?chk=' + Date.now(), { cache: 'no-store' }); if (!r.ok) return;
@@ -732,8 +750,127 @@
       dlPhUi(); const f = $('dl-w').querySelector('iframe'); if (f) f.src = dlUrl();
     } catch (e) { alert(e.message); } finally { $('dl-ph-ok').disabled = false; }
   };
+  // ===== 11/21 위로드 배송 화면 — 딜리버리웹과 같은 서버를 중계 함수(dmproxy)로 불러 위로드 안에서 보여줌
+  //  · 1단계: 조회만 (오늘 목록·상태, 연락 가능 고객, 주차/출입, 거래명세서, 배송 참고사항). 출발·작업·사진·검수·재고조사는 [기존 배송화면]
+  //  · 테스트 주소 ?dm=1 로 한 번 열면 그 폰에 기억, ?dm=0 이면 끔 · 서버가 바뀌어 안 되면 자동으로 기존 화면 버튼 안내
+  //  · 동작 정리: docs/delivery-manager-api.md
+  try { const v = new URLSearchParams(location.search).get('dm'); if (v === '1') localStorage.setItem('wr-dm', '1'); else if (v === '0') localStorage.removeItem('wr-dm'); } catch (e) { /* noop */ }
+  const DM_ON = (() => { try { return localStorage.getItem('wr-dm') === '1'; } catch (e) { return false; } })();
+  const DM = { iframe: false, busy: '', err: '', sch: null, det: {}, ref: {}, open: '', cand: null };
+  const DMF = 'https://ridvdsluzfjxonqlavgm.supabase.co/functions/v1/dmproxy';
+  const dmTokGet = () => { try { const t = JSON.parse(localStorage.getItem('wr-dmtok') || 'null'); return t && t.ph === cfg.ph && t.n === cfg.n ? t : null; } catch (e) { return null; } };
+  const dmTokSet = (t) => { try { if (t) localStorage.setItem('wr-dmtok', JSON.stringify(t)); else localStorage.removeItem('wr-dmtok'); } catch (e) { /* noop */ } };
+  async function dmPost(b) {
+    const r = await fetch(DMF, { method: 'POST', headers: { 'Content-Type': 'application/json', apikey: KEY, Authorization: 'Bearer ' + KEY }, body: JSON.stringify({ name: cfg.n, tok: cfg.tok, ...b }) });
+    const j = await r.json().catch(() => ({ ok: false, error: 'HTTP ' + r.status }));
+    if (r.status === 401 && j.error) throw new Error(j.error);
+    return j;
+  }
+  async function dmLogin(mid) {
+    const j = await dmPost({ op: 'login', cellphone: cfg.ph, deliveryManagerId: mid || undefined });
+    const d = j.data || {};
+    if (d.type === 'CANDIDATES' || Array.isArray(d.candidates)) { DM.cand = d.candidates || []; return null; }
+    if (!j.ok || !d.accessToken) throw new Error((d && (d.message || d.error)) || j.error || '배송 로그인이 안 됐어요');
+    const t = { n: cfg.n, ph: cfg.ph, gt: d.grantType || 'Bearer', at: d.accessToken, rt: d.refreshToken || '', mid: mid || '' };
+    dmTokSet(t); DM.cand = null; return t;
+  }
+  async function dmGet(path, query) {
+    let t = dmTokGet() || await dmLogin(); if (!t) return null;
+    let j = await dmPost({ path, query, auth: `${t.gt} ${t.at}`, at: t.at, rt: t.rt });
+    if (j.tok && j.tok.accessToken) { t = { ...t, gt: j.tok.grantType || t.gt, at: j.tok.accessToken, rt: j.tok.refreshToken || t.rt }; dmTokSet(t); }
+    if (j.status === 401) { dmTokSet(null); t = await dmLogin(t.mid); if (!t) return null; j = await dmPost({ path, query, auth: `${t.gt} ${t.at}`, at: t.at, rt: t.rt }); }
+    if (!j.ok) throw new Error((j.data && (j.data.message || j.data.error)) || j.error || ('오류 ' + (j.status || '')));
+    return j.data;
+  }
+  const dmHm = (v) => { if (!v) return ''; const d = new Date(v); return isNaN(d) ? String(v).slice(11, 16) : d.toTimeString().slice(0, 5); };
+  const dmId = (x) => x && (x.detailId || x.id);
+  const dmBr = (x) => (x && x.branch) || {};
+  function dmState(x) {   // 딜리버리웹과 같은 규칙
+    if (!x) return ['', ''];
+    if (x.doneYN === 'Y') return ['ok', '완료 ' + dmHm(x.taskDoneAt)];
+    if (x.taskStartAt) return ['work', '작업 중'];
+    if (x.deliveryStartAt) return ['go', '출발 ' + dmHm(x.deliveryStartAt)];
+    return ['', x.startDeliveryAvailable === false ? '대기' : '출발 전'];
+  }
+  const DM_STEP = { D: '진열 전·후 사진', DE: '진열 전 사진 → 검수 → 진열 후 사진', DS: '진열 사진 → 재고조사', DES: '진열 전 → 검수 → 진열 후 → 재고조사', DC: '진열 사진 → 커피머신 점검', DEC: '진열 → 검수 → 커피머신 점검', S: '재고조사', C: '커피머신 점검' };
+  async function dmOpen(force) {
+    if (!cfg.ph) { $('dm-w').innerHTML = ''; return; }   // 위의 휴대폰번호 입력 카드가 먼저
+    if (DM.sch && !force && Date.now() - (DM.at || 0) < 60e3) return dmUi();
+    DM.busy = '배송 목록 읽는 중…'; DM.err = ''; dmUi();
+    try { const d = await dmGet('schedules'); if (d) { DM.sch = d; DM.at = Date.now(); } }
+    catch (e) { DM.err = e.message; }
+    DM.busy = ''; dmUi();
+  }
+  async function dmDetail(id) {
+    DM.open = DM.open === String(id) ? '' : String(id); dmUi(); if (!DM.open) return;
+    try {
+      if (!DM.det[id]) { DM.det[id] = await dmGet('schedules/details/' + id); dmUi(); }
+      const bid = dmBr(DM.det[id]).branchId;
+      if (bid && !DM.ref[bid]) { try { DM.ref[bid] = await dmGet('reference', { branchId: bid }); } catch (e) { DM.ref[bid] = { err: e.message }; } dmUi(); }
+    } catch (e) { DM.det[id] = { _err: e.message }; dmUi(); }
+  }
+  function dmUi() {
+    const w = $('dm-w'); if (!w || w.hidden) return;
+    const top = (txt) => `<div class="dm-top"><b>${txt}</b><button type="button" data-dm="re">새로고침</button><button type="button" data-dm="old">기존 배송화면</button></div>`;
+    if (DM.cand) { w.innerHTML = top('담당자 선택') + `<div class="card msg">이 번호에 배송 담당자가 여럿이에요. 본인을 골라 주세요.</div>` + DM.cand.map((c) => `<button type="button" class="dm-btn" style="display:block;width:100%;margin-bottom:8px;text-align:left" data-dm="cand" data-id="${esc(c.id || c.deliveryManagerId || '')}">${esc(c.name || c.deliveryManagerName || c.id || '')} ${esc(c.companyName || c.branchName || '')}</button>`).join(''); return; }
+    if (DM.err) { w.innerHTML = top('배송') + `<div class="card warn">배송 정보를 못 불러왔어요: ${esc(DM.err)}<br>[기존 배송화면]으로 진행해 주세요.</div>`; return; }
+    const list = (DM.sch && Array.isArray(DM.sch.details)) ? DM.sch.details : [];
+    if (!list.length) { w.innerHTML = top('배송') + `<div class="card msg">${DM.busy || '오늘 배송이 없어요.'}</div>`; return; }
+    const done = list.filter((x) => x.doneYN === 'Y').length, cur = list.find((x) => x.doneYN !== 'Y');
+    w.innerHTML = top(`오늘 배송 ${list.length}곳 · 완료 ${done}`) + (DM.busy ? `<div class="card msg">${DM.busy}</div>` : '') + list.map((x, i) => {
+      const id = dmId(x), b = dmBr(x), [sc, st] = dmState(x), open = DM.open === String(id), d = DM.det[id] || null, db = dmBr(d || x);
+      const tags = [x.stockSurveyYN === 'Y' && '<span class="w">재고조사</span>', x.examineYN === 'Y' && '<span class="w">검수</span>', x.coffeeMachineYN === 'Y' && '<span>커피머신</span>', b.entranceType === '보안카드' && '<span>출입증 카드지참</span>', b.unableDeliveryTime != null && b.unableDeliveryTime !== undefined && '<span>시간 엄수</span>', x.meridiem === 'AM' && '<span>오전</span>', x.meridiem === 'PM' && '<span>오후</span>'].filter(Boolean).join('');
+      let det = '';
+      if (open) {
+        if (!d) det = '<div class="dm-d">불러오는 중…</div>';
+        else if (d._err) det = `<div class="dm-d">상세를 못 불러왔어요: ${esc(d._err)}</div>`;
+        else {
+          const ref = DM.ref[db.branchId], notes = ref && Array.isArray(ref.content) ? ref.content : [];
+          const mem = Array.isArray(db.branchMembers) ? db.branchMembers.filter((m) => m && m.cellphone) : [];
+          const co = d.coordinate || {}, lat = +co.latitude, lng = +co.longitude;
+          det = `<div class="dm-d">
+            <div class="sec"><label>주소</label>${esc(db.address || '-')}</div>
+            ${db.workingTime ? `<div class="sec"><label>근무 시간</label>${esc(db.workingTime)}</div>` : ''}
+            <div class="sec"><label>주차/출입 참고사항</label><div class="memo">${db.parkingMemo ? esc(String(db.parkingMemo).replace(/\r\n/g, '\n')) : '등록된 주차/출입 참고사항이 없어요.'}</div></div>
+            <div class="sec"><label>연락 가능 고객</label>${mem.length ? mem.map((m, k) => `<a class="dm-btn" style="display:inline-block;margin:0 6px 6px 0;text-decoration:none" href="tel:${esc(String(m.cellphone).replace(/[^0-9]/g, ''))}">📞 ${esc(m.name || ('담당 ' + (k + 1)))}</a>`).join('') : '-'}</div>
+            ${d.stepCase ? `<div class="sec"><label>작업 단계</label>${esc(DM_STEP[d.stepCase] || d.stepCase)}</div>` : ''}
+            ${d.notice ? `<div class="sec"><label>공지</label><div class="memo">${esc(d.notice)}</div></div>` : ''}
+            <div class="sec"><label>배송 참고사항</label>${ref && ref.err ? '못 불러왔어요' : notes.length ? notes.map((n) => `<div class="dm-note"><i>${esc(String(n.createAt || '').slice(0, 10))}${n.topFixed ? ' · 고정' : ''}</i>${esc(n.contents || '')}</div>`).join('') : '등록된 배송 참고사항이 없어요.'}</div>
+            <div class="acts">
+              ${isFinite(lat) && lat ? `<button type="button" class="y" data-dm="nav" data-id="${esc(id)}">🧭 내비</button>` : ''}
+              ${d.orderUrl ? `<a href="${esc(d.orderUrl)}" target="_blank" rel="noopener">거래명세서 ↗</a>` : ''}
+              <button type="button" data-dm="old">작업은 기존 배송화면</button>
+              ${DM_RAW ? `<button type="button" data-dm="raw" data-id="${esc(id)}">원본 복사 (점검용)</button>` : ''}
+            </div></div>`;
+        }
+      }
+      return `<div class="dm-it${x.doneYN === 'Y' ? ' done' : ''}${cur && dmId(cur) === id ? ' cur' : ''}" data-dm="open" data-id="${esc(id)}">
+        <div class="dm-h"><span class="n">${i + 1}</span><div class="t"><b>${esc(b.companyName || x.companyName || '거래처')}</b><span>${esc(b.branchName || '')}${x.deliveryCycle ? ' · ' + esc(x.deliveryCycle) : ''}</span></div>${st ? `<span class="dm-st ${sc}">${esc(st)}</span>` : ''}</div>
+        ${tags ? `<div class="dm-tg">${tags}</div>` : ''}${det}</div>`;
+    }).join('');
+  }
+  const DM_RAW = (() => { try { return new URLSearchParams(location.search).get('dm') === '1' || localStorage.getItem('wr-dm-raw') === '1'; } catch (e) { return false; } })();
+  try { if (DM_RAW) localStorage.setItem('wr-dm-raw', '1'); } catch (e) { /* noop */ }
+  $('dm-w').onclick = async (ev) => {
+    const b = ev.target.closest('[data-dm]'); if (!b) return;
+    const a = b.dataset.dm, id = b.dataset.id;
+    if (a === 'open') { if (ev.target.closest('.dm-d')) return; return dmDetail(id); }
+    ev.stopPropagation();
+    if (a === 're') { DM.det = {}; DM.ref = {}; return dmOpen(true); }
+    if (a === 'old') { DM.iframe = true; return dlOpen(); }
+    if (a === 'cand') { try { await dmLogin(id); DM.cand = null; dmOpen(true); } catch (e) { alert(e.message); } return; }
+    if (a === 'nav') { const d = DM.det[id] || {}, co = d.coordinate || {}, br = dmBr(d); return nvRaw(br.companyName || '거래처', +co.latitude, +co.longitude, br.address || ''); }
+    if (a === 'raw') {   // 점검용: 데이터 모양 확인 (전화번호는 가림)
+      const mask = (k, v) => (typeof v === 'string' && /phone|tel|cellphone/i.test(k) ? v.replace(/\d(?=\d{2})/g, '*') : v);
+      const t = JSON.stringify({ schedule: DM.sch && { ...DM.sch, details: (DM.sch.details || []).slice(0, 2) }, detail: DM.det[id], ref: DM.ref[dmBr(DM.det[id]).branchId] }, mask, 1);
+      let ok = false; try { await navigator.clipboard.writeText(t); ok = true; } catch (e) { try { const ta = document.createElement('textarea'); ta.value = t; document.body.appendChild(ta); ta.select(); ok = document.execCommand('copy'); ta.remove(); } catch (e2) { ok = false; } }
+      b.textContent = ok ? '복사됨 — 대화창에 붙여 주세요' : '복사 실패';
+    }
+  };
   function dlOpen() {
     dlPhUi();
+    if (DM_ON && !DM.iframe && !isMaster()) { $('dl-w').hidden = true; $('dm-w').hidden = false; $('dl-app').hidden = true; return dmOpen(); }
+    $('dm-w').hidden = true; $('dl-w').hidden = false;
     if ($('dl-w').firstChild) return;
     // 11/20 위로드 로그인 휴대폰번호로 배송매니저 자동 로그인 (배송매니저가 #cellphone= 을 받아 바로 로그인)
     const f = document.createElement('iframe'); f.src = dlUrl(); f.allow = 'geolocation; camera'; f.title = '배송매니저';
@@ -1167,6 +1304,13 @@
     window.__wrNav = url;   // 점검용 (마지막으로 연 내비 주소)
     location.href = url;
     setTimeout(() => { if (!document.hidden) { NV.hint = code; csUi(); } }, 2000);
+  }
+  function nvRaw(name, lat, lng, addr) {   // 좌표/주소로 바로 내비 (스낵 배송 화면용)
+    const k = nvApp(); if (!k) return nvPick(() => nvRaw(name, lat, lng, addr));
+    const NVsave = NV.r; NV.r = { ll: { _: [lat, lng, addr] } };
+    const u = nvUrls(k, { c: '_', nm: name, addr }); NV.r = NVsave;
+    const url = /Android/i.test(navigator.userAgent) && !APP ? `intent://${u.path}#Intent;scheme=${NAVS[k][1]};package=${NAVS[k][2]};S.browser_fallback_url=${encodeURIComponent(u.web)};end` : u.scheme;
+    window.__wrNav = url; location.href = url;
   }
   function nvNext() {
     const r = nvRun(); if (!r.on) return;
