@@ -217,7 +217,7 @@
   <div class="tabs"><button data-tab="cs" hidden>실적표</button><button data-tab="cw" hidden>업무</button><button data-tab="sh">실적표</button><button data-tab="loc">출근</button><button data-tab="lc">상차</button><button data-tab="dl">배송</button><button class="on" data-tab="rec">퇴근</button></div>
   <div id="t-cs" hidden>
     <div class="card">
-      <div class="sh-top"><div class="name"><span id="cs-nm">—</span><span class="tmchip">편의점</span><small id="cs-sub">일일실적표 · 거래처 정보 · 상온/저온/합계 매출</small></div><button class="sh-lo" id="cs-lo">팀 바꾸기</button></div>
+      <div class="sh-top"><div class="name"><span id="cs-nm">—</span><span class="tmchip">편의점</span><small id="cs-sub">일일실적표 · 거래처 정보 · 상온/저온/합계 매출</small></div></div>
       <div class="lc-bar"><button id="cs-prev">◀</button><span class="d" id="cs-d">—</span><button id="cs-next">▶</button><button id="cs-re">↻</button></div>
       <div class="lc-prog" id="cs-prog"></div>
     </div>
@@ -244,7 +244,7 @@
   </div>
   <div id="t-sh" hidden>
     <div class="card">
-      <div class="sh-top"><div class="name">일일실적표<small id="sh-sub">거래처 · 주소 · 상온/저온/합계 매출</small></div><button class="sh-lo" id="sh-lo">로그아웃</button></div>
+      <div class="sh-top"><div class="name">일일실적표<small id="sh-sub">거래처 · 주소 · 상온/저온/합계 매출</small></div></div>
       <div class="lc-bar"><button id="sh-prev">◀</button><span class="d" id="sh-d">—</span><button id="sh-next">▶</button><button id="sh-re">↻</button></div>
       <div class="lc-prog" id="sh-prog"></div>
     </div>
@@ -518,7 +518,6 @@
   window.addEventListener('pagehide', () => { if (on && buf.length) { try { fetch(SERVER + '/rest/v1/rpc/push_locations', { method: 'POST', keepalive: true, headers: { 'Content-Type': 'application/json', apikey: KEY }, body: JSON.stringify({ p_name: cfg.n, p_token: cfg.tok, p_rows: rows(buf.slice(-200)) }) }); } catch (e) { /* noop */ } } });
   const _lo = $('logout'); if (APP) _lo.addEventListener('click', () => { try { window.WeRoadApp.stop(); } catch (e) { /* noop */ } });
   $('logout').onclick = (e) => { e.preventDefault(); if (on) stop(); localStorage.setItem(LS, JSON.stringify({ n: cfg.n || '' })); localStorage.removeItem(LS + '-on'); location.reload(); };
-  $('sh-lo').onclick = () => $('logout').click();
   ui();
   // 지난번에 켜 둔 상태로 닫혔으면 다시 열 때 자동 시작
   if (!$('main').hidden && !isMaster() && localStorage.getItem(LS + '-on') === '1') start();
@@ -539,7 +538,7 @@
 
 
   // 11/20 앱 안 업데이트: 서버의 새 index.html 빌드 번호가 다르면 [업데이트] 버튼 → 새로 불러오기 (홈 화면에 다시 추가할 필요 없음)
-  const BUILD = '20261120-5';
+  const BUILD = '20261121-1';
   async function updCheck() {
     try {
       const r = await fetch('app.html?chk=' + Date.now(), { cache: 'no-store' }); if (!r.ok) return;
@@ -1071,7 +1070,7 @@
   $('cs-next').onclick = () => { CS.d = addDay(CS.d, 1); csLoad(true); };
   $('cs-re').onclick = () => csLoad(true);
   const csOut = (e) => { if (e) e.preventDefault(); if (APP) { try { window.WeRoadApp.stop(); } catch (x) { /* noop */ } } if (on) stop(); localStorage.setItem(LS, JSON.stringify({ n: cfg.n, v: cfg.v || '' })); localStorage.removeItem(LS + '-on'); localStorage.removeItem(LS + '-csme'); try { sessionStorage.removeItem('wr-tab'); } catch (x) { /* noop */ } location.reload(); };
-  $('cs-lo').onclick = csOut; $('cw-lo').onclick = csOut;
+  if ($('cw-lo')) $('cw-lo').onclick = csOut; // 11/21 실적표의 로그아웃·팀 바꾸기 버튼은 오른쪽 위 로그아웃과 중복이라 뺌
   // 11/19 모든 화면 오른쪽 위 로그아웃 (스낵↔편의점 운행 바꿀 때 다시 로그인)
   $('top-lo').hidden = $('main').hidden;
   $('top-lo').onclick = (e) => { if (confirm('정말 로그아웃을 하시겠어요?')) csOut(e); };
