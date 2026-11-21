@@ -651,7 +651,7 @@
 
 
   // 11/20 앱 안 업데이트: 서버의 새 index.html 빌드 번호가 다르면 [업데이트] 버튼 → 새로 불러오기 (홈 화면에 다시 추가할 필요 없음)
-  const BUILD = '20261121-21';
+  const BUILD = '20261121-22';
   async function updCheck() {
     try {
       const r = await fetch('app.html?chk=' + Date.now(), { cache: 'no-store' }); if (!r.ok) return;
@@ -774,7 +774,8 @@
   try { const v = new URLSearchParams(location.search).get('dm'); if (v === '1') localStorage.setItem('wr-dm', '1'); else if (v === '0') localStorage.setItem('wr-dm', '0'); } catch (e) { /* noop */ }
   // 11/21 시범 기사: 홈 화면 앱은 주소(?dm=1)를 바꿀 수 없어서 이름으로도 켬
   const DM_PILOT = ['김태회', '김선태'];
-  const dmOn = () => { try { if (localStorage.getItem('wr-dm') === '0') return false; return localStorage.getItem('wr-dm') === '1' || DM_PILOT.includes(String(cfg.n || '').replace(/\s/g, '')); } catch (e) { return false; } };
+  // 11/21 전체 기사 적용 (상진님) — ?dm=0 으로 연 폰만 기존 화면(아이프레임). DM_PILOT 은 [원본 복사] 버튼용으로만 남김
+  const dmOn = () => { try { return localStorage.getItem('wr-dm') !== '0'; } catch (e) { return true; } };
   const DM = { iframe: false, busy: '', err: '', sch: null, det: {}, ref: {}, open: '', cand: null, d: '' };
   // 11/21 날짜 이동: 딜리버리웹 화면은 어제·오늘·내일만 보여주지만 서버는 schedules?deliveryDate=YYYY-MM-DD 를 받음 → 주말에 월요일 미리보기
   const dmToday = () => { const t = new Date(Date.now() + 9 * 3600e3); return t.toISOString().slice(0, 10); };
