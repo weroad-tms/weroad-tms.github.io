@@ -634,7 +634,7 @@
 
 
   // 11/20 앱 안 업데이트: 서버의 새 index.html 빌드 번호가 다르면 [업데이트] 버튼 → 새로 불러오기 (홈 화면에 다시 추가할 필요 없음)
-  const BUILD = '20261121-16';
+  const BUILD = '20261121-17';
   async function updCheck() {
     try {
       const r = await fetch('app.html?chk=' + Date.now(), { cache: 'no-store' }); if (!r.ok) return;
@@ -851,7 +851,7 @@
               ${isFinite(lat) && lat ? `<button type="button" class="y" data-dm="nav" data-id="${esc(id)}">🧭 내비</button>` : ''}
               ${d.orderUrl ? `<a href="${esc(d.orderUrl)}" target="_blank" rel="noopener">거래명세서 ↗</a>` : ''}
               <button type="button" data-dm="old">작업은 기존 배송화면</button>
-              ${DM_RAW ? `<button type="button" data-dm="raw" data-id="${esc(id)}">원본 복사 (점검용)</button>` : ''}
+              ${dmRaw() ? `<button type="button" data-dm="raw" data-id="${esc(id)}">원본 복사 (점검용)</button>` : ''}
             </div></div>`;
         }
       }
@@ -860,8 +860,9 @@
         ${tags ? `<div class="dm-tg">${tags}</div>` : ''}${det}</div>`;
     }).join('');
   }
-  const DM_RAW = (() => { try { return new URLSearchParams(location.search).get('dm') === '1' || localStorage.getItem('wr-dm-raw') === '1'; } catch (e) { return false; } })();
-  try { if (DM_RAW) localStorage.setItem('wr-dm-raw', '1'); } catch (e) { /* noop */ }
+  // 점검용 [원본 복사]: ?dm=1 로 연 폰 + 시범 기사 (홈 화면 앱은 주소를 못 바꿔서)
+  try { if (new URLSearchParams(location.search).get('dm') === '1') localStorage.setItem('wr-dm-raw', '1'); } catch (e) { /* noop */ }
+  const dmRaw = () => { try { return localStorage.getItem('wr-dm-raw') === '1' || DM_PILOT.includes(String(cfg.n || '').replace(/\s/g, '')); } catch (e) { return false; } };
   $('dm-w').onclick = async (ev) => {
     const b = ev.target.closest('[data-dm]'); if (!b) return;
     const a = b.dataset.dm, id = b.dataset.id;
@@ -873,7 +874,7 @@
     if (a === 'cand') { try { await dmLogin(id); DM.cand = null; dmOpen(true); } catch (e) { alert(e.message); } return; }
     if (a === 'nav') { const d = DM.det[id] || {}, co = d.coordinate || {}, br = dmBr(d); return nvRaw(br.companyName || '거래처', +co.latitude, +co.longitude, br.address || ''); }
     if (a === 'raw') {   // 점검용: 데이터 모양 확인 (전화번호는 가림)
-      const mask = (k, v) => (typeof v === 'string' && /phone|tel|cellphone/i.test(k) ? v.replace(/\d(?=\d{2})/g, '*') : v);
+      const mask = (k, v) => (typeof v !== 'string' ? v : /phone|tel|cellphone/i.test(k) ? v.replace(/\d(?=\d{2})/g, '*') : v.replace(/0\d{1,2}[-. ]?\d{3,4}[-. ]?\d{4}/g, '0**-****-****'));   // 메모 안 전화번호도 가림
       b.textContent = '모으는 중…';
       const dt = DM.det[id] || {}, extra = {};   // 2단계 준비: 단계·검수·재고조사 화면이 쓰는 자료도 같이 (조회만)
       try { extra.tasks = await dmGet('schedules/details/' + id + '/tasks'); } catch (e) { extra.tasks = { err: e.message }; }
