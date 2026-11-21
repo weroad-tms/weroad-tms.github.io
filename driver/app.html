@@ -634,7 +634,7 @@
 
 
   // 11/20 앱 안 업데이트: 서버의 새 index.html 빌드 번호가 다르면 [업데이트] 버튼 → 새로 불러오기 (홈 화면에 다시 추가할 필요 없음)
-  const BUILD = '20261121-11';
+  const BUILD = '20261121-12';
   async function updCheck() {
     try {
       const r = await fetch('app.html?chk=' + Date.now(), { cache: 'no-store' }); if (!r.ok) return;
@@ -756,7 +756,12 @@
   //  · 동작 정리: docs/delivery-manager-api.md
   try { const v = new URLSearchParams(location.search).get('dm'); if (v === '1') localStorage.setItem('wr-dm', '1'); else if (v === '0') localStorage.removeItem('wr-dm'); } catch (e) { /* noop */ }
   const DM_ON = (() => { try { return localStorage.getItem('wr-dm') === '1'; } catch (e) { return false; } })();
-  const DM = { iframe: false, busy: '', err: '', sch: null, det: {}, ref: {}, open: '', cand: null };
+  const DM = { iframe: false, busy: '', err: '', sch: null, det: {}, ref: {}, open: '', cand: null, d: '' };
+  // 11/21 날짜 이동: 딜리버리웹 화면은 어제·오늘·내일만 보여주지만 서버는 schedules?deliveryDate=YYYY-MM-DD 를 받음 → 주말에 월요일 미리보기
+  const dmToday = () => { const t = new Date(Date.now() + 9 * 3600e3); return t.toISOString().slice(0, 10); };
+  const dmAdd = (d, n) => { const t = new Date(d + 'T00:00:00Z'); t.setUTCDate(t.getUTCDate() + n); return t.toISOString().slice(0, 10); };
+  const dmLbl = (d) => { const t = new Date(d + 'T00:00:00Z'), w = '일월화수목금토'[t.getUTCDay()]; return `${t.getUTCMonth() + 1}/${t.getUTCDate()}(${w})` + (d === dmToday() ? ' 오늘' : ''); };
+  const dmNextBiz = (d) => { let x = dmAdd(d, 1); while ([0, 6].includes(new Date(x + 'T00:00:00Z').getUTCDay())) x = dmAdd(x, 1); return x; };
   const DMF = 'https://ridvdsluzfjxonqlavgm.supabase.co/functions/v1/dmproxy';
   const dmTokGet = () => { try { const t = JSON.parse(localStorage.getItem('wr-dmtok') || 'null'); return t && t.ph === cfg.ph && t.n === cfg.n ? t : null; } catch (e) { return null; } };
   const dmTokSet = (t) => { try { if (t) localStorage.setItem('wr-dmtok', JSON.stringify(t)); else localStorage.removeItem('wr-dmtok'); } catch (e) { /* noop */ } };
@@ -798,7 +803,8 @@
     if (!cfg.ph) { $('dm-w').innerHTML = ''; return; }   // 위의 휴대폰번호 입력 카드가 먼저
     if (DM.sch && !force && Date.now() - (DM.at || 0) < 60e3) return dmUi();
     DM.busy = '배송 목록 읽는 중…'; DM.err = ''; dmUi();
-    try { const d = await dmGet('schedules'); if (d) { DM.sch = d; DM.at = Date.now(); } }
+    if (!DM.d) DM.d = dmToday();
+    try { const d = await dmGet('schedules', DM.d === dmToday() ? undefined : { deliveryDate: DM.d }); if (d) { DM.sch = d; DM.at = Date.now(); DM.det = {}; DM.open = ''; } }
     catch (e) { DM.err = e.message; }
     DM.busy = ''; dmUi();
   }
@@ -812,13 +818,15 @@
   }
   function dmUi() {
     const w = $('dm-w'); if (!w || w.hidden) return;
-    const top = (txt) => `<div class="dm-top"><b>${txt}</b><button type="button" data-dm="re">새로고침</button><button type="button" data-dm="old">기존 배송화면</button></div>`;
+    const dd = DM.d || dmToday(), wk = [0, 6].includes(new Date(dd + 'T00:00:00Z').getUTCDay());
+    const top = (txt) => `<div class="dm-top"><button type="button" data-dm="dp" aria-label="전날">◀</button><b style="text-align:center">${dmLbl(dd)}</b><button type="button" data-dm="dn" aria-label="다음날">▶</button></div>
+      <div class="dm-top"><b>${txt}</b><button type="button" data-dm="re">새로고침</button><button type="button" data-dm="old">기존 배송화면</button></div>`;
     if (DM.cand) { w.innerHTML = top('담당자 선택') + `<div class="card msg">이 번호에 배송 담당자가 여럿이에요. 본인을 골라 주세요.</div>` + DM.cand.map((c) => `<button type="button" class="dm-btn" style="display:block;width:100%;margin-bottom:8px;text-align:left" data-dm="cand" data-id="${esc(c.id || c.deliveryManagerId || '')}">${esc(c.name || c.deliveryManagerName || c.id || '')} ${esc(c.companyName || c.branchName || '')}</button>`).join(''); return; }
     if (DM.err) { w.innerHTML = top('배송') + `<div class="card warn">배송 정보를 못 불러왔어요: ${esc(DM.err)}<br>[기존 배송화면]으로 진행해 주세요.</div>`; return; }
     const list = (DM.sch && Array.isArray(DM.sch.details)) ? DM.sch.details : [];
-    if (!list.length) { w.innerHTML = top('배송') + `<div class="card msg">${DM.busy || '오늘 배송이 없어요.'}</div>`; return; }
+    if (!list.length) { w.innerHTML = top('배송') + `<div class="card msg">${DM.busy || (dmLbl(dd) + ' 배송이 없어요.' + (wk ? ` <button type="button" class="dm-btn" data-dm="nb" style="margin-left:6px">다음 배송일(${dmLbl(dmNextBiz(dd))}) 보기</button>` : ''))}</div>`; return; }
     const done = list.filter((x) => x.doneYN === 'Y').length, cur = list.find((x) => x.doneYN !== 'Y');
-    w.innerHTML = top(`오늘 배송 ${list.length}곳 · 완료 ${done}`) + (DM.busy ? `<div class="card msg">${DM.busy}</div>` : '') + list.map((x, i) => {
+    w.innerHTML = top(`배송 ${list.length}곳 · 완료 ${done}`) + (DM.busy ? `<div class="card msg">${DM.busy}</div>` : '') + list.map((x, i) => {
       const id = dmId(x), b = dmBr(x), [sc, st] = dmState(x), open = DM.open === String(id), d = DM.det[id] || null, db = dmBr(d || x);
       const tags = [x.stockSurveyYN === 'Y' && '<span class="w">재고조사</span>', x.examineYN === 'Y' && '<span class="w">검수</span>', x.coffeeMachineYN === 'Y' && '<span>커피머신</span>', b.entranceType === '보안카드' && '<span>출입증 카드지참</span>', b.unableDeliveryTime != null && b.unableDeliveryTime !== undefined && '<span>시간 엄수</span>', x.meridiem === 'AM' && '<span>오전</span>', x.meridiem === 'PM' && '<span>오후</span>'].filter(Boolean).join('');
       let det = '';
@@ -858,6 +866,7 @@
     if (a === 'open') { if (ev.target.closest('.dm-d')) return; return dmDetail(id); }
     ev.stopPropagation();
     if (a === 're') { DM.det = {}; DM.ref = {}; return dmOpen(true); }
+    if (a === 'dp' || a === 'dn' || a === 'nb') { const d0 = DM.d || dmToday(); DM.d = a === 'nb' ? dmNextBiz(d0) : dmAdd(d0, a === 'dp' ? -1 : 1); DM.sch = null; return dmOpen(true); }
     if (a === 'old') { DM.iframe = true; return dlOpen(); }
     if (a === 'cand') { try { await dmLogin(id); DM.cand = null; dmOpen(true); } catch (e) { alert(e.message); } return; }
     if (a === 'nav') { const d = DM.det[id] || {}, co = d.coordinate || {}, br = dmBr(d); return nvRaw(br.companyName || '거래처', +co.latitude, +co.longitude, br.address || ''); }
