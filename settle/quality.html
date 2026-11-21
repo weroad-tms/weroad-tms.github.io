@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#1B2A4A">
+<link rel="icon" href="../driver/icon.svg" type="image/svg+xml">
+<title>위펀 서비스 품질 공유</title>
+<!-- 11/21 운송사 전용: 위수탁계약상 서비스 품질 확인 자료. 운송료 마감과 같은 아이디로 로그인, 자기 소속 기사 기록만 보임 -->
+<style>
+:root{--bg:#F3F5F9;--card:#fff;--ink:#1A2233;--muted:#667085;--line:#E5EAF2;--line2:#F0F3F8;--brand:#3E6AF2;--ok:#12B76A;--bad:#E5484D;--navy:#1B2A4A}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 -apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",sans-serif}
+body{padding:max(14px,env(safe-area-inset-top)) 16px 40px;max-width:1180px;margin:0 auto}
+.brand{display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+.brand img{width:34px;height:34px;border-radius:9px}.brand b{font-size:17px}.brand small{color:var(--muted)}
+.spacer{flex:1}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:14px}
+h2{margin:0 0 4px;font-size:19px}.sub{color:var(--muted);font-size:13px}
+input,select{font:inherit;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:9px;padding:8px 10px}
+button{font:inherit;cursor:pointer;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:10px;padding:8px 14px;font-weight:600}
+button.pri{background:var(--brand);border-color:var(--brand);color:#fff}button.ghost{border-color:transparent;background:transparent;color:var(--muted)}
+.login{max-width:380px;margin:12vh auto 0}.login label{display:block;margin:10px 0 4px;font-size:13px;color:var(--muted)}.login input{width:100%;padding:11px 12px}.login button{width:100%;margin-top:16px;padding:12px}
+.err{color:var(--bad);font-size:13px;margin-top:8px;min-height:18px}
+.bar{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.kpi{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.kpi div{background:var(--line2);border-radius:12px;padding:12px}.kpi b{display:block;font-size:24px}.kpi span{font-size:12.5px;color:var(--muted)}
+.kpi .g b{color:var(--ok)}.kpi .r b{color:var(--bad)}
+table{width:100%;border-collapse:collapse;font-size:13.5px}th,td{padding:8px 6px;border-bottom:1px solid var(--line2);text-align:right;white-space:nowrap}th:first-child,td:first-child{text-align:left}th{color:var(--muted);font-weight:600;font-size:12.5px}
+.tw{overflow:auto}
+.ev{padding:10px 0;border-bottom:1px solid var(--line2)}.ev:last-child{border:0}.ev .t{display:flex;gap:8px;align-items:center;font-size:13px;color:var(--muted)}.ev .t b{color:var(--ink)}.ev p{margin:4px 0 0;white-space:pre-line}
+.k{font-size:11.5px;font-weight:800;padding:2px 8px;border-radius:8px}.k.good{background:#E7F8EF;color:#067647}.k.bad{background:#FEECEC;color:#B42318}.k.check{background:#EEF2FF;color:#3538CD}
+.foot{font-size:12.5px;color:var(--muted);line-height:1.7}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+const SB_URL = 'https://ridvdsluzfjxonqlavgm.supabase.co', SB_KEY = 'sb_publishable_iP4DgQBqKFE_u7V929BCjw_CO4dxjWS';
+const LS = 'wf-settle-carrier';   // 운송료 마감과 같은 로그인
+let A = null; try { A = JSON.parse(localStorage.getItem(LS) || 'null'); } catch (e) { A = null; }
+const store = () => { try { A ? localStorage.setItem(LS, JSON.stringify(A)) : localStorage.removeItem(LS); } catch (e) { /* noop */ } };
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const pct = (a, b) => b ? Math.round(a * 1000 / b) / 10 + '%' : '—';
+async function rpc(fn, body) {
+  const r = await fetch(`${SB_URL}/rest/v1/rpc/${fn}`, { method: 'POST', headers: { apikey: SB_KEY, 'Content-Type': 'application/json' }, body: JSON.stringify(body || {}) });
+  const t = await r.text(); if (!r.ok) { let m = t; try { m = JSON.parse(t).message || t; } catch (e) { /* noop */ } throw new Error(m); } return t ? JSON.parse(t) : null;
+}
+const kst = (d) => new Date(d.getTime() + 9 * 3600e3).toISOString().slice(0, 10);
+const yest = () => kst(new Date(Date.now() - 864e5));
+let F = yest(), T = yest(), D = null, busy = false;
+function loginView() {
+  return `<div class="login card"><div class="brand"><img src="../driver/icon.svg" alt=""><b>서비스 품질 공유</b><small>운송사 전용</small></div>
+    <p class="sub">운송료 마감과 같은 아이디·비밀번호로 로그인해 주세요.</p>
+    <form id="lf"><label>아이디</label><input name="id" autocomplete="username"><label>비밀번호</label><input name="pw" type="password" autocomplete="current-password">
+    <button class="pri">로그인</button><div class="err" id="le"></div></form></div>`;
+}
+function view() {
+  const s = (D && D.sum) || {}, dr = (D && D.drivers) || [], ev = (D && D.evals) || [];
+  const kn = { good: '칭찬', bad: '개선 요청', check: '의견' };
+  return `<div class="brand"><img src="../driver/icon.svg" alt=""><b>서비스 품질 공유</b><small>${esc(A.carrier || '')}</small><span class="spacer"></span><a href="index.html" style="font-size:13px">운송료 마감</a><button class="ghost" id="lo">로그아웃</button></div>
+  <div class="card"><div class="bar"><b>기간</b><input type="date" id="f" value="${F}"> ~ <input type="date" id="t" value="${T}"><button id="go" class="pri">조회</button>
+    <button data-q="1">어제</button><button data-q="7">최근 7일</button><button data-q="m">이번 달</button></div>
+    <p class="sub" style="margin:8px 0 0">위펀오피스 배송 기록과 고객사 배송평가, 위로드 위치 공유 기록을 모은 자료예요. 배송 기록은 다음 날 반영돼요.</p></div>
+  ${busy ? '<div class="card sub">불러오는 중…</div>' : !D ? '' : `
+  <div class="card"><h2>요약</h2><div class="kpi" style="margin-top:10px">
+    <div><b>${s.drivers || 0}명</b><span>운행 기사 · ${s.days || 0}운행</span></div>
+    <div><b>${pct(s.done, s.stops)}</b><span>배송완료 처리 ${s.done || 0}/${s.stops || 0}곳</span></div>
+    <div><b>${pct(s.photo, s.stops)}</b><span>배송사진 등록</span></div>
+    <div><b>${pct(s.loc, s.days)}</b><span>위치 공유된 운행</span></div>
+    <div><b>${s.bulk || 0}</b><span>완료 처리를 한꺼번에 한 운행</span></div>
+    <div class="g"><b>${s.good || 0}</b><span>고객 칭찬</span></div>
+    <div class="r"><b>${s.bad || 0}</b><span>고객 개선 요청</span></div></div></div>
+  <div class="card"><h2>기사별</h2><div class="tw"><table><thead><tr><th>기사</th><th>운행</th><th>착지</th><th>배송완료</th><th>사진</th><th>위치 공유</th><th>한꺼번에 처리</th><th>칭찬</th><th>개선 요청</th></tr></thead><tbody>
+    ${dr.map((x) => `<tr><td>${esc(x.name)}</td><td>${x.days}</td><td>${x.stops}</td><td>${pct(x.done, x.stops)}</td><td>${pct(x.photo, x.stops)}</td><td>${x.loc}/${x.days}</td><td>${x.bulk || ''}</td><td>${x.good || ''}</td><td>${x.bad || ''}</td></tr>`).join('') || '<tr><td colspan="9" class="sub">기록 없음</td></tr>'}
+  </tbody></table></div></div>
+  <div class="card"><h2>고객사 의견 <span class="sub">${ev.length}건</span></h2>${ev.map((e) => `<div class="ev"><div class="t"><span class="k ${e.kind}">${kn[e.kind] || ''}</span><b>${esc(e.driver)}</b><span>${esc(e.shop)}</span><span class="spacer"></span><span>${esc(e.d)}</span></div><p>${esc(e.memo)}</p></div>`).join('') || '<p class="sub">이 기간 고객사 의견이 없어요.</p>'}</div>`}
+  <p class="foot">※ 이 자료는 위수탁계약에 따른 서비스 품질 확인을 위해 공유드리는 것입니다. 소속 기사님 운영·관리는 귀사 기준에 따라 진행해 주세요.<br>※ 위치 공유는 화물 운송 현황 확인과 고객 도착 안내 목적으로만 쓰입니다.</p>`;
+}
+async function load() {
+  busy = true; render();
+  try { D = await rpc('carrier_quality', { p_token: A.token, p_from: F, p_to: T }); }
+  catch (e) { if (/로그인/.test(e.message)) { A = null; store(); } else alert(e.message); D = null; }
+  busy = false; render();
+}
+function render() {
+  const app = document.getElementById('app');
+  if (!A) {
+    app.innerHTML = loginView();
+    document.getElementById('lf').onsubmit = async (ev) => {
+      ev.preventDefault(); const f = new FormData(ev.target);
+      try { const j = await rpc('st_login', { p_id: f.get('id'), p_pw: f.get('pw') }); A = { token: j.token, name: j.name, carrier: j.carrier_name, cid: j.carrier_id }; store(); load(); }
+      catch (e) { document.getElementById('le').textContent = e.message; }
+    };
+    return;
+  }
+  app.innerHTML = view();
+  document.getElementById('lo').onclick = async () => { try { await rpc('st_logout', { p_token: A.token }); } catch (e) { /* noop */ } A = null; D = null; store(); render(); };
+  document.getElementById('go').onclick = () => { F = document.getElementById('f').value; T = document.getElementById('t').value; load(); };
+  document.querySelectorAll('[data-q]').forEach((b) => { b.onclick = () => { const q = b.dataset.q; T = yest(); F = q === 'm' ? T.slice(0, 8) + '01' : kst(new Date(Date.now() - (+q) * 864e5)); load(); }; });
+}
+render(); if (A) load();
+</script>
+</body>
+</html>
