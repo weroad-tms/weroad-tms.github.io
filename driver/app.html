@@ -112,6 +112,7 @@
   .agree h2{margin:6px 0 10px;font-size:22px}.agree ul{margin:0;padding-left:18px;line-height:1.65;font-size:15.5px}.agree li{margin-bottom:6px}.agree b{color:#fff}
   .agree .note{opacity:.75;font-size:13.5px;line-height:1.6;margin-top:10px}
   .agree button{display:block;width:100%;border:0;border-radius:16px;padding:18px;font:inherit;font-size:19px;font-weight:800;margin-top:12px}
+  .agree .ag-x{position:absolute;right:12px;top:max(12px,env(safe-area-inset-top));width:auto;margin:0;padding:10px 14px;font-size:15px;font-weight:600;background:rgba(255,255,255,.1);color:#EAF0FF;border-radius:12px}
   .agree .yes{background:#3E6AF2;color:#fff}.agree .no{background:rgba(255,255,255,.1);color:#EAF0FF}
   .sh{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:12px 14px;margin-bottom:10px}
   .sh.req{border-color:#3E6AF2;box-shadow:0 0 0 1px #3E6AF2 inset}.sh.done{opacity:.75}
@@ -226,15 +227,19 @@
 </div>
 
 <div id="agree" class="agree" hidden>
+  <button id="ag-x" class="ag-x" hidden aria-label="닫기">닫기</button>
   <div class="brand"><span class="lg"><img src="icon.svg?v=6" width="34" height="34" alt="" style="display:block"></span><b>위로드</b><small>배송기사웹</small></div>
-  <h2>위로드앱 위치정보수집동의</h2>
+  <h2>위치정보 수집·이용 동의</h2>
   <div class="card"><ul>
-    <li><b>수집정보</b> — 위치, 속도, 정확도, 수집시각</li>
-    <li><b>사용목적</b> — 고객사의 도착시간 안내 및 예측</li>
-    <li><b>수집기간</b> — 운행 시작을 누른 동안만. 운행 종료하면 수집하지 않음</li>
-    <li><b>보관기간</b> — 상세 경로는 30일 뒤 자동 삭제. 이외 정보는 정산 목적으로 기록</li>
-    <li><b>모니터링 권한</b> — 관리자만</li>
-  </ul></div>
+    <li><b>수집정보</b> — 휴대폰 위치(위도·경도), 속도, 정확도, 수집시각</li>
+    <li><b>수집시간</b> — 운행 시작(업무시작)을 누른 때부터 운행 종료까지만. 그 밖의 시간에는 수집하지 않음</li>
+    <li><b>이용목적</b> — 배송 진행 확인과 고객사 도착 안내, 사고·고장 등 긴급상황 대응, 소속 운송사와의 서비스 품질 정보 공유</li>
+    <li><b>제공받는 곳</b> — 소속 운송사 (운행 기록 요약에 한함)</li>
+    <li><b>보관기간</b> — 상세 경로는 30일 뒤 자동 삭제</li>
+    <li><b>쓰지 않는 용도</b> — 근태 평가, 제재, 운송료 감액의 근거</li>
+  </ul>
+  <div class="note">동의하지 않거나 언제든 철회할 수 있고, 그로 인한 불이익은 없습니다. 다만 위치 기반 기능(도착 안내 등)은 쓸 수 없습니다. 철회는 홈 화면 맨 아래 <b>위치정보 동의 관리</b>에서 할 수 있습니다.<br>운영: (주)위펀풀필먼트 · <a href="loc-terms.html" target="_blank" style="color:#9DB4FF">위치기반서비스 이용약관 전문</a></div></div>
+  <div class="note" id="ag-st" hidden></div>
   <button class="yes" id="ag-ok">동의하고 시작</button><button class="no" id="ag-no">동의하지 않음</button>
 </div>
 
@@ -243,7 +248,7 @@
 <button class="top-lo" id="top-lo" hidden>로그아웃</button>
 <div id="main" hidden>
   <div id="pd" hidden></div>
-  <div id="home"><div class="hm-nm" id="hm-nm">—</div><div class="hm-sub" id="hm-sub"></div><div class="hm-st" id="hm-st"><i></i><span id="hm-stt">—</span></div><div class="hm-car" id="hm-car"></div><button class="hm-chg" id="hm-chg">내 차 바꾸기</button><div class="hm-rows" id="hm-rows"></div></div>
+  <div id="home"><div class="hm-nm" id="hm-nm">—</div><div class="hm-sub" id="hm-sub"></div><div class="hm-st" id="hm-st"><i></i><span id="hm-stt">—</span></div><div class="hm-car" id="hm-car"></div><button class="hm-chg" id="hm-chg">내 차 바꾸기</button><div class="hm-rows" id="hm-rows"></div><button class="hm-chg" id="hm-loc">위치정보 동의 관리</button></div>
   <div id="hbk"><button id="hbk-b" aria-label="홈으로"><svg width="26" height="26" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" stroke="#EDEFF1" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></button><b id="hbk-t"></b></div>
   <div class="tabs"><button data-tab="cs" hidden>실적표</button><button data-tab="cw" hidden>업무</button><button data-tab="sh">실적표</button><button data-tab="loc">운행 시작</button><button data-tab="lc">상차</button><button data-tab="dl">배송</button><button data-tab="mm" hidden>내 운행 기록</button><button class="on" data-tab="rec">퇴근</button></div>
   <div id="t-cs" hidden>
@@ -433,20 +438,37 @@
   if (!loggedIn()) { $('setup').hidden = false; }
   else { $('main').hidden = false; $('nm').firstChild.textContent = cfg.n; $('nm2').firstChild.textContent = cfg.n; if (isMaster()) { document.querySelector('.tabs button[data-tab=loc]').hidden = true; $('nm2').lastElementChild.textContent = '관리자 계정 — 어떤 차량이든 대신 기록할 수 있어요'; } }
   // 11/6 위치 수집 동의 (한 번) — 동의 기록은 위치 서버에도 남김
-  const AGREE_VER = '2026-11-07';   // 11/7 문구 변경 → 다시 동의 받음
+  const AGREE_VER = '2026-11-21';   // 11/21 운송사 제공·쓰지 않는 용도·철회 방법 추가 → 다시 동의 받음
   if (loggedIn() && !isMaster() && cfg.agree !== AGREE_VER && !cfg.noAgree) $('agree').hidden = false;
   $('ag-ok').onclick = async () => {
     $('ag-ok').disabled = true;
     try { await rpc('driver_consent', { p_name: cfg.n, p_token: cfg.tok, p_ver: AGREE_VER, p_ok: true }); } catch (e) { /* 기록 실패해도 진행 · 다음에 다시 기록 */ }
-    cfg.agree = AGREE_VER; delete cfg.noAgree; localStorage.setItem(LS, JSON.stringify(cfg)); $('agree').hidden = true;
+    cfg.agree = AGREE_VER; delete cfg.noAgree; localStorage.setItem(LS, JSON.stringify(cfg)); $('agree').hidden = true; $('ag-ok').disabled = false;
+    if (!isMaster()) { const t = document.querySelector('.tabs button[data-tab=loc]'); if (t) t.hidden = false; }
   };
   $('ag-no').onclick = async () => {
     try { await rpc('driver_consent', { p_name: cfg.n, p_token: cfg.tok, p_ver: AGREE_VER, p_ok: false }); } catch (e) { /* noop */ }
-    cfg.noAgree = true; localStorage.setItem(LS, JSON.stringify(cfg)); $('agree').hidden = true;
+    cfg.noAgree = true; delete cfg.agree; localStorage.setItem(LS, JSON.stringify(cfg)); $('agree').hidden = true;
+    if (APP) { try { window.WeRoadApp.stop(); } catch (e) { /* noop */ } } if (typeof on !== 'undefined' && on) stop();
     const t = document.querySelector('.tabs button[data-tab=loc]'); if (t) t.hidden = true;
     const r = document.querySelector('.tabs button[data-tab=rec]'); if (r) r.click();
   };
   if (cfg.noAgree) { const t = document.querySelector('.tabs button[data-tab=loc]'); if (t) t.hidden = true; }
+  // 11/21 다른 폰에서 동의·철회한 경우도 맞춤 (서버 기록이 기준)
+  if (loggedIn() && !isMaster()) setTimeout(() => rpc('driver_consent_get', { p_name: cfg.n, p_token: cfg.tok }).then((c) => {
+    if (!c) return;
+    if (c.ok && c.ver === AGREE_VER && cfg.agree !== AGREE_VER) { cfg.agree = AGREE_VER; delete cfg.noAgree; localStorage.setItem(LS, JSON.stringify(cfg)); $('agree').hidden = true; }
+    else if (!c.ok && !cfg.noAgree) { cfg.noAgree = true; delete cfg.agree; localStorage.setItem(LS, JSON.stringify(cfg)); const t = document.querySelector('.tabs button[data-tab=loc]'); if (t) t.hidden = true; }
+  }).catch(() => { /* noop */ }), 0);
+  const locAgreed = () => isMaster() || cfg.agree === AGREE_VER;
+  function agOpen() {
+    const st = $('ag-st'); st.hidden = false;
+    st.textContent = cfg.agree === AGREE_VER ? '현재 상태: 동의함' : (cfg.noAgree ? '현재 상태: 동의하지 않음 (위치를 보내지 않습니다)' : '현재 상태: 아직 동의하지 않음');
+    $('ag-no').textContent = cfg.agree === AGREE_VER ? '동의 철회' : '동의하지 않음';
+    $('ag-x').hidden = false; $('agree').hidden = false; $('agree').scrollTop = 0;
+  }
+  $('ag-x').onclick = () => { $('agree').hidden = true; };
+  $('hm-loc').onclick = agOpen;
   $('s-n').value = cfg.n || '';
   const rpc = async (fn, body) => {
     const r = await fetch(SERVER + '/rest/v1/rpc/' + fn, { method: 'POST', headers: { 'Content-Type': 'application/json', apikey: KEY }, body: JSON.stringify(body) });
@@ -548,14 +570,14 @@
     try { localStorage.setItem(LS + '-on', '0'); } catch (e) { /* noop */ }
     log('중지');
   }
-  $('btn').onclick = () => (on ? stop() : start());
+  $('btn').onclick = () => (on ? stop() : (locAgreed() ? start() : agOpen()));
   document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && on) { keepAwake(); flush(true); } });
   window.addEventListener('pagehide', () => { if (on && buf.length) { try { fetch(SERVER + '/rest/v1/rpc/push_locations', { method: 'POST', keepalive: true, headers: { 'Content-Type': 'application/json', apikey: KEY }, body: JSON.stringify({ p_name: cfg.n, p_token: cfg.tok, p_rows: rows(buf.slice(-200)) }) }); } catch (e) { /* noop */ } } });
   const _lo = $('logout'); if (APP) _lo.addEventListener('click', () => { try { window.WeRoadApp.stop(); } catch (e) { /* noop */ } });
   $('logout').onclick = (e) => { e.preventDefault(); if (on) stop(); localStorage.setItem(LS, JSON.stringify({ n: cfg.n || '' })); localStorage.removeItem(LS + '-on'); location.reload(); };
   ui();
   // 지난번에 켜 둔 상태로 닫혔으면 다시 열 때 자동 시작
-  if (!$('main').hidden && !isMaster() && localStorage.getItem(LS + '-on') === '1') start();
+  if (!$('main').hidden && !isMaster() && localStorage.getItem(LS + '-on') === '1' && locAgreed()) start();
 
   // ---- 퇴근 기록 (v5): 계기판 km · 주유비 → 서버 함수 push_trip_log(로그인 토큰 확인) → trip_logs. 위로드 차량관리가 읽음
   const R = { shift: new Date().getHours() < 12 ? '야간' : '주간', hist: [], pend: [], mine: [], all: [] };   // 오전 퇴근 = 야간 근무
@@ -573,7 +595,7 @@
 
 
   // 11/20 앱 안 업데이트: 서버의 새 index.html 빌드 번호가 다르면 [업데이트] 버튼 → 새로 불러오기 (홈 화면에 다시 추가할 필요 없음)
-  const BUILD = '20261121-4';
+  const BUILD = '20261121-5';
   async function updCheck() {
     try {
       const r = await fetch('app.html?chk=' + Date.now(), { cache: 'no-store' }); if (!r.ok) return;
@@ -832,7 +854,7 @@
   async function punch(kind) { try { const r = await rpc('punch', { p_name: cfg.n, p_token: cfg.tok, p_kind: kind }); A.st = { ...(A.st || {}), att: r }; return r; } catch (e) { if (/로그인/.test(e.message)) { alert('다시 로그인해 주세요'); cfg = { n: cfg.n, v: cfg.v }; localStorage.setItem(LS, JSON.stringify(cfg)); location.reload(); } throw e; } }
   $('a-in').onclick = async () => {
     const ok = $('a-ok'), w = $('a-warn'); ok.hidden = true; w.hidden = true; $('a-in').disabled = true;
-    if (APP) { try { if (window.WeRoadApp.setAuth && cfg.tok) window.WeRoadApp.setAuth(cfg.n, cfg.tok); else window.WeRoadApp.setDriver(cfg.n); window.WeRoadApp.start(); } catch (e) { /* noop */ } }
+    if (APP && locAgreed()) { try { if (window.WeRoadApp.setAuth && cfg.tok) window.WeRoadApp.setAuth(cfg.n, cfg.tok); else window.WeRoadApp.setDriver(cfg.n); window.WeRoadApp.start(); } catch (e) { /* noop */ } }
     try { const r = await punch('in'); await aLoad(); if (r && r.in_at) A.st = { ...(A.st || {}), att: r }; ok.hidden = false; ok.innerHTML = `<b>운행 시작 ${hm((A.st.att || {}).in_at)}</b> — 안전 운행하세요!` + ((A.st.last_age_min != null && A.st.last_age_min <= 10) ? '' : '<br>위치 앱이 아직 안 보내고 있어요. 아래 안내대로 켜 주세요.'); }
     catch (e) { w.hidden = false; w.textContent = '운행 시작 실패: ' + e.message; }
     $('a-in').disabled = false; aUi();
@@ -1119,8 +1141,8 @@
   $('cw-start').onclick = async () => {
     if (!CS.j) await csLoad(true); if (!CS.j) return;
     $('cw-start').disabled = true;
-    if (APP) { try { if (window.WeRoadApp.setAuth && cfg.tok) window.WeRoadApp.setAuth(cfg.n, cfg.tok); else window.WeRoadApp.setDriver(cfg.n); window.WeRoadApp.start(); } catch (e) { /* noop */ } }
-    else if (!on) start();
+    if (APP && locAgreed()) { try { if (window.WeRoadApp.setAuth && cfg.tok) window.WeRoadApp.setAuth(cfg.n, cfg.tok); else window.WeRoadApp.setDriver(cfg.n); window.WeRoadApp.start(); } catch (e) { /* noop */ } }
+    else if (!APP && !on && locAgreed()) start();
     try { const r = await csWork('start'); $('cw-ok').hidden = false; $('cw-ok').innerHTML = `<b>업무시작 ${csHm(r.start_at)}</b> — 점포마다 배송을 마치면 아래에서 사진을 올려 주세요.`; } catch (e) { /* 위에 표시 */ }
     $('cw-start').disabled = false; csUi();
   };
