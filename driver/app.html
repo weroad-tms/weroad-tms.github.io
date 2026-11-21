@@ -651,7 +651,7 @@
 
 
   // 11/20 앱 안 업데이트: 서버의 새 index.html 빌드 번호가 다르면 [업데이트] 버튼 → 새로 불러오기 (홈 화면에 다시 추가할 필요 없음)
-  const BUILD = '20261121-22';
+  const BUILD = '20261121-23';
   async function updCheck() {
     try {
       const r = await fetch('app.html?chk=' + Date.now(), { cache: 'no-store' }); if (!r.ok) return;
@@ -826,7 +826,12 @@
     if (DM.sch && !force && Date.now() - (DM.at || 0) < 60e3) return dmUi();
     DM.busy = '배송 목록 읽는 중…'; DM.err = ''; dmUi();
     if (!DM.d) DM.d = dmToday();
-    try { const d = await dmGet('schedules', DM.d === dmToday() ? undefined : { deliveryDate: DM.d }); if (d) { DM.sch = d; DM.at = Date.now(); DM.det = {}; DM.open = ''; } }
+    try { let d = await dmGet('schedules', DM.d === dmToday() ? undefined : { deliveryDate: DM.d });
+      if (d && !DM.auto && DM.d === dmToday()) {   // 11/21 오늘 일정이 없거나 다 끝났으면 다음 배송일 일정을 먼저 보여줌 (야간 기사 전날 출발)
+        DM.auto = true; const ls = Array.isArray(d.details) ? d.details : [];
+        if (!ls.length || ls.every((x) => x.doneYN === 'Y')) { const nx = dmNextBiz(DM.d), d2 = await dmGet('schedules', { deliveryDate: nx }); if (d2 && Array.isArray(d2.details) && d2.details.length) { DM.d = nx; d = d2; } }
+      }
+      if (d) { DM.sch = d; DM.at = Date.now(); DM.det = {}; DM.open = ''; } }
     catch (e) { DM.err = e.message; }
     DM.busy = ''; dmUi();
   }
@@ -857,6 +862,8 @@
   const DM_MAXIMG = 11;
   const dmDraft = (k, v) => { try { if (v === undefined) return JSON.parse(localStorage.getItem('wr-dm-' + k) || 'null'); if (v === null) localStorage.removeItem('wr-dm-' + k); else localStorage.setItem('wr-dm-' + k, JSON.stringify(v)); } catch (e) { /* noop */ } return null; };
   const dmIsToday = () => (DM.d || dmToday()) === dmToday();
+  // 11/21 야간 기사는 전날 오후에 다음 날(월요일이면 일요일 오후) 일정을 출발 → 버튼은 '어제 ~ 다음 배송일' 일정에 보임 (오늘만 X)
+  const dmActDay = () => { const d = DM.d || dmToday(), t = dmToday(); return d >= dmAdd(t, -1) && d <= dmNextBiz(t); };
   const dmItem = (id) => ((DM.sch && DM.sch.details) || []).find((x) => String(dmId(x)) === String(id));
   async function dmReload() {   // 목록만 다시 (열어 둔 카드는 그대로)
     try { const d = await dmGet('schedules', dmIsToday() ? undefined : { deliveryDate: DM.d }); if (d) { DM.sch = d; DM.at = Date.now(); } } catch (e) { DM.err = e.message; }
@@ -1031,7 +1038,7 @@
     const list = (DM.sch && Array.isArray(DM.sch.details)) ? DM.sch.details.slice().sort((a, b) => (+a.sequence || 999) - (+b.sequence || 999)) : [];
     if (!list.length) { w.innerHTML = top('배송') + `<div class="card msg">${DM.busy || (dmLbl(dd) + ' 배송이 없어요.' + (wk ? ` <button type="button" class="dm-btn" data-dm="nb" style="margin-left:6px">다음 배송일(${dmLbl(dmNextBiz(dd))}) 보기</button>` : ''))}</div>`; return; }
     const done = list.filter((x) => x.doneYN === 'Y').length, cur = list.find((x) => x.doneYN !== 'Y');
-    const today = dmIsToday(), uni = false;   // 11/21 출근 복장 사진은 생략 (상진님) — 다시 쓰려면 DM.sch.uniformYN === 'N' 로
+    const today = dmActDay(), uni = false;   // 11/21 출근 복장 사진은 생략 (상진님) — 다시 쓰려면 DM.sch.uniformYN === 'N' 로
     w.innerHTML = top(`배송 ${list.length}곳 · 완료 ${done}`) + (DM.busy ? `<div class="card msg">${DM.busy}</div>` : '')
       + (uni ? `<div class="card warn"><b>오늘의 출근 복장 사진</b>을 먼저 등록해 주세요. (등록해야 출발할 수 있어요)<br><label class="dm-btn y" style="display:inline-block;margin-top:8px" data-uni="1">📷 출근 복장 촬영<input type="file" accept="image/*" capture hidden></label></div>` : '')
       + list.map((x, i) => {
