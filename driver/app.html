@@ -634,7 +634,7 @@
 
 
   // 11/20 앱 안 업데이트: 서버의 새 index.html 빌드 번호가 다르면 [업데이트] 버튼 → 새로 불러오기 (홈 화면에 다시 추가할 필요 없음)
-  const BUILD = '20261121-10';
+  const BUILD = '20261121-11';
   async function updCheck() {
     try {
       const r = await fetch('app.html?chk=' + Date.now(), { cache: 'no-store' }); if (!r.ok) return;
@@ -768,8 +768,9 @@
   }
   async function dmLogin(mid) {
     const j = await dmPost({ op: 'login', cellphone: cfg.ph, deliveryManagerId: mid || undefined });
-    const d = j.data || {};
-    if (d.type === 'CANDIDATES' || Array.isArray(d.candidates)) { DM.cand = d.candidates || []; return null; }
+    const r0 = j.data || {};
+    if (r0.type === 'CANDIDATES' || Array.isArray(r0.candidates)) { DM.cand = r0.candidates || []; return null; }
+    const d = r0.token && r0.token.accessToken ? r0.token : r0;   // 응답: {type:'ISSUED', token:{accessToken, grantType, refreshToken}}
     if (!j.ok || !d.accessToken) throw new Error('배송 로그인이 안 됐어요 (응답 ' + (j.status || '-') + (d && (d.message || d.error || d.code) ? ' · ' + (d.message || d.error || d.code) : (typeof d === 'string' && d ? ' · ' + d.slice(0, 80) : '')) + ')');
     const t = { n: cfg.n, ph: cfg.ph, gt: d.grantType || 'Bearer', at: d.accessToken, rt: d.refreshToken || '', mid: mid || '' };
     dmTokSet(t); DM.cand = null; return t;
