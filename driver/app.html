@@ -634,7 +634,7 @@
 
 
   // 11/20 앱 안 업데이트: 서버의 새 index.html 빌드 번호가 다르면 [업데이트] 버튼 → 새로 불러오기 (홈 화면에 다시 추가할 필요 없음)
-  const BUILD = '20261121-13';
+  const BUILD = '20261121-14';
   async function updCheck() {
     try {
       const r = await fetch('app.html?chk=' + Date.now(), { cache: 'no-store' }); if (!r.ok) return;
@@ -754,8 +754,10 @@
   //  · 1단계: 조회만 (오늘 목록·상태, 연락 가능 고객, 주차/출입, 거래명세서, 배송 참고사항). 출발·작업·사진·검수·재고조사는 [기존 배송화면]
   //  · 테스트 주소 ?dm=1 로 한 번 열면 그 폰에 기억, ?dm=0 이면 끔 · 서버가 바뀌어 안 되면 자동으로 기존 화면 버튼 안내
   //  · 동작 정리: docs/delivery-manager-api.md
-  try { const v = new URLSearchParams(location.search).get('dm'); if (v === '1') localStorage.setItem('wr-dm', '1'); else if (v === '0') localStorage.removeItem('wr-dm'); } catch (e) { /* noop */ }
-  const DM_ON = (() => { try { return localStorage.getItem('wr-dm') === '1'; } catch (e) { return false; } })();
+  try { const v = new URLSearchParams(location.search).get('dm'); if (v === '1') localStorage.setItem('wr-dm', '1'); else if (v === '0') localStorage.setItem('wr-dm', '0'); } catch (e) { /* noop */ }
+  // 11/21 시범 기사: 홈 화면 앱은 주소(?dm=1)를 바꿀 수 없어서 이름으로도 켬
+  const DM_PILOT = ['김태회', '김선태'];
+  const dmOn = () => { try { if (localStorage.getItem('wr-dm') === '0') return false; return localStorage.getItem('wr-dm') === '1' || DM_PILOT.includes(String(cfg.n || '').replace(/\s/g, '')); } catch (e) { return false; } };
   const DM = { iframe: false, busy: '', err: '', sch: null, det: {}, ref: {}, open: '', cand: null, d: '' };
   // 11/21 날짜 이동: 딜리버리웹 화면은 어제·오늘·내일만 보여주지만 서버는 schedules?deliveryDate=YYYY-MM-DD 를 받음 → 주말에 월요일 미리보기
   const dmToday = () => { const t = new Date(Date.now() + 9 * 3600e3); return t.toISOString().slice(0, 10); };
@@ -879,7 +881,7 @@
   };
   function dlOpen() {
     dlPhUi();
-    if (DM_ON && !DM.iframe && !isMaster()) { $('dl-w').hidden = true; $('dm-w').hidden = false; $('dl-app').hidden = true; return dmOpen(); }
+    if (dmOn() && !DM.iframe && !isMaster()) { $('dl-w').hidden = true; $('dm-w').hidden = false; $('dl-app').hidden = true; return dmOpen(); }
     $('dm-w').hidden = true; $('dl-w').hidden = false;
     if ($('dl-w').firstChild) return;
     // 11/20 위로드 로그인 휴대폰번호로 배송매니저 자동 로그인 (배송매니저가 #cellphone= 을 받아 바로 로그인)
