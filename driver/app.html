@@ -634,7 +634,7 @@
 
 
   // 11/20 앱 안 업데이트: 서버의 새 index.html 빌드 번호가 다르면 [업데이트] 버튼 → 새로 불러오기 (홈 화면에 다시 추가할 필요 없음)
-  const BUILD = '20261121-17';
+  const BUILD = '20261121-19';
   async function updCheck() {
     try {
       const r = await fetch('app.html?chk=' + Date.now(), { cache: 'no-store' }); if (!r.ok) return;
@@ -856,7 +856,7 @@
         }
       }
       return `<div class="dm-it${x.doneYN === 'Y' ? ' done' : ''}${cur && dmId(cur) === id ? ' cur' : ''}" data-dm="open" data-id="${esc(id)}">
-        <div class="dm-h"><span class="n">${i + 1}</span><div class="t"><b>${esc(b.companyName || x.companyName || '거래처')}</b><span>${esc(b.branchName || '')}${x.deliveryCycle ? ' · ' + esc(x.deliveryCycle) : ''}</span></div>${st ? `<span class="dm-st ${sc}">${esc(st)}</span>` : ''}</div>
+        <div class="dm-h"><span class="n">${i + 1}</span><div class="t"><b>${esc(b.branchName || b.companyName || x.companyName || '거래처')}</b><span>${esc(b.branchName && b.companyName ? b.companyName : '')}${x.deliveryCycle ? (b.branchName && b.companyName ? ' · ' : '') + esc(x.deliveryCycle) : ''}</span></div>${st ? `<span class="dm-st ${sc}">${esc(st)}</span>` : ''}</div>
         ${tags ? `<div class="dm-tg">${tags}</div>` : ''}${det}</div>`;
     }).join('');
   }
@@ -872,9 +872,9 @@
     if (a === 'dp' || a === 'dn' || a === 'nb') { const d0 = DM.d || dmToday(); DM.d = a === 'nb' ? dmNextBiz(d0) : dmAdd(d0, a === 'dp' ? -1 : 1); DM.sch = null; return dmOpen(true); }
     if (a === 'old') { DM.iframe = true; return dlOpen(); }
     if (a === 'cand') { try { await dmLogin(id); DM.cand = null; dmOpen(true); } catch (e) { alert(e.message); } return; }
-    if (a === 'nav') { const d = DM.det[id] || {}, co = d.coordinate || {}, br = dmBr(d); return nvRaw(br.companyName || '거래처', +co.latitude, +co.longitude, br.address || ''); }
+    if (a === 'nav') { const d = DM.det[id] || {}, co = d.coordinate || {}, br = dmBr(d); return nvRaw(br.branchName || br.companyName || '거래처', +co.latitude, +co.longitude, br.address || ''); }
     if (a === 'raw') {   // 점검용: 데이터 모양 확인 (전화번호는 가림)
-      const mask = (k, v) => (typeof v !== 'string' ? v : /phone|tel|cellphone/i.test(k) ? v.replace(/\d(?=\d{2})/g, '*') : v.replace(/0\d{1,2}[-. ]?\d{3,4}[-. ]?\d{4}/g, '0**-****-****'));   // 메모 안 전화번호도 가림
+      const mask = (k, v) => (typeof v !== 'string' ? v : /phone|tel|cellphone/i.test(k) ? v.replace(/\d(?=\d{2})/g, '*') : v.replace(/(^|[^\d.])0(1[016789]|2|[3-6]\d|70)[-. ]?\d{3,4}[-. ]?\d{4}(?!\d)/g, '$10**-****-****'));   // 메모 안 전화번호도 가림
       b.textContent = '모으는 중…';
       const dt = DM.det[id] || {}, extra = {};   // 2단계 준비: 단계·검수·재고조사 화면이 쓰는 자료도 같이 (조회만)
       try { extra.tasks = await dmGet('schedules/details/' + id + '/tasks'); } catch (e) { extra.tasks = { err: e.message }; }
