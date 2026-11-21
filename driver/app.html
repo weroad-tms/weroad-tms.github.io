@@ -634,7 +634,7 @@
 
 
   // 11/20 앱 안 업데이트: 서버의 새 index.html 빌드 번호가 다르면 [업데이트] 버튼 → 새로 불러오기 (홈 화면에 다시 추가할 필요 없음)
-  const BUILD = '20261121-14';
+  const BUILD = '20261121-15';
   async function updCheck() {
     try {
       const r = await fetch('app.html?chk=' + Date.now(), { cache: 'no-store' }); if (!r.ok) return;
@@ -874,7 +874,12 @@
     if (a === 'nav') { const d = DM.det[id] || {}, co = d.coordinate || {}, br = dmBr(d); return nvRaw(br.companyName || '거래처', +co.latitude, +co.longitude, br.address || ''); }
     if (a === 'raw') {   // 점검용: 데이터 모양 확인 (전화번호는 가림)
       const mask = (k, v) => (typeof v === 'string' && /phone|tel|cellphone/i.test(k) ? v.replace(/\d(?=\d{2})/g, '*') : v);
-      const t = JSON.stringify({ schedule: DM.sch && { ...DM.sch, details: (DM.sch.details || []).slice(0, 2) }, detail: DM.det[id], ref: DM.ref[dmBr(DM.det[id]).branchId] }, mask, 1);
+      b.textContent = '모으는 중…';
+      const dt = DM.det[id] || {}, extra = {};   // 2단계 준비: 단계·검수·재고조사 화면이 쓰는 자료도 같이 (조회만)
+      try { extra.tasks = await dmGet('schedules/details/' + id + '/tasks'); } catch (e) { extra.tasks = { err: e.message }; }
+      if (dt.examineYN === 'Y' || /E/.test(dt.stepCase || '')) { try { extra.display = await dmGet('task-inspections/details/' + id + '/display'); } catch (e) { extra.display = { err: e.message }; } }
+      try { extra.images = await dmGet('schedules/details/' + id + '/images'); } catch (e) { extra.images = { err: e.message }; }
+      const t = JSON.stringify({ schedule: DM.sch && { ...DM.sch, details: (DM.sch.details || []).slice(0, 2) }, detail: dt, ref: DM.ref[dmBr(dt).branchId], ...extra }, mask, 1);
       let ok = false; try { await navigator.clipboard.writeText(t); ok = true; } catch (e) { try { const ta = document.createElement('textarea'); ta.value = t; document.body.appendChild(ta); ta.select(); ok = document.execCommand('copy'); ta.remove(); } catch (e2) { ok = false; } }
       b.textContent = ok ? '복사됨 — 대화창에 붙여 주세요' : '복사 실패';
     }
