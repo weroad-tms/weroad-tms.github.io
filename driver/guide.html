@@ -41,7 +41,7 @@
 </head>
 <body>
 <div class="top"><img src="icon.svg?v=6" width="44" height="44" alt="" style="display:block"><h1 style="margin:0;font-size:19px;line-height:1.3">위로드 기사앱<br>설치·사용 가이드</h1></div>
-<div class="sub">설치는 처음 한 번만. 매일은 <b>실적표 → 운행 시작 → 상차 → 배송 → 운행 종료</b> 순서대로 위 탭을 왼쪽부터 누르면 돼요.</div>
+<div class="sub">설치는 처음 한 번만. 매일은 앱 첫 화면(홈)의 <b>운행 시작 → 상차 → 실적표(출발·사진) → 운행 종료</b> 순서대로 누르면 돼요.</div>
 
 <div id="tm-chip" class="sub" hidden></div>
 <a class="btn wr-open" href="./">배송기사웹 바로 열기</a>
@@ -85,7 +85,7 @@
   </div>
   <div class="card">
     <h2><span class="n">4</span>끝 — 이제 매일 순서대로</h2>
-    <p style="margin:0">아래 <b>하루 순서</b>대로 쓰면 돼요. 앱 업데이트는 따로 안 해도 되고, 배송 탭 사진 첨부가 안 될 때만 1번 버튼으로 다시 내려받아 덮어 설치하세요 (로그인 유지).</p>
+    <p style="margin:0">아래 <b>하루 순서</b>대로 쓰면 돼요. 앱 업데이트는 따로 안 해도 돼요 (새 버전이 나오면 화면 아래 <b>[업데이트]</b>를 누르면 끝). 사진 촬영이 안 될 때만 1번 버튼으로 다시 내려받아 덮어 설치하세요 (로그인 유지).</p>
   </div>
   <div class="card">
     <h2>문제가 생기면</h2>
@@ -153,16 +153,15 @@
 <div id="day-snack">
 <h2 style="font-size:20px;margin:26px 0 10px">하루 순서</h2>
 <div class="card">
-  <h2><span class="n">1</span>실적표 — 오늘 갈 곳 확인</h2>
+  <h2><span class="n">0</span>홈 화면 보는 법</h2>
   <ul>
-    <li>오늘 거래처를 <b>배송 순서대로</b>, 주소와 상온·저온·합계 매출까지</li>
-    <li>이름표가 붙은 곳은 미리 주의 (뜻은 아래 표)</li>
-    <li><b>카드 확인 (필수)</b> 버튼이 있는 곳은 눌러서 끝까지 읽기 — 안 읽으면 배송 탭이 안 열려요</li>
+    <li>앱을 열면 홈 화면 — 내 차 아래 <b>운행 시작 · 상차 · 배송</b> 동그라미 버튼과 <b>오늘 일정</b> 카드(곳 수·매출·남은 일)가 있어요</li>
+    <li>아래 메뉴 글씨에 그날 숫자가 나와요 (예: 상차 체크 3건 남음)</li>
+    <li>왼쪽 위 <b>‹</b> 를 누르면 언제든 홈으로 돌아와요</li>
   </ul>
-  <img class="shot" src="g/sheet.jpg" alt="일일실적표: 거래처마다 첫 배송·혼동 주의·최근 VOC·냉동·담당 변경 이름표와 카드 확인 필수 버튼" loading="lazy">
 </div>
 <div class="card">
-  <h2><span class="n">2</span>운행 시작</h2>
+  <h2><span class="n">1</span>운행 시작</h2>
   <ul>
     <li>초록 <b>운행 시작</b> 버튼 한 번. 위치는 앱이 알아서 보내요 (화면 꺼도, 네비 써도 계속)</li>
     <li>안드로이드는 상단 알림에 "위로드"가 뜨면 정상</li>
@@ -170,7 +169,7 @@
   <img class="shot" src="g/work.jpg" alt="운행 시작 화면: 운행 시작 버튼과 오늘 시작·종료 시각" loading="lazy">
 </div>
 <div class="card">
-  <h2><span class="n">3</span>상차 — 챙기는 즉시 ✓</h2>
+  <h2><span class="n">2</span>상차 — 챙기는 즉시 ✓</h2>
   <ul>
     <li>거래처 순서대로 <b>상온·저온 로케이션</b>이 나와요</li>
     <li>로케이션에서 꺼내는 순간 그 칸을 눌러 <b>☐ → ✓</b></li>
@@ -178,28 +177,42 @@
   </ul>
   <img class="shot" src="g/load.jpg" alt="상차 화면: 상온·저온 로케이션별 체크, 진행 3/6" loading="lazy">
 </div>
-<div class="card lock">
-  <h2><span class="n">4</span>배송 — 다 끝나야 열려요</h2>
+<div class="card">
+  <h2><span class="n">3</span>실적표 — 배송까지 여기서 다 해요</h2>
   <ul>
-    <li>상차 ✓ 또는 카드 확인이 하나라도 남으면 배송 탭이 <b>잠겨요</b></li>
-    <li>잠금 화면의 <b>상차 탭으로 / 실적표로</b> 버튼으로 바로 가서 마저 하기</li>
-    <li>열리면 거래처마다 <b>출발 → 도착 → 배송사진</b> (예전 배송매니저 그대로)</li>
+    <li>오늘 거래처가 <b>배송 순서대로</b> — 거래처 이름(위펀오피스 이름), 주소 옆 <b>🧭 내비</b>, 상온·저온·합계 매출</li>
+    <li><b>요약카드 확인 (필수)</b> 버튼이 있는 곳은 눌러서 끝까지 읽기</li>
+    <li>상차 ✓ 와 요약카드 확인을 다 끝내면 거래처마다 <b>🚚 출발</b> 버튼이 나와요 (한 번에 한 곳씩)</li>
+    <li><b>배송 정보 ▾</b> 를 누르면 주차·출입 참고사항, 연락 가능 고객(누르면 전화), 거래명세서가 나와요</li>
   </ul>
-  <img class="shot" src="g/lock.jpg" alt="배송 탭 잠금: 상차 체크 6건, 카드 확인 2곳 남음" loading="lazy">
-  <div class="tip">배송 탭 로그인이 풀리면 휴대폰번호만 다시 넣으면 돼요. 화면이 안 열리면 오른쪽 위 <b>새 창 ↗</b>.</div>
+  <img class="shot" src="g/sheet2.jpg" alt="실적표 거래처 카드: 주소 옆 내비, 매출, 출발 상태, 작업 시작·사진 버튼" loading="lazy">
+</div>
+<div class="card">
+  <h2><span class="n">4</span>도착하면 — 📷 작업 시작 · 사진</h2>
+  <ul>
+    <li>거래처에 도착하면 그 카드의 <b>📷 작업 시작 · 사진</b> 버튼</li>
+    <li>화면 위 단계(예: 1/3)대로 진행 → <b>📷 촬영</b> 또는 <b>앨범에서</b> → 등록하기
+      <br>· 일반 거래처: 진열 전 사진 → 진열 후 사진 → 완료
+      <br>· 재고조사 있는 곳: <b>재고조사</b>(USB 스캐너로 바코드) → 진열 전 사진 → (검수) → 진열 후 사진 → 완료
+      <br>· 검수: 품목마다 <b>전체 진열</b> 또는 진열한 수량 입력</li>
+    <li>끝나면 자동으로 실적표로 돌아오고 다음 거래처에 <b>출발</b> 버튼이 열려요</li>
+    <li>중간에 앱이 꺼져도 <b>📷 작업 이어하기 · 사진</b>으로 남은 단계부터 이어져요</li>
+  </ul>
+  <img class="shot" src="g/step.jpg" alt="작업 화면: 1/3 진열 전 사진, 촬영·앨범에서 버튼" loading="lazy">
+  <div class="tip">오류가 나거나 진행이 안 되면 화면 위 <b>[기존 배송화면]</b> → 예전 배송매니저 화면에서 이어서 하면 돼요. 기록은 그대로 이어져요.</div>
 </div>
 <div class="card">
   <h2><span class="n">5</span>운행 종료</h2>
   <ul>
-    <li>운행 시작 탭에서 <b>운행 종료</b> → 위치 전송이 꺼져요</li>
-    <li>회사 차량 기사님은 <b>퇴근</b> 탭에서 계기판 누적 km · 주유 금액 저장 (아래 주의)</li>
+    <li>운행 시작 화면에서 <b>운행 종료</b> → 위치 전송이 꺼져요</li>
+    <li>회사 차량 기사님은 <b>퇴근</b>에서 계기판 누적 km · 주유 금액 저장 (아래 주의)</li>
   </ul>
 </div>
 
 <div class="card">
   <h2>이름표 뜻</h2>
   <table class="mean">
-    <tr><td><span class="tg" style="background:#3E6AF2">카드 확인 (필수)</span></td><td>물류팀이 주의사항을 적어 둔 곳. 카드를 열어 읽어야 배송 시작</td></tr>
+    <tr><td><span class="tg" style="background:#3E6AF2">요약카드 확인 (필수)</span></td><td>물류팀이 주의사항을 적어 둔 곳. 카드를 열어 읽어야 출발 버튼이 나와요</td></tr>
     <tr><td><span class="tg" style="background:#EA580C">첫 배송</span></td><td>처음 가는 곳. 주소·출입 방법·진열 위치 먼저 확인</td></tr>
     <tr><td><span class="tg" style="background:#7C3AED">담당 변경</span></td><td>평소 다른 기사님 담당. 진열 위치 확인</td></tr>
     <tr><td><span class="tg" style="background:#B91C1C">최근 VOC</span></td><td>30일 안 고객 불만이 있던 곳. 같은 실수 주의</td></tr>
@@ -212,6 +225,14 @@
 <div id="day-cvs" hidden>
 <h2 style="font-size:20px;margin:26px 0 10px">하루 순서 — 편의점</h2>
 <div class="card">
+  <h2><span class="n">0</span>홈 화면 보는 법</h2>
+  <ul>
+    <li>앱을 열면 홈 화면 — 내 차 아래 <b>업무시작 · 실적표 · 배송사진</b> 동그라미 버튼과 <b>오늘 일정</b> 카드(점포 수·매출·주류확인·결품/취소)가 있어요</li>
+    <li>아래 메뉴 글씨에 그날 숫자가 나와요 (예: 업무 중 · 배송사진 3 / 12)</li>
+    <li>왼쪽 위 <b>‹</b> 를 누르면 언제든 홈으로 돌아와요</li>
+  </ul>
+</div>
+<div class="card">
   <h2><span class="n">1</span>실적표 — 오늘 갈 점포 확인</h2>
   <ul>
     <li>오늘 내 점포를 <b>배송 순서대로</b> — 점포 이름·주소·전화번호</li>
@@ -222,7 +243,7 @@
 <div class="card">
   <h2><span class="n">2</span>업무시작</h2>
   <ul>
-    <li><b>업무</b> 탭 → 파란 <b>업무시작</b> 버튼 한 번</li>
+    <li>홈의 <b>업무시작</b> 동그라미(또는 <b>업무</b> 메뉴) → 파란 <b>업무시작</b> 버튼 한 번</li>
     <li>누르면 위치 전송이 켜져요 (화면 꺼도, 네비 써도 계속)</li>
   </ul>
 </div>
@@ -239,7 +260,7 @@
   <ul>
     <li>특이사항 칸에 짧게 (없으면 <b>없음</b> 그대로)</li>
     <li>빨간 <b>업무종료</b> → 위치 전송이 꺼져요. 다시 누르면 시각·특이사항을 고칠 수 있어요</li>
-    <li>위펀풀필먼트 정직원은 <b>퇴근</b> 탭에서 계기판 km · 주유 금액도 저장</li>
+    <li>위펀풀필먼트 정직원은 <b>퇴근</b>에서 계기판 km · 주유 금액도 저장</li>
   </ul>
 </div>
 </div>
@@ -252,7 +273,7 @@
     <li>경고등·소음·사고 등은 특이사항에 짧게</li>
   </ul>
 </div>
-<div class="foot">위로드 WeRoad · 위펀 운송관리 · 배송기사웹 v22 · 문의는 운영 담당자에게</div>
+<div class="foot">위로드 WeRoad · 위펀 운송관리 · 배송기사웹 v23 · 문의는 운영 담당자에게</div>
 
 <script>
   const q = new URLSearchParams(location.search), ua = navigator.userAgent;
