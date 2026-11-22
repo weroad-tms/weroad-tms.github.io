@@ -285,7 +285,7 @@
   <label>비밀번호 (휴대폰번호, 숫자만)</label><input id="s-p" type="tel" inputmode="numeric" placeholder="01012345678" autocomplete="off">
   <button id="s-ok">시작하기</button>
   <p class="msg" style="margin-top:12px">로그인이 안 되면 관리자에게 "위로드 기사 등록"을 요청해 주세요.</p>
-  <div class="gd"><a class="gd-main" href="guide.html">📖 설치·사용 가이드 보기</a><div class="gd-l">내 폰을 고르면 그 폰에 맞는 가이드가 열려요</div><div class="gd-os"><a data-os="and" href="guide.html?os=and">안드로이드 (갤럭시)</a><a data-os="ios" href="guide.html?os=ios">아이폰</a></div></div>
+  <div class="gd"><a class="gd-main" href="guide.html">설치·사용 가이드 보기</a><div class="gd-l">내 폰을 고르면 그 폰에 맞는 가이드가 열려요</div><div class="gd-os"><a data-os="and" href="guide.html?os=and">안드로이드 (갤럭시)</a><a data-os="ios" href="guide.html?os=ios">아이폰</a></div></div>
 </div>
 
 <div id="agree" class="agree" hidden>
@@ -339,7 +339,7 @@
     <button class="big stop" id="cw-end">업무종료</button>
     <div class="card msg" id="cw-rec" hidden>· 위펀풀필먼트 정직원은 <b>퇴근</b> 탭에서 계기판 km·주유 금액도 적어 주세요.</div>
     <div class="card msg">· 업무시작을 누르면 위치 전송이 켜지고, 업무종료를 누르면 꺼져요.<br>· 사진은 점포마다 배송을 마친 뒤 바로 찍어 올려 주세요 (여러 장 가능).<br>· <a href="#" id="cw-lo" style="color:#9CB4FF">팀 바꾸기 / 다른 이름으로 로그인</a></div>
-    <div class="card"><div class="gd"><a class="gd-main" href="guide.html">📖 설치·사용 가이드 보기</a><div class="gd-l">내 폰을 고르면 그 폰에 맞는 가이드가 열려요</div><div class="gd-os"><a data-os="and" href="guide.html?os=and">안드로이드 (갤럭시)</a><a data-os="ios" href="guide.html?os=ios">아이폰</a></div></div></div>
+    <div class="card"><div class="gd"><a class="gd-main" href="guide.html">설치·사용 가이드 보기</a><div class="gd-l">내 폰을 고르면 그 폰에 맞는 가이드가 열려요</div><div class="gd-os"><a data-os="and" href="guide.html?os=and">안드로이드 (갤럭시)</a><a data-os="ios" href="guide.html?os=ios">아이폰</a></div></div></div>
   </div>
   <div id="t-sh" hidden>
     <div class="card">
@@ -354,7 +354,7 @@
   <div id="sh-ov" class="sh-ov" hidden><div class="sh-ovh"><b id="sh-ovt">거래처 카드</b><button id="sh-ovx">확인했어요 ✕</button></div><iframe id="sh-ovf" title="거래처 요약카드"></iframe><div id="sh-ovb" class="sh-ovb"></div></div>
   <div id="t-dl" hidden>
     <div class="card warn dl-lock" id="dl-lock" hidden></div>
-    <div class="dl-bar"><span>배송매니저 (출발·도착·배송사진 → 위펀오피스)</span><a href="https://delivery-manager.wefun.kr/" target="_blank" rel="noopener">새 창 ↗</a></div>
+    <div class="dl-bar" id="dl-bar"><span>배송매니저 (출발·도착·배송사진 → 위펀오피스)</span><a href="https://delivery-manager.wefun.kr/" target="_blank" rel="noopener">새 창 ↗</a></div>
     <div class="card msg" id="dl-ph" hidden><b>배송 자동 로그인</b><br>위로드에 로그인한 휴대폰번호를 한 번만 넣으면, 다음부터 배송 화면이 자동으로 로그인돼요.<div style="display:flex;gap:8px;margin-top:10px"><input id="dl-ph-in" type="tel" inputmode="numeric" placeholder="01012345678" autocomplete="off" style="flex:1;margin:0"><button class="sm" id="dl-ph-ok" style="flex:none">저장</button></div></div>
     <div id="dm-w" hidden></div>
     <div class="dlw" id="dl-w"></div>
@@ -370,7 +370,7 @@
     <input id="lc-q" placeholder="거래처 이름·로케이션 검색" autocomplete="off">
     <div class="card warn" id="lc-warn" hidden></div>
     <div id="lc-list"></div>
-    <div class="card msg"><b>로케이션 사용법</b><br>· 상품을 챙기는 즉시 그 칸의 ☐를 눌러 ✓ 표시하세요 (상온·저온 따로).<br>· 로케이션이 없으면 도크장 앞 파레트를 확인하세요.<br>· ✓ 안 한 상품이 남아 있으면 배송 탭으로 넘어갈 수 없어요.</div>
+    <div class="card msg"><b>로케이션 사용법</b><br>· 상품을 챙기는 즉시 그 칸의 ☐를 눌러 ✓ 표시하세요 (상온·저온 따로).<br>· 로케이션이 없으면 도크장 앞 파레트를 확인하세요.<br>· ✓ 안 한 상품이 남아 있으면 실적표에서 출발할 수 없어요.</div>
   </div>
   <div id="t-mm" hidden>
     <div class="card"><div class="mm-top"><button class="mm-nav" id="mm-prev" aria-label="이전 달">◀</button><b id="mm-ym">—</b><button class="mm-nav" id="mm-next" aria-label="다음 달">▶</button></div><div class="mm-sub">내 운행 기록과 고객사가 남긴 의견을 모아 보여드려요</div></div>
@@ -390,7 +390,7 @@
     <div class="card ok" id="r-ok" hidden></div>
     <div class="card warn" id="r-warn" hidden></div>
     <div class="card"><div class="kv" style="background:none;padding:0"><label>최근 기록</label></div><div class="hist" id="r-hist">—</div></div>
-    <div class="card msg">· 계기판 숫자는 <b>누적 km 전체</b>를 적어요 (예: 246720). 지난 기록보다 작으면 저장이 안 돼요.<br>· 저장이 안 되면 기록은 폰에 남아 있다가 다음에 열 때 다시 보내요.<br>· 주유 영수증은 사진으로 따로 보관해 주세요.<br>· <a href="guide.html" style="color:#9CB4FF">📖 사용 가이드</a></div>
+    <div class="card msg">· 계기판 숫자는 <b>누적 km 전체</b>를 적어요 (예: 246720). 지난 기록보다 작으면 저장이 안 돼요.<br>· 저장이 안 되면 기록은 폰에 남아 있다가 다음에 열 때 다시 보내요.<br>· 주유 영수증은 사진으로 따로 보관해 주세요.<br>· <a href="guide.html" style="color:#9CB4FF">사용 가이드</a></div>
   </div>
   <div id="t-loc" hidden>
   <div class="card">
@@ -417,7 +417,7 @@
       <li><div><b>실적표</b><span>배송 순서대로 거래처·매출 확인 → '요약카드 확인' 붙은 곳은 꼭 읽기<br>거래처마다 출발 → 도착하면 작업 시작 · 사진 → 작업 완료하기</span></div></li>
       <li><div><b>운행 종료</b><span>이 화면에서 [운행 종료] 누르기 (위치 전송 꺼짐)</span><span id="dg-rec" hidden>퇴근 탭에 계기판 km·주유 금액 적고 저장</span></div></li>
     </ol>
-    <div class="gd"><a class="gd-main" href="guide.html">📖 설치·사용 가이드 보기</a><div class="gd-l">내 폰을 고르면 그 폰에 맞는 가이드가 열려요</div><div class="gd-os"><a data-os="and" href="guide.html?os=and">안드로이드 (갤럭시)</a><a data-os="ios" href="guide.html?os=ios">아이폰</a></div></div>
+    <div class="gd"><a class="gd-main" href="guide.html">설치·사용 가이드 보기</a><div class="gd-l">내 폰을 고르면 그 폰에 맞는 가이드가 열려요</div><div class="gd-os"><a data-os="and" href="guide.html?os=and">안드로이드 (갤럭시)</a><a data-os="ios" href="guide.html?os=ios">아이폰</a></div></div>
   </div>
   <div class="card msg" id="app-help" hidden>
     <b>위로드 앱 상태</b>
@@ -462,7 +462,7 @@
   <div class="log" id="log"></div>
   </div>
 </div>
-<div class="foot">위로드 WeRoad · 위펀 운송관리 · <span id="ver">v22</span></div>
+<div class="foot">위로드 WeRoad · 위펀 운송관리 · <span id="ver"></span></div>
 
 <script>
 (function () {
@@ -666,7 +666,8 @@
 
 
   // 11/20 앱 안 업데이트: 서버의 새 index.html 빌드 번호가 다르면 [업데이트] 버튼 → 새로 불러오기 (홈 화면에 다시 추가할 필요 없음)
-  const BUILD = '20261122-8';
+  const BUILD = '20261122-9';
+  try { document.getElementById('ver').textContent = 'v' + BUILD.slice(2, 8) + '-' + BUILD.split('-')[1]; } catch (e) {}
   async function updCheck() {
     try {
       const r = await fetch('app.html?chk=' + Date.now(), { cache: 'no-store' }); if (!r.ok) return;
@@ -736,7 +737,7 @@
   const carGet = () => { try { const k = localStorage.getItem('wr-car'); return CARS[k] && (isMaster() || carOpen(k)) ? k : '화이트'; } catch (e) { return '화이트'; } };
   function hmLbl(t) {
     const ic = { list: 'M8 6h12M8 12h12M8 18h12M4 6h.01M4 12h.01M4 18h.01', work: 'M12 7v5l3 2M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z', pin: 'M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21zM12 12a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z', box: 'M3 8l9-5 9 5v8l-9 5-9-5zM3 8l9 5 9-5M12 13v8', cam: 'M4 8h3l2-3h6l2 3h3v11H4zM12 17a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z', flag: 'M5 21V4h11l-2 4 2 4H5', star: 'M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z' };
-    const m = { cs: ['실적표', '거래처 · 매출 · 주류확인', 'list'], cw: ['업무', '업무시작 · 배송완료사진 · 업무종료', 'work'], sh: ['실적표', (() => { try { return shDmOn() ? '거래처 · 매출 · 출발 · 배송 사진' : '거래처 · 주소 · 매출'; } catch (e) { return '거래처 · 주소 · 매출'; } })(), 'list'], loc: ['운행 시작', '위치 전송 켜기 · 끄기', 'pin'], lc: ['상차', '로케이션 · 상차 체크', 'box'], dl: ['배송', '출발 · 도착 · 배송 사진', 'cam'], rec: ['퇴근', '계기판 km · 주유 금액', 'flag'], mm: ['내 운행 기록', '완료 배송 · 고객 칭찬 · 고객 의견', 'star'] }[t] || [t, '', 'list'];
+    const m = { cs: ['실적표', '거래처 · 매출 · 주류확인', 'list'], cw: ['업무', '업무시작 · 배송완료사진 · 업무종료', 'work'], sh: ['실적표', (() => { try { return shDmOn() ? '거래처 · 매출 · 출발 · 배송 사진' : '거래처 · 주소 · 매출'; } catch (e) { return '거래처 · 주소 · 매출'; } })(), 'list'], loc: ['운행 시작', '위치 전송 켜기 · 끄기', 'pin'], lc: ['상차', '로케이션 · 상차 체크', 'box'], dl: [(() => { try { return shDmOn() ? '작업 · 사진' : '배송'; } catch (e) { return '배송'; } })(), '출발 · 도착 · 배송 사진', 'cam'], rec: ['퇴근', '계기판 km · 주유 금액', 'flag'], mm: ['내 운행 기록', '완료 배송 · 고객 칭찬 · 고객 의견', 'star'] }[t] || [t, '', 'list'];
     return { t: m[0], s: m[1], d: ic[m[2]] };
   }
   const hmWant = () => { try { return sessionStorage.getItem('wr-hm') !== '0'; } catch (e) { return true; } };
@@ -795,7 +796,7 @@
   function hmExtra() {
     const team = CVS() ? 'cvs' : 'snack', ic = (t) => hmLbl(t).d;
     const q = isMaster() ? [] : HM_Q[team].filter(([t]) => !tabBtn(t).hidden);
-    $('hm-q').innerHTML = q.map(([t, l], i) => `<button type="button" data-hm="${t}" class="${i === 0 ? 'on' : ''}"><span><svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path d="${ic(t)}" stroke="#EDEFF1" stroke-width="1.9" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span>${l}</button>`).join('');
+    $('hm-q').innerHTML = q.map(([t, l], i) => `<button type="button" data-hm="${t}" class="${i === 0 ? 'on' : ''}"><span><svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path d="${l === '배송사진' ? 'M4 8h3l2-3h6l2 3h3v11H4zM12 17a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z' : ic(t)}" stroke="#EDEFF1" stroke-width="1.9" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span>${l}</button>`).join('');
     $('hm-q').style.gridTemplateColumns = `repeat(${Math.max(q.length, 1)}, minmax(0, 1fr))`;
     const D = isMaster() ? null : hmDayData();
     $('hm-day').hidden = !D;
@@ -1110,7 +1111,7 @@
           <div class="q"><button type="button" data-dm="all" data-id="${esc(x.id)}" class="${x.qty === x.max ? 'on' : ''}">전체 진열</button><input type="number" inputmode="numeric" min="0" max="${x.max}" value="${x.qty || ''}" placeholder="0" data-insp="${esc(x.id)}"></div></div>`).join('')).join('')
         + `<button type="button" class="dm-go" data-dm="send">검수 저장하고 다음</button>`;
     } else if (k === 'stock') {
-      body = `<div class="dm-row"><input id="dm-bc" type="text" inputmode="numeric" maxlength="20" placeholder="USB 스캐너로 찍거나 숫자 입력 후 Enter" autocomplete="off" enterkeyhint="search"><button type="button" class="dm-btn y" data-dm="scan">검색</button></div>
+      body = `<div class="dm-row"><input id="dm-bc" type="text" inputmode="numeric" maxlength="20" placeholder="바코드 스캔 또는 숫자 입력" autocomplete="off" enterkeyhint="search"><button type="button" class="dm-btn y" data-dm="scan">검색</button></div>
         <label class="dm-ck"><input type="checkbox" id="dm-sold" ${W.sold ? 'checked' : ''}> 판매내역에서 재고조회</label>
         <div id="dm-stock">${dmStockHtml()}</div>
         <button type="button" class="dm-go" id="dm-stock-go" data-dm="send" ${W.stock.length && !W.scanning ? '' : 'disabled'}>재고조사 완료하기</button>`;
@@ -1131,12 +1132,12 @@
   }
   function dmActsHtml(x, id, today, uni, gate) {
     if (!today || x.doneYN === 'Y') return '';
-    if (gate) return `<div class="acts main"><span class="dm-hint">${esc(gate)}</span></div>`;
+    if (gate && !x.deliveryStartAt && !x.taskStartAt) return x.startDeliveryAvailable === false ? '' : `<div class="acts main"><span class="dm-hint">${esc(gate)}</span></div>`;   // 11/22 안내는 출발할 차례인 곳에만 한 번
     return `<div class="acts main">${
       x.taskStartAt ? `<button type="button" class="y" data-dm="wk" data-id="${esc(id)}">작업 이어하기 · 사진</button>`
       : x.deliveryStartAt ? `<button type="button" class="y" data-dm="task" data-id="${esc(id)}">작업 시작 · 사진</button><button type="button" data-dm="goX" data-id="${esc(id)}">출발 취소</button>`
       : uni ? '<span class="dm-hint">출근 복장 사진을 먼저 등록해 주세요</span>'
-      : x.startDeliveryAvailable === false ? '<span class="dm-hint">진행 중인 배송을 끝내면 출발할 수 있어요</span>'
+      : x.startDeliveryAvailable === false ? '<span class="dm-hint">앞 거래처를 끝내면 출발할 수 있어요</span>'
       : `<button type="button" class="y" data-dm="go" data-id="${esc(id)}">출발</button>`}</div>`;
   }
   function dmDetHtml(x, d, db, id, today, uni, gate) {   // 11/21 배송 화면·실적표 같이 씀
@@ -1274,7 +1275,7 @@
     try { pdUi(); } catch (e) { /* 소모품 카드는 나중에 */ }
     if (CVS()) { setTimeout(() => csApply(first), 0); return; }   // 편의점 팀 화면 (아래 모듈이 다 읽힌 뒤)
     const corp = isCorp();
-    tabBtn('rec').hidden = !corp; $('dg-rec').hidden = !corp; tabBtn('mm').hidden = isMaster(); tabBtn('loc').hidden = isMaster(); tabBtn('dl').hidden = isMaster() || shDmOn(); tabBtn('sh').hidden = isMaster();
+    tabBtn('rec').hidden = !corp; $('dg-rec').hidden = !corp; tabBtn('mm').hidden = isMaster(); tabBtn('loc').hidden = isMaster(); tabBtn('dl').hidden = isMaster() || shDmOn(); try { $('dl-bar').hidden = shDmOn(); } catch (e) {} tabBtn('sh').hidden = isMaster();
     try { localStorage.setItem(LS + '-type', corp ? 'corp' : 'jiip'); } catch (e) { /* noop */ }
     const cur = document.querySelector('.tabs button.on');
     if (first) { let t = ''; try { t = sessionStorage.getItem('wr-tab') || ''; } catch (e) { /* noop */ } if (!t || tabBtn(t).hidden) t = isMaster() ? 'lc' : (localStorage.getItem(LS + '-on') === '1') ? 'lc' : (!corp || new Date().getHours() < 14) ? 'sh' : 'rec'; hmKeep = hmWant(); showTab(t); hmKeep = false; if (hmWant()) goHome(); }
@@ -1439,13 +1440,14 @@
     $('lc-prog').innerHTML = n ? `<div class="kv"><label>거래처</label><b>${n}<i>곳</i></b></div><div class="kv"><label>상온 상차</label><b>${p ? p.ambient_done + '/' + p.ambient_total : '—'}</b></div><div class="kv"><label>저온 상차</label><b>${p ? p.chilled_done + '/' + p.chilled_total : '—'}</b></div>` : '';
     $('lc-sub').textContent = L.departed ? '출차 완료 · 체크 변경은 관리자에게' : (isMaster() && !L.drv ? '관리자 — 기사를 고르면 그 기사 로케이션이 보여요' : '풀필먼트 로케이션 · 배송 순번대로');
     const q = $('lc-q').value.trim().toLowerCase();
-    const rs = L.recs.filter((r) => !q || [r.name, r.amb, r.chl, r.code].some((x) => String(x || '').toLowerCase().includes(q)));
+    const rs = L.recs.filter((r) => !q || [r.name, r.amb, r.chl, r.code, (SH.flags[String(r.code)] || {}).cl].some((x) => String(x || '').toLowerCase().includes(q)));
     const can = !L.departed && (!isMaster() || !!L.drv);
     const multi = new Set(L.recs.map((r) => r.course)).size > 1;
     const row = (r, t) => { const a = t === 'a', loc = a ? r.amb : r.chl, need = a ? r.needA : r.needC, ck = a ? r.ckA : r.ckC;
       return `<div class="lc-r ${a ? 'a' : 'c'} ${ck ? 'ck' : ''}"><label>${a ? '상온' : '저온'}</label><span class="loc ${loc ? '' : 'none'}">${loc ? esc(loc) : (need ? '로케이션 없음 — 도크장 앞 파레트 확인' : '상품 없음')}</span>${need ? `<button class="cb" data-ck="${r.id}" data-t="${a ? 'ambient' : 'chilled'}" ${can ? '' : 'disabled'}>${ck ? '✓' : ''}</button>` : ''}</div>`; };
+    const lnm = (r) => { if (SH.fd !== L.d) return r.name; const cl = String((SH.flags[String(r.code)] || {}).cl || ''), k = cl.indexOf(' - '); return (k >= 0 ? cl.slice(k + 3) : cl) || r.name; };   // 11/22 실적표와 같은 이름 (위펀오피스 기준정보)
     $('lc-list').innerHTML = rs.map((r) => { const done = (!r.needA || r.ckA) && (!r.needC || r.ckC);
-      return `<div class="lc ${done && (r.needA || r.needC) ? 'done' : ''}"><div class="lc-h"><span class="sq">${r.seq != null ? esc(r.seq) : '·'}</span><b>${esc(r.name)}</b>${multi ? `<span class="lc-tg" style="background:#334155;color:#E2E8F0">${esc(String(r.course || '').replace(/^스\)/, ''))}</span>` : ''}${r.frozen ? '<span class="lc-tg fz">냉동</span>' : ''}${r.ice ? '<span class="lc-tg ic">얼음</span>' : ''}</div>${row(r, 'a')}${row(r, 'c')}${r.note ? `<div class="lc-nt">📝 ${esc(r.note)}</div>` : ''}</div>`; }).join('')
+      return `<div class="lc ${done && (r.needA || r.needC) ? 'done' : ''}"><div class="lc-h"><span class="sq">${r.seq != null ? esc(r.seq) : '·'}</span><b>${esc(lnm(r))}</b>${multi ? `<span class="lc-tg" style="background:#334155;color:#E2E8F0">${esc(String(r.course || '').replace(/^스\)/, ''))}</span>` : ''}${r.frozen ? '<span class="lc-tg fz">냉동</span>' : ''}${r.ice ? '<span class="lc-tg ic">얼음</span>' : ''}</div>${row(r, 'a')}${row(r, 'c')}${r.note ? `<div class="lc-nt">📝 ${esc(r.note)}</div>` : ''}</div>`; }).join('')
       || (L.busy ? '<div class="card msg">불러오는 중…</div>' : `<div class="card msg">${isMaster() && !L.drv ? '위에서 기사를 골라 주세요.' : q ? '검색 결과가 없어요.' : dLbl(L.d) + ' 배정된 거래처가 아직 없어요. 풀필먼트 담당자가 로케이션을 넣으면 여기 떠요.'}</div>`);
   }
   async function lcLoad(fresh) {
@@ -1457,7 +1459,7 @@
       if (L.auto && !isMaster() && !j.records.length && L.d === today()) { const j2 = await drv({ act: 'list', date: addDay(L.d, 1) }); if (j2.records.length) { L.d = addDay(L.d, 1); j = j2; } }
       L.auto = false; L.recs = j.records || []; L.prog = j.progress; L.departed = j.departed; if (j.drivers) L.drivers = j.drivers;
     } catch (e) { $('lc-warn').hidden = false; $('lc-warn').textContent = '로케이션을 못 불러왔어요: ' + e.message; L.recs = []; }
-    L.busy = false; lcUi();
+    L.busy = false; lcUi(); if (!isMaster() && !CVS() && SH.fd !== L.d) shFlags().then(lcUi).catch(() => {});
   }
   $('lc-prev').onclick = () => { L.d = addDay(L.d, -1); L.auto = false; lcLoad(); };
   $('lc-next').onclick = () => { L.d = addDay(L.d, 1); L.auto = false; lcLoad(); };
@@ -1575,7 +1577,7 @@
     if (!rs.length) { $('sh-list').innerHTML = SH.busy || L.busy ? '<div class="card msg">불러오는 중…</div>' : `<div class="card msg">${dLbl(L.d)} 배정된 거래처가 아직 없어요.</div>`; return; }
     // 착지 수에 맞춰 글씨 크기 자동 (8곳 이하 크게 → 20곳이면 작게)
     const n = rs.length, z = n <= 8 ? 1 : n >= 20 ? 0.78 : 1 - (n - 8) * 0.22 / 12;
-    const dmOk = shDmOn(), MT = dmOk ? shDmMatch() : { m: {}, rest: [] }, gate = dmOk && (pend.cards.length || pend.loads) ? `상차 체크${pend.loads ? ' ' + pend.loads + '건' : ''}·요약카드 확인${pend.cards.length ? ' ' + pend.cards.length + '곳' : ''}을 끝내면 출발할 수 있어요` : '';
+    const dmOk = shDmOn(), MT = dmOk ? shDmMatch() : { m: {}, rest: [] }, gate = dmOk && (pend.cards.length || pend.loads) ? [pend.loads ? `상차 체크 ${pend.loads}건` : '', pend.cards.length ? `요약카드 확인 ${pend.cards.length}곳` : ''].filter(Boolean).join('·') + '을 끝내면 출발할 수 있어요' : '';
     // 11/22 배송 순서를 바꾸면 실적표도 그 순서로 (짝 맞은 거래처끼리 자리만 바꿈, 짝 없는 곳은 제자리)
     const ord = rs.slice(); if (dmOk) { const slots = [], ms = []; rs.forEach((r, k) => { if (MT.m[r.code]) { slots.push(k); ms.push(r); } }); ms.sort((a, b) => (+MT.m[a.code].sequence || 999) - (+MT.m[b.code].sequence || 999)); slots.forEach((k, j) => { ord[k] = ms[j]; }); }
     const body = ord.map((r, i) => { const f = fOf(r) || {}, need = reqOf(r), rd = SH.reads.has(String(r.code)), m = am(r), dx = MT.m[r.code];
@@ -1608,10 +1610,11 @@
     if (!b) { if (ev.target.closest('button, select, a, input, label, .sh-zoom')) return; const zr = ev.target.closest('.shr[data-zc]'); if (zr) { SH.zoom = zr.dataset.zc; shUi(); window.scrollTo(0, 0); } return; }
     const r = L.recs.find((x) => String(x.code) === b.dataset.card); if (!r) return;
     const f = fOf(r) || {}; shCur = r;
-    $('sh-ovt').textContent = r.name;
+    const ocl = String(f.cl || ''), oci = ocl.indexOf(' - '), onm = (oci >= 0 ? ocl.slice(oci + 3) : ocl) || r.name;
+    $('sh-ovt').textContent = onm;
     if (f.pub) { $('sh-ovf').hidden = false; $('sh-ovf').src = 'card.html?c=' + encodeURIComponent(f.pub); $('sh-ovb').hidden = true; }
     else { $('sh-ovf').hidden = true; $('sh-ovf').removeAttribute('src'); $('sh-ovb').hidden = false;
-      $('sh-ovb').innerHTML = `<p><b>${esc(r.name)}</b><br>${esc(r.addr || '')}</p>${f.new ? '<p>★ <b>오늘 첫 배송</b>인 거래처예요. 주소·출입 방법을 꼭 확인하세요.</p>' : ''}${f.chg ? `<p>↺ 평소 <b>${esc(f.chg)}</b> 기사님 담당이에요. 진열 위치를 확인하세요.</p>` : ''}${f.voc ? f.voc.map((v) => `<p>⚠ <b>VOC ${esc(String(v.d || '').slice(5).replace('-', '/'))}</b> ${esc(v.t)}</p>`).join('') : ''}${f.conf ? `<p>🏢 같은 건물: ${f.conf.map(esc).join(' · ')}</p>` : ''}${r.note ? `<p>📝 ${esc(r.note)}</p>` : ''}<p style="opacity:.7">아직 요약카드가 없는 거래처예요. 위 내용을 확인했으면 오른쪽 위 [확인했어요]를 눌러 주세요.</p>`; }
+      $('sh-ovb').innerHTML = `<p><b>${esc(onm)}</b><br>${esc(r.addr || '')}</p>${f.new ? '<p>★ <b>오늘 첫 배송</b>인 거래처예요. 주소·출입 방법을 꼭 확인하세요.</p>' : ''}${f.chg ? `<p>↺ 평소 <b>${esc(f.chg)}</b> 기사님 담당이에요. 진열 위치를 확인하세요.</p>` : ''}${f.voc ? f.voc.map((v) => `<p>⚠ <b>VOC ${esc(String(v.d || '').slice(5).replace('-', '/'))}</b> ${esc(v.t)}</p>`).join('') : ''}${f.conf ? `<p>🏢 같은 건물: ${f.conf.map(esc).join(' · ')}</p>` : ''}${r.note ? `<p>📝 ${esc(r.note)}</p>` : ''}<p style="opacity:.7">아직 요약카드가 없는 거래처예요. 위 내용을 확인했으면 오른쪽 위 [확인했어요]를 눌러 주세요.</p>`; }
     $('sh-ov').hidden = false;
   };
   $('sh-ovx').onclick = async () => {
