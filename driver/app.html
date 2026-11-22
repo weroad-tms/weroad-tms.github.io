@@ -133,7 +133,7 @@
   .dm-d .acts.main button{flex:1;padding:14px 12px;font-size:16px;font-weight:800}.dm-d .acts button:disabled{opacity:.5}
   .sha{display:flex;align-items:center;gap:8px}.sh-nv{flex:none;margin-left:auto;border:0;border-radius:9px;padding:7px 10px;font:inherit;font-size:13px;font-weight:800;background:#F2C230;color:#17191C}
   .sh-co{font-size:12.5px;opacity:.6;margin:2px 0 4px 34px}
-  .sh-dm{margin-top:10px;border-top:1px dashed rgba(255,255,255,.14);padding-top:10px}.sh-dmh{display:flex;align-items:center;gap:8px}.sh-dmh em{font-style:normal;font-size:12.5px;opacity:.65}
+  .sh-dm{margin-top:10px;border-top:1px dashed rgba(255,255,255,.14);padding-top:10px}.sh-dmh{display:flex;align-items:center;gap:8px}.sh-dmh em{font-style:normal;font-size:12.5px;opacity:.65}.sh-seq{border:1px solid rgba(255,255,255,.25);border-radius:10px;height:34px;padding:0 6px;font:inherit;font-size:14px;font-weight:800;background:#334155;color:#fff}
   .sh-dmi{margin-left:auto;border:0;border-radius:9px;padding:7px 10px;font:inherit;font-size:13px;font-weight:700;background:rgba(255,255,255,.1);color:#fff}
   .sh-dm .acts.main{display:flex;gap:8px;margin-top:10px}.sh-dm .acts.main button{flex:1;border:0;border-radius:12px;padding:14px 12px;font:inherit;font-size:16px;font-weight:800;background:rgba(255,255,255,.1);color:#fff}.sh-dm .acts.main .y{background:#F2C230;color:#17191C}.sh-dm .acts.main button:disabled{opacity:.5}
   .sh-dmbar{display:flex;align-items:center;gap:8px;margin-bottom:10px;font-weight:800}.sh-dmbar span{flex:1}.sh-dmrest{font-weight:900;color:#FDE68A;margin:2px 0 10px}
@@ -666,7 +666,7 @@
 
 
   // 11/20 앱 안 업데이트: 서버의 새 index.html 빌드 번호가 다르면 [업데이트] 버튼 → 새로 불러오기 (홈 화면에 다시 추가할 필요 없음)
-  const BUILD = '20261122-5';
+  const BUILD = '20261122-6';
   async function updCheck() {
     try {
       const r = await fetch('app.html?chk=' + Date.now(), { cache: 'no-store' }); if (!r.ok) return;
@@ -1529,8 +1529,31 @@
   function shDmHtml(x, gate) {
     const id = dmId(x), b = dmBr(x), [sc, st] = dmState(x), open = DM.open === String(id), d = DM.det[id] || null, db = dmBr(d || x), today = dmActDay();
     const tags = [x.stockSurveyYN === 'Y' && '<span class="w">재고조사</span>', x.examineYN === 'Y' && '<span class="w">검수</span>', x.coffeeMachineYN === 'Y' && '<span>커피머신</span>', b.entranceType === '보안카드' && '<span>출입증</span>', b.unableDeliveryTime && `<span>배송 불가 ${esc(b.unableDeliveryTime)}</span>`].filter(Boolean).join('');
-    return `<div class="sh-dm"><div class="sh-dmh"><span class="dm-st ${sc}">${esc(st || '배송')}</span>${x.sequence ? `<em>배송 ${esc(x.sequence)}번</em>` : ''}<button type="button" class="sh-dmi" data-dm="open" data-id="${esc(id)}">배송 정보 ${open ? '▴' : '▾'}</button></div>
+    return `<div class="sh-dm"><div class="sh-dmh"><span class="dm-st ${sc}">${esc(st || '배송')}</span>${shSeqHtml(x, today)}<button type="button" class="sh-dmi" data-dm="open" data-id="${esc(id)}">배송 정보 ${open ? '▴' : '▾'}</button></div>
       ${tags ? `<div class="dm-tg">${tags}</div>` : ''}${dmActsHtml(x, id, today, false, gate)}${open ? dmDetHtml(x, d, db, id, today, false, true) : ''}</div>`;
+  }
+  // 11/22 배송 순서 바꾸기 — 딜리버리웹 '배송 순서 변경하기'와 같은 요청 (출발했거나 끝난 곳은 위에 고정, 그 아래에서만 옮김)
+  const dmSeqList = () => ((DM.sch && DM.sch.details) || []).slice().sort((a, b) => (+a.sequence || 999) - (+b.sequence || 999));
+  const dmFixed = (y) => y.doneYN === 'Y' || !!y.deliveryStartAt;
+  function shSeqHtml(x, today) {
+    const ls = dmSeqList(), i = ls.indexOf(x), fx = ls.filter(dmFixed).length;
+    if (i < 0) return x.sequence ? `<em>배송 ${esc(x.sequence)}번</em>` : '';
+    if (!today || !DM.sch || !DM.sch.id || dmFixed(x) || ls.length - fx < 2) return `<em>배송 ${i + 1}번</em>`;
+    let o = ''; for (let k = fx; k < ls.length; k++) o += `<option value="${k}"${k === i ? ' selected' : ''}>배송 ${k + 1}번</option>`;
+    return `<select class="sh-seq" data-dmseq="${esc(dmId(x))}" aria-label="배송 순서">${o}</select>`;
+  }
+  async function dmSeq(id, k, sel) {
+    const ls = dmSeqList(), i = ls.findIndex((y) => String(dmId(y)) === String(id)), fx = ls.filter(dmFixed).length;
+    if (i < 0 || k < fx || k >= ls.length || k === i) return shUi();
+    const nm = dmBr(ls[i]).branchName || dmBr(ls[i]).companyName || '이 거래처';
+    if (!confirm(`${nm}을(를) 배송 ${k + 1}번으로 옮길까요?\n딜리버리웹 배송 순서도 같이 바뀌어요.`)) return shUi();
+    const arr = ls.slice(); arr.splice(k, 0, arr.splice(i, 1)[0]);
+    const t = arr.filter((y) => !y.taskStartAt), base = arr.length - t.length;
+    const schedules = t.map((y, j) => ({ deliveryScheduleDetailId: dmId(y), meridiem: y.meridiem, sequence: base + j + 1 }));
+    if (sel) sel.disabled = true;
+    try { await dmCall('PATCH', `schedules/${DM.sch.id}/sequences`, undefined, { schedules }); }
+    catch (e) { alert('순서를 못 바꿨어요: ' + (e.message || '') + '\n\n계속 안 되면 [기존 배송화면]에서 바꿔 주세요.'); }
+    await dmReload(); shUi();
   }
   const fOf = (r) => SH.flags[String(r.code)] || null;
   const reqOf = (r) => { const f = fOf(r); if (!f) return false; return f.card !== undefined ? !!(f.card && f.pub) : !!(f.req && f.pub); };   // 11/8: 물류팀이 요약카드를 작성한 거래처만 필수
@@ -1553,7 +1576,9 @@
     // 착지 수에 맞춰 글씨 크기 자동 (8곳 이하 크게 → 20곳이면 작게)
     const n = rs.length, z = n <= 8 ? 1 : n >= 20 ? 0.78 : 1 - (n - 8) * 0.22 / 12;
     const dmOk = shDmOn(), MT = dmOk ? shDmMatch() : { m: {}, rest: [] }, gate = dmOk && (pend.cards.length || pend.loads) ? `상차 체크${pend.loads ? ' ' + pend.loads + '건' : ''}·요약카드 확인${pend.cards.length ? ' ' + pend.cards.length + '곳' : ''}을 끝내면 출발할 수 있어요` : '';
-    const body = rs.map((r, i) => { const f = fOf(r) || {}, need = reqOf(r), rd = SH.reads.has(String(r.code)), m = am(r), dx = MT.m[r.code];
+    // 11/22 배송 순서를 바꾸면 실적표도 그 순서로 (짝 맞은 거래처끼리 자리만 바꿈, 짝 없는 곳은 제자리)
+    const ord = rs.slice(); if (dmOk) { const slots = [], ms = []; rs.forEach((r, k) => { if (MT.m[r.code]) { slots.push(k); ms.push(r); } }); ms.sort((a, b) => (+MT.m[a.code].sequence || 999) - (+MT.m[b.code].sequence || 999)); slots.forEach((k, j) => { ord[k] = ms[j]; }); }
+    const body = ord.map((r, i) => { const f = fOf(r) || {}, need = reqOf(r), rd = SH.reads.has(String(r.code)), m = am(r), dx = MT.m[r.code];
       const tg = [f.new ? '<span class="t-new">첫 배송</span>' : '', f.chg ? `<span class="t-chg">담당 변경 (평소 ${esc(f.chg)})</span>` : '', f.voc ? '<span class="t-voc">최근 VOC</span>' : '', f.conf ? '<span class="t-conf">혼동 주의</span>' : '', r.frozen ? '<span class="t-fz">냉동 배송 있음</span>' : '', noLoc(r) ? '<span class="t-nol">로케이션 없음</span>' : ''].join('');
       const ex = [f.voc ? f.voc.map((v) => `<div class="bx voc"><b class="h">최근 VOC · ${esc(String(v.d || '').slice(5).replace('-', '/'))}</b>${esc(v.t)}</div>`).join('') : '', f.conf ? `<div class="bx conf"><b class="h">혼동 주의</b>같은 건물에 다른 거래처: ${f.conf.map(esc).join(' · ')} — 층·호 꼭 확인</div>` : '', noLoc(r) ? '<div class="bx nol"><b class="h">로케이션 없음</b>도크장 앞 파레트 확인</div>' : ''].join('');
       const ad = addrOf(r);
@@ -1572,6 +1597,7 @@
   $('sh-next').onclick = () => { L.d = addDay(L.d, 1); L.auto = false; shLoad(true); };
   $('sh-re').onclick = () => shLoad(true);
   let shCur = null;
+  $('sh-list').onchange = (ev) => { const sl = ev.target.closest && ev.target.closest('select[data-dmseq]'); if (sl) dmSeq(sl.dataset.dmseq, +sl.value, sl); };
   $('sh-list').onclick = (ev) => {
     if (ev.target.closest('[data-dm]')) return dmClick(ev);   // 11/21 배송 버튼
     const b = ev.target.closest('button[data-card]'); if (!b) return;
