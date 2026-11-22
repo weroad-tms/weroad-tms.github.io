@@ -313,7 +313,7 @@
   <div id="pd" hidden></div>
   <div id="home"><div class="hm-nm" id="hm-nm">—</div><div class="hm-sub" id="hm-sub"></div><div class="hm-st" id="hm-st"><i></i><span id="hm-stt">—</span></div><div class="hm-car" id="hm-car"></div><button class="hm-chg" id="hm-chg">내 차 바꾸기</button><div class="hm-q" id="hm-q"></div><div class="hm-day" id="hm-day" hidden></div><div class="hm-rows" id="hm-rows"></div><button class="hm-chg" id="hm-loc">위치정보 동의 관리</button></div>
   <div id="hbk"><button id="hbk-b" aria-label="홈으로"><svg width="26" height="26" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" stroke="#EDEFF1" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></button><b id="hbk-t"></b></div>
-  <div class="tabs"><button data-tab="cs" hidden>실적표</button><button data-tab="cw" hidden>업무</button><button data-tab="sh">실적표</button><button data-tab="loc">운행 시작</button><button data-tab="lc">상차</button><button data-tab="dl">배송</button><button data-tab="mm" hidden>내 운행 기록</button><button class="on" data-tab="rec">퇴근</button></div>
+  <div class="tabs"><button data-tab="cs" hidden>실적표</button><button data-tab="cw" hidden>업무</button><button data-tab="loc">운행 시작</button><button data-tab="lc">상차</button><button data-tab="sh">실적표</button><button data-tab="dl">배송</button><button data-tab="mm" hidden>내 운행 기록</button><button class="on" data-tab="rec">퇴근</button></div>
   <div id="t-cs" hidden>
     <div class="card">
       <div class="sh-top"><div class="name"><span id="cs-nm">—</span><span class="tmchip">편의점</span><small id="cs-sub">일일실적표 · 거래처 정보 · 상온/저온/합계 매출</small></div></div>
@@ -412,10 +412,9 @@
   <div class="card dg">
     <h3>하루 순서 — 위 탭 왼쪽부터 차례대로</h3>
     <ol>
-      <li><div><b>실적표</b><span>오늘 갈 거래처·주소·매출 확인<br>'요약카드 확인' 붙은 곳은 카드를 눌러 꼭 읽기</span></div></li>
       <li class="me"><div><b>운행 시작 (지금 화면)</b><span>[운행 시작] 누르면 위치는 앱이 알아서 보내요</span></div></li>
-      <li><div><b>상차</b><span>로케이션 보고 챙기는 즉시 <b style="display:inline;font-size:inherit;white-space:nowrap">☐ → ✓</b><br>✓ 안 한 상품이 있으면 배송 탭이 안 열려요</span></div></li>
-      <li><div><b>배송</b><span>거래처마다 출발 → 도착 → 배송사진</span></div></li>
+      <li><div><b>상차</b><span>로케이션 보고 챙기는 즉시 <b style="display:inline;font-size:inherit;white-space:nowrap">☐ → ✓</b><br>✓ 안 한 상품이 있으면 출발 버튼이 안 열려요</span></div></li>
+      <li><div><b>실적표</b><span>배송 순서대로 거래처·매출 확인 → '요약카드 확인' 붙은 곳은 꼭 읽기<br>거래처마다 출발 → 도착하면 작업 시작 · 사진 → 작업 완료하기</span></div></li>
       <li><div><b>운행 종료</b><span>이 화면에서 [운행 종료] 누르기 (위치 전송 꺼짐)</span><span id="dg-rec" hidden>퇴근 탭에 계기판 km·주유 금액 적고 저장</span></div></li>
     </ol>
     <div class="gd"><a class="gd-main" href="guide.html">📖 설치·사용 가이드 보기</a><div class="gd-l">내 폰을 고르면 그 폰에 맞는 가이드가 열려요</div><div class="gd-os"><a data-os="and" href="guide.html?os=and">안드로이드 (갤럭시)</a><a data-os="ios" href="guide.html?os=ios">아이폰</a></div></div>
@@ -667,7 +666,7 @@
 
 
   // 11/20 앱 안 업데이트: 서버의 새 index.html 빌드 번호가 다르면 [업데이트] 버튼 → 새로 불러오기 (홈 화면에 다시 추가할 필요 없음)
-  const BUILD = '20261122-3';
+  const BUILD = '20261122-4';
   async function updCheck() {
     try {
       const r = await fetch('app.html?chk=' + Date.now(), { cache: 'no-store' }); if (!r.ok) return;
@@ -765,7 +764,7 @@
     hmStat();
   }
   // 11/21 홈 시안 나머지 (상진님): 바로가기 4개 · 오늘 일정 카드 · 메뉴 밑 그날 숫자
-  const HM_Q = { snack: [['loc', '운행 시작'], ['lc', '상차'], ['sh', '배송'], ['rec', '퇴근']], cvs: [['cw', '업무시작'], ['cs', '실적표'], ['cw', '배송사진'], ['rec', '퇴근']] };
+  const HM_Q = { snack: [['loc', '운행 시작'], ['lc', '상차'], ['sh', '실적표'], ['rec', '퇴근']], cvs: [['cs', '실적표'], ['cw', '업무시작'], ['cw', '배송사진'], ['rec', '퇴근']] };
   const hmW = (n) => Number(n || 0).toLocaleString('ko-KR');
   function hmDayData() {   // 오늘(또는 다음) 일정 요약
     try {
