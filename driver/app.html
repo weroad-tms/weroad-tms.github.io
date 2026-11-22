@@ -139,6 +139,8 @@
   .sh-dmbar{display:flex;align-items:center;gap:8px;margin-bottom:10px;font-weight:800}.sh-dmbar span{flex:1}.sh-dmrest{font-weight:900;color:#FDE68A;margin:2px 0 10px}
   .dm-hint{font-size:13px;opacity:.7;margin:8px 0}
   .dm-pg{margin-bottom:12px}.dm-pg b{display:block;font-size:17px;margin-bottom:8px}.dm-pg div{display:flex;gap:4px}.dm-pg i{flex:1;height:5px;border-radius:3px;background:rgba(255,255,255,.12)}.dm-pg i.d{background:#3E6AF2}.dm-pg i.c{background:#F2C230}
+  .dm-back{display:block;width:100%;border:1px solid rgba(255,255,255,.18);border-radius:14px;padding:14px;margin:-16px 0 30px;font:inherit;font-size:15px;font-weight:800;background:transparent;color:#D7DADF}
+  .dm-ph .gone img{opacity:.25}
   .dm-go{display:block;width:100%;border:0;border-radius:14px;padding:16px;margin:14px 0 30px;font:inherit;font-size:17px;font-weight:900;background:#F2C230;color:#17191C}.dm-go:disabled{opacity:.4}
   .dm-row{display:flex;gap:8px;margin-bottom:10px}.dm-row label{flex:1;text-align:center;padding:14px 12px;font-size:16px}
   .dm-row input[type=text]{flex:1;min-width:0;border:1px solid rgba(255,255,255,.15);border-radius:10px;padding:12px;font:inherit;font-size:16px;background:rgba(255,255,255,.06);color:#fff}
@@ -665,7 +667,7 @@
 
 
   // 11/20 앱 안 업데이트: 서버의 새 index.html 빌드 번호가 다르면 [업데이트] 버튼 → 새로 불러오기 (홈 화면에 다시 추가할 필요 없음)
-  const BUILD = '20261122-2';
+  const BUILD = '20261122-3';
   async function updCheck() {
     try {
       const r = await fetch('app.html?chk=' + Date.now(), { cache: 'no-store' }); if (!r.ok) return;
@@ -992,29 +994,44 @@
     } catch (e) { if (DM.wk) { DM.wk.busy = ''; DM.wk.err = e.message; dmUi(); } }
   }
   async function dmWkStep() {   // 현재 단계에 필요한 자료 준비
-    const W = DM.wk; if (!W) return; const [k] = W.steps[W.idx]; W.busy = '불러오는 중…'; W.err = ''; dmUi(); window.scrollTo(0, 0);
+    const W = DM.wk; if (!W) return; const [k, ty] = W.steps[W.idx]; W.busy = '불러오는 중…'; W.err = ''; dmUi(); window.scrollTo(0, 0);
     try {
-      if (k === 'img') W.imgs = [];
+      // 11/22 '이전 단계'로 돌아와 고치는 경우: 서버에 이미 저장된 내용을 불러와 채움
+      const T = W.edit ? (await dmGet(`schedules/details/${W.id}/tasks`)) || {} : null, sv = T && DM_DONE[ty] && Array.isArray(T[DM_DONE[ty]]) ? T[DM_DONE[ty]] : [];
+      W.old = []; W.del = [];
+      if (k === 'img') { W.imgs = []; W.old = sv.map((x) => ({ id: x.id || x.imageId, url: x.web || x.url || x.imageUrl || x.uri || (x.image && x.image.uri) || x.path || '' })).filter((x) => x.id != null); }
       else if (k === 'insp') {
         const d = await dmGet(`task-inspections/details/${W.id}/display`), dr = dmDraft('insp-' + W.id) || {};
-        W.insp = (Array.isArray(d) ? d : []).map((x) => { const it = x.item || {}, max = (+x.orderUnit || 1) * (+x.quantity || 0); const q = Math.min(max, Math.max(0, +dr[x.orderItemId] || 0));
+        const pv = {}; for (const v of sv) { const oid = v.orderItemId || (v.orderItem && v.orderItem.id); if (oid != null) pv[oid] = +(v.displayQuantity != null ? v.displayQuantity : v.quantity) || 0; }
+        W.insp = (Array.isArray(d) ? d : []).map((x) => { const it = x.item || {}, max = (+x.orderUnit || 1) * (+x.quantity || 0); const q = Math.min(max, Math.max(0, dr[x.orderItemId] != null ? +dr[x.orderItemId] || 0 : pv[x.orderItemId] != null ? pv[x.orderItemId] : 0));
           return { id: x.orderItemId, name: it.name || '', cap: it.capacity || '', brand: it.brandName || '', grp: (it.category && it.category.group) || '기타', max, qty: q }; });
         if (!W.insp.length) throw new Error('검수할 품목이 없다고 나와요');
       }
-      else if (k === 'stock') { W.stock = dmDraft('stock-' + W.id) || []; W.sold = true; W.q = []; W.miss = ''; W.hit = null; }
-      else if (k === 'coffee') { const d = await dmGet('task-inspections/coffee'); W.chk = (Array.isArray(d) ? d : []).map((x) => ({ id: x.id, label: String(x.content || ''), on: false })); W.memo = { m: false, t: false, text: '' }; if (!W.chk.length) throw new Error('체크리스트를 못 불러왔어요'); }
-      else if (k === 'fin') { await dmCall('PATCH', `schedules/details/${W.id}/done-task`); dmDraft('insp-' + W.id, null); dmDraft('stock-' + W.id, null); dmReload(); }
+      else if (k === 'stock') { W.stock = dmDraft('stock-' + W.id) || [];
+        if (!W.stock.length && sv.length) W.stock = sv.map((v) => { const it = v.item || {}; return { id: it.id || v.itemId, name: it.name || v.itemName || '', cap: it.capacity || '', brand: it.brandName || '', barcode: it.barcode || v.barcode || '', grp: (it.category && it.category.group) || '기타', quantity: +v.quantity || 1 }; }).filter((x) => x.id != null);
+        W.sold = true; W.q = []; W.miss = ''; W.hit = null; }
+      else if (k === 'coffee') { const d = await dmGet('task-inspections/coffee'); W.chk = (Array.isArray(d) ? d : []).map((x) => ({ id: x.id, label: String(x.content || ''), on: false })); W.memo = { m: false, t: false, text: '' }; if (!W.chk.length) throw new Error('체크리스트를 못 불러왔어요'); if (W.edit && sv.length) W.chk.forEach((c) => { c.on = true; }); }
+      else if (k === 'fin') W.done = false;   // 11/22 완료는 [작업 완료하기]를 눌러야 (그 전엔 이전 단계로 돌아가 고칠 수 있음)
       W.busy = '';
     } catch (e) { W.busy = ''; W.err = e.message; }
     dmUi();
   }
-  const dmWkNext = () => { DM.wk.idx += 1; return dmWkStep(); };
+  const dmWkNext = () => { DM.wk.idx += 1; DM.wk.edit = DM.wk.idx < (DM.wk.top || 0); return dmWkStep(); };
+  function dmWkBack() { const W = DM.wk; if (!W || W.idx < 1 || W.done) return; W.top = Math.max(W.top || 0, W.idx); W.idx -= 1; W.edit = true; W.mark = false; return dmWkStep(); }
+  async function dmWkDone(btn) {
+    const W = DM.wk; btn.disabled = true; btn.textContent = '완료 처리 중…';
+    try { await dmCall('PATCH', `schedules/details/${W.id}/done-task`); W.done = true; dmDraft('insp-' + W.id, null); dmDraft('stock-' + W.id, null); dmReload(); dmUi(); }
+    catch (e) { btn.disabled = false; btn.textContent = '작업 완료하기'; alert((e.message || '완료가 안 됐어요') + '\n\n계속 안 되면 [기존 배송화면]에서 완료해 주세요.'); }
+  }
   async function dmWkSend(btn) {   // 현재 단계 저장 → 다음 단계
     const W = DM.wk, [k, ty] = W.steps[W.idx], old = btn.textContent; btn.disabled = true; btn.textContent = '저장 중…';
     try {
       if (k === 'img') {
-        const ok = W.imgs.filter((e) => e.st === 'ok'); if (!ok.length) throw new Error('사진을 1장 이상 올려 주세요');
-        await dmCall('POST', `schedules/details/${W.id}/images`, undefined, { fileRequests: ok.map((e) => ({ contentLength: e.r.contentLength, originalFileName: e.r.originalFileName, preSignedUrl: e.r.uploadUrl, type: e.r.type })), type: DM_IMG[ty][0] });
+        const ok = W.imgs.filter((e) => e.st === 'ok'), keep = W.old.filter((o) => !W.del.includes(o.id)).length;
+        if (!ok.length && !keep) throw new Error('사진을 1장 이상 올려 주세요');
+        const fr = ok.map((e) => ({ contentLength: e.r.contentLength, originalFileName: e.r.originalFileName, preSignedUrl: e.r.uploadUrl, type: e.r.type }));
+        if (W.old.length) { if (fr.length || W.del.length) await dmCall('PUT', `schedules/details/${W.id}/images`, undefined, { fileRequests: fr, type: DM_IMG[ty][0], deleteImageIds: W.del }); }   // 이미 올린 사진 고치기 (딜리버리웹 '추가 사진'과 같은 방식)
+        else await dmCall('POST', `schedules/details/${W.id}/images`, undefined, { fileRequests: fr, type: DM_IMG[ty][0] });
       } else if (k === 'insp') {
         const diff = W.insp.filter((x) => x.qty !== x.max).length;
         if (diff && !confirm(`주문 수량과 다른 품목이 ${diff}개 있어요.\n그대로 진행할까요?\n\n(취소하면 다른 품목을 빨갛게 표시해요)`)) { W.mark = true; return dmUi(); }
@@ -1022,7 +1039,7 @@
         dmDraft('insp-' + W.id, null);
       } else if (k === 'stock') {
         if (!W.stock.length) throw new Error('상품을 1개 이상 넣어 주세요');
-        if (!confirm('재고조사를 완료할까요?')) return;
+        if (!confirm('재고조사를 저장하고 다음으로 갈까요?\n(다음 화면에서 [이전 단계]로 돌아와 고칠 수 있어요)')) return;
         await dmCall('POST', `schedules/details/${W.id}/stock-survey`, undefined, { stockItems: W.stock.map((x) => ({ itemId: x.id, quantity: Math.max(1, +x.quantity || 1) })) });
         dmDraft('stock-' + W.id, null);
       } else if (k === 'coffee') {
@@ -1082,10 +1099,11 @@
     let body = '';
     if (k === 'img') {
       const n = W.imgs.length, ok = W.imgs.filter((e) => e.st === 'ok').length, up = W.imgs.some((e) => e.st === 'up');
-      body = `<div class="dm-ph">${W.imgs.map((e, i) => `<div class="${e.st}"><img src="${e.url}" alt=""><button type="button" data-dm="imgx" data-id="${i}" aria-label="사진 삭제">×</button>${e.st === 'up' ? '<em>올리는 중</em>' : e.st === 'err' ? '<em>실패</em>' : ''}</div>`).join('')}</div>
-        ${n < DM_MAXIMG ? `<div class="dm-row"><label class="dm-btn y">📷 촬영<input type="file" accept="image/*" capture="environment" hidden></label><label class="dm-btn">앨범에서<input type="file" accept="image/*" multiple hidden></label></div>` : ''}
+      const olds = W.old.map((o) => `<div class="ok${W.del.includes(o.id) ? ' gone' : ''}">${o.url ? `<img src="${esc(o.url)}" alt="">` : '<em>저장된 사진</em>'}<button type="button" data-dm="oldx" data-id="${esc(o.id)}" aria-label="${W.del.includes(o.id) ? '되살리기' : '사진 삭제'}">${W.del.includes(o.id) ? '↺' : '×'}</button>${W.del.includes(o.id) ? '<em>지울 사진</em>' : ''}</div>`).join('');
+      body = `${W.old.length ? '<p class="dm-hint">이미 올린 사진이에요. ×로 지우거나 새로 추가할 수 있어요.</p>' : ''}<div class="dm-ph">${olds}${W.imgs.map((e, i) => `<div class="${e.st}"><img src="${e.url}" alt=""><button type="button" data-dm="imgx" data-id="${i}" aria-label="사진 삭제">×</button>${e.st === 'up' ? '<em>올리는 중</em>' : e.st === 'err' ? '<em>실패</em>' : ''}</div>`).join('')}</div>
+        ${n < DM_MAXIMG ? `<div class="dm-row"><label class="dm-btn y">촬영<input type="file" accept="image/*" capture="environment" hidden></label><label class="dm-btn">앨범에서<input type="file" accept="image/*" multiple hidden></label></div>` : ''}
         <p class="dm-hint">최대 ${DM_MAXIMG}장${W.imgs.some((e) => e.st === 'err') ? ' · 실패한 사진은 ×로 지우고 다시 올려 주세요' : ''}</p>
-        <button type="button" class="dm-go" data-dm="send" ${ok && !up ? '' : 'disabled'}>${esc(DM_IMG[ty][1])} 사진 등록하기${ok ? ` (${ok}장)` : ''}</button>`;
+        <button type="button" class="dm-go" data-dm="send" ${(ok || W.old.length) && !up ? '' : 'disabled'}>${W.old.length ? `${esc(DM_IMG[ty][1])} 사진 고치고 다음` : `${esc(DM_IMG[ty][1])} 사진 등록하기${ok ? ` (${ok}장)` : ''}`}</button>`;
     } else if (k === 'insp') {
       const left = W.insp.filter((x) => !x.qty).length, pcs = W.insp.reduce((a, x) => a + x.max, 0), g = {};
       W.insp.forEach((x) => { (g[x.grp] = g[x.grp] || []).push(x); });
@@ -1105,20 +1123,22 @@
         ${W.memo.t ? `<textarea id="dm-memo" rows="3" placeholder="전달사항이나 특이사항을 남겨주세요.">${esc(W.memo.text)}</textarea>` : ''}
         <button type="button" class="dm-go" data-dm="send">케어서비스 작업 내용 등록하기</button>`;
     } else if (k === 'fin') {
-      void ty; body = `<div class="card msg" style="text-align:center;font-size:17px">✅ 작업이 완료되었습니다.<br><b>${esc(W.name)}</b> 끝!</div><button type="button" class="dm-go" data-dm="wkx">목록으로</button>`;
+      void ty; body = W.done ? `<div class="card msg" style="text-align:center;font-size:17px">✅ 작업이 완료되었습니다.<br><b>${esc(W.name)}</b> 끝!</div><button type="button" class="dm-go" data-dm="wkx">목록으로</button>`
+        : `<div class="card msg" style="text-align:center;font-size:16px;line-height:1.6">모든 단계를 마쳤어요.<br>고칠 게 있으면 <b>이전 단계</b>로 돌아가세요.<br>다 맞으면 <b>작업 완료하기</b>를 눌러 주세요.</div><button type="button" class="dm-go" data-dm="done">작업 완료하기</button>`;
     }
-    w.innerHTML = head + bar + body;
+    const back = W.idx > 0 && !(k === 'fin' && W.done) ? `<button type="button" class="dm-back" data-dm="back">← 이전 단계 (${esc(DM_LBL(W.steps[W.idx - 1][0], W.steps[W.idx - 1][1]))}) 고치기</button>` : '';
+    w.innerHTML = head + bar + (W.edit && k !== 'fin' ? '<div class="card msg">이전에 저장한 내용을 고치는 중이에요. 고친 뒤 저장하면 다음 단계로 가요.</div>' : '') + body + back;
     if (k === 'stock') setTimeout(dmBcFocus, 50);
   }
   function dmActsHtml(x, id, today, uni, gate) {
     if (!today || x.doneYN === 'Y') return '';
     if (gate) return `<div class="acts main"><span class="dm-hint">${esc(gate)}</span></div>`;
     return `<div class="acts main">${
-      x.taskStartAt ? `<button type="button" class="y" data-dm="wk" data-id="${esc(id)}">📷 작업 이어하기 · 사진</button>`
-      : x.deliveryStartAt ? `<button type="button" class="y" data-dm="task" data-id="${esc(id)}">📷 작업 시작 · 사진</button><button type="button" data-dm="goX" data-id="${esc(id)}">출발 취소</button>`
+      x.taskStartAt ? `<button type="button" class="y" data-dm="wk" data-id="${esc(id)}">작업 이어하기 · 사진</button>`
+      : x.deliveryStartAt ? `<button type="button" class="y" data-dm="task" data-id="${esc(id)}">작업 시작 · 사진</button><button type="button" data-dm="goX" data-id="${esc(id)}">출발 취소</button>`
       : uni ? '<span class="dm-hint">출근 복장 사진을 먼저 등록해 주세요</span>'
       : x.startDeliveryAvailable === false ? '<span class="dm-hint">진행 중인 배송을 끝내면 출발할 수 있어요</span>'
-      : `<button type="button" class="y" data-dm="go" data-id="${esc(id)}">🚚 출발</button>`}</div>`;
+      : `<button type="button" class="y" data-dm="go" data-id="${esc(id)}">출발</button>`}</div>`;
   }
   function dmDetHtml(x, d, db, id, today, uni, gate) {   // 11/21 배송 화면·실적표 같이 씀
       let det = '';
@@ -1139,7 +1159,7 @@
             <div class="sec"><label>배송 참고사항</label>${ref && ref.err ? '못 불러왔어요' : notes.length ? notes.map((n) => `<div class="dm-note"><i>${esc(String(n.createAt || '').slice(0, 10))}${n.topFixed ? ' · 고정' : ''}</i>${esc(n.contents || '')}</div>`).join('') : '등록된 배송 참고사항이 없어요.'}</div>
             ${gate ? '' : dmActsHtml(x, id, today, uni)}
             <div class="acts">
-              ${isFinite(lat) && lat && !gate ? `<button type="button" class="y" data-dm="nav" data-id="${esc(id)}">🧭 내비</button>` : ''}
+              ${isFinite(lat) && lat && !gate ? `<button type="button" class="y" data-dm="nav" data-id="${esc(id)}">길안내</button>` : ''}
               ${d.orderUrl ? `<a href="${esc(d.orderUrl)}" target="_blank" rel="noopener">거래명세서 ↗</a>` : ''}
               <button type="button" data-dm="old">기존 배송화면</button>
               ${dmRaw() ? `<button type="button" data-dm="raw" data-id="${esc(id)}">원본 복사 (점검용)</button>` : ''}
@@ -1161,7 +1181,7 @@
     const done = list.filter((x) => x.doneYN === 'Y').length, cur = list.find((x) => x.doneYN !== 'Y');
     const today = dmActDay(), uni = false;   // 11/21 출근 복장 사진은 생략 (상진님) — 다시 쓰려면 DM.sch.uniformYN === 'N' 로
     w.innerHTML = top(`배송 ${list.length}곳 · 완료 ${done}`) + (DM.busy ? `<div class="card msg">${DM.busy}</div>` : '')
-      + (uni ? `<div class="card warn"><b>오늘의 출근 복장 사진</b>을 먼저 등록해 주세요. (등록해야 출발할 수 있어요)<br><label class="dm-btn y" style="display:inline-block;margin-top:8px" data-uni="1">📷 출근 복장 촬영<input type="file" accept="image/*" capture hidden></label></div>` : '')
+      + (uni ? `<div class="card warn"><b>오늘의 출근 복장 사진</b>을 먼저 등록해 주세요. (등록해야 출발할 수 있어요)<br><label class="dm-btn y" style="display:inline-block;margin-top:8px" data-uni="1">출근 복장 촬영<input type="file" accept="image/*" capture hidden></label></div>` : '')
       + list.map((x, i) => {
       const id = dmId(x), b = dmBr(x), [sc, st] = dmState(x), open = DM.open === String(id), d = DM.det[id] || null, db = dmBr(d || x);
       const tags = [x.stockSurveyYN === 'Y' && '<span class="w">재고조사</span>', x.examineYN === 'Y' && '<span class="w">검수</span>', x.coffeeMachineYN === 'Y' && '<span>커피머신</span>', b.entranceType === '보안카드' && '<span>출입증 카드지참</span>', b.unableDeliveryTime && `<span>배송 불가 ${esc(b.unableDeliveryTime)}</span>`, x.meridiem === 'AM' && '<span>오전</span>', x.meridiem === 'PM' && '<span>오후</span>'].filter(Boolean).join('');
@@ -1190,6 +1210,9 @@
       if (a === 'wkre') return W.steps ? dmWkStep() : dmWkOpen(W.id);
       if (a === 'next') return dmWkNext();
       if (a === 'send') return dmWkSend(b);
+      if (a === 'back') return dmWkBack();
+      if (a === 'done') return dmWkDone(b);
+      if (a === 'oldx') { const i = W.del.indexOf(id) >= 0 ? W.del.indexOf(id) : W.del.findIndex((v) => String(v) === id); if (i >= 0) W.del.splice(i, 1); else { const o = W.old.find((v) => String(v.id) === id); if (o) W.del.push(o.id); } return dmUi(); }
       if (a === 'imgx') { const e = W.imgs[+id]; if (e) { try { URL.revokeObjectURL(e.url); } catch (er) { /* noop */ } W.imgs.splice(+id, 1); } return dmUi(); }
       if (a === 'all') { const x = W.insp.find((q) => String(q.id) === id); if (!x) return; x.qty = x.max; dmInspSave();
         const row = b.closest('.dm-li'); row.querySelector('input').value = x.max; b.classList.add('on'); row.classList.remove('bad'); const sm = $('dm-insp-sum'); if (sm) sm.lastElementChild.textContent = W.insp.filter((q) => !q.qty).length; return; }
@@ -1197,7 +1220,10 @@
       if (a === 'stx') { W.stock = W.stock.filter((q) => String(q.id) !== id); dmDraft('stock-' + W.id, W.stock); dmStockRefresh(); return dmBcFocus(); }
     }
     if (a === 'cand') { try { await dmLogin(id); DM.cand = null; dmOpen(true); } catch (e) { alert(e.message); } return; }
-    if (a === 'nav') { const d = (DM.det[id] && DM.det[id].coordinate ? DM.det[id] : dmItem(id)) || {}, co = d.coordinate || {}, br = dmBr(d), ad = b.dataset.addr || br.address || ''; return nvRaw(br.branchName || br.companyName || '거래처', +co.latitude, +co.longitude, ad); }
+    if (a === 'nav') {   // 11/22 좌표가 있으면 그 자리로, 없으면 주소로 찾기 (짝이 안 맞은 거래처도 길안내)
+      const d = (id && ((DM.det[id] && DM.det[id].coordinate) ? DM.det[id] : dmItem(id))) || {}, co = d.coordinate || {}, br = dmBr(d), ad = b.dataset.addr || br.address || '';
+      if (!(+co.latitude) && !ad) return alert('주소가 없어 길안내를 못 해요');
+      return nvRaw(b.dataset.nm || br.branchName || br.companyName || '거래처', +co.latitude, +co.longitude, ad); }
     if (a === 'raw') {   // 점검용: 데이터 모양 확인 (전화번호는 가림)
       const mask = (k, v) => (typeof v !== 'string' ? v : /phone|tel|cellphone/i.test(k) ? v.replace(/\d(?=\d{2})/g, '*') : v.replace(/(^|[^\d.])0(1[016789]|2|[3-6]\d|70)[-. ]?\d{3,4}[-. ]?\d{4}(?!\d)/g, '$10**-****-****'));   // 메모 안 전화번호도 가림
       b.textContent = '모으는 중…';
@@ -1534,7 +1560,7 @@
       const ad = addrOf(r);
       const cl = String(f.cl || ''), ci = cl.indexOf(' - '), wnm = ci >= 0 ? cl.slice(ci + 3) : cl, wco = ci >= 0 ? cl.slice(0, ci) : '';   // 11/22 위펀오피스 기준정보 이름 (금액은 판매가 그대로)
       return `<div class="shr ${need && !rd ? 'req' : ''}"><div class="shn"><i>${i + 1}</i><b>${esc(wnm || r.name)}</b></div>${wco ? `<div class="sh-co">${esc(wco)} · 상온코드 ${esc(r.code)}</div>` : ''}
-        ${(() => { const ad2 = ad || (dx && dmBr(dx).address) || ''; return `<div class="sha">${ad2 ? esc(ad2) : '<span style="opacity:.5">주소 정보 없음</span>'}${dx && dx.coordinate && +dx.coordinate.latitude ? `<button type="button" class="sh-nv" data-dm="nav" data-id="${esc(dmId(dx))}" data-addr="${esc(ad2)}">🧭 내비</button>` : ''}</div>`; })()}
+        ${(() => { const ad2 = ad || (dx && dmBr(dx).address) || ''; return `<div class="sha">${ad2 ? esc(ad2) : '<span style="opacity:.5">주소 정보 없음</span>'}${(dx && dx.coordinate && +dx.coordinate.latitude) || ad2 ? `<button type="button" class="sh-nv" data-dm="nav" data-id="${dx ? esc(dmId(dx)) : ''}" data-addr="${esc(ad2)}" data-nm="${esc(wnm || r.name)}">길안내</button>` : ''}</div>`; })()}
         <div class="shm"><span><label>상온</label>${cell(m.a)}</span><span><label>저온</label>${cell(m.c)}</span><span class="t"><label>합계</label>${won(m.s)}</span></div>
         ${tg ? `<div class="sh-tg">${tg}</div>` : ''}${ex ? `<div class="sh-x">${ex}</div>` : ''}${need || f.pub ? `<button class="sh-btn ${rd || !need ? 'ok' : ''}" data-card="${esc(r.code)}">${need ? (rd ? '✓ 요약카드 확인함' : '요약카드 확인 (필수)') : '요약카드 보기'}</button>` : ''}${dx ? shDmHtml(dx, gate) : ''}</div>`; }).join('');
     const dmTop = !dmOk ? '' : DM.err ? `<div class="card warn">배송 정보를 못 불러왔어요: ${esc(DM.err)} <button type="button" class="dm-btn" data-dm="old">기존 배송화면</button></div>`
@@ -1631,7 +1657,7 @@
     const canOrd = !!j && sts.length > 1;
     const nvr = nvRun(), nvCur = NAV_ON && nvr.on ? sts.find((x) => !x.carry && !nvDone(x, nvr)) : null;
     $('cs-list').innerHTML = none ? `<div class="card msg">${esc(none)}</div>` : nvBar(sts) + (canOrd ? `<div class="card msg cs-ordh">· <b>▲ ▼</b>로 방문 순서를 바꿀 수 있어요. ${NAV_ON ? '이 순서대로 [주행 시작] 안내가 이어져요. 내일은 오늘 순서가 기본으로 나와요.' : '바꾼 순서는 물류팀 관제 지도에도 그대로 번호로 보여요.'}${CS.ordBusy ? ' <i>저장 중…</i>' : ''}</div>` : '') + sts.map((x, i) => `<div class="card cs-st${NAV_ON && nvr.on && !x.carry && nvDone(x, nvr) ? ' nv-done' : ''}${nvCur && nvCur.c === x.c ? ' nv-cur' : ''}"><b><span class="cs-sq">${i + 1}</span>${esc(x.nm)}${x.kinds.length > 1 ? '<span class="cs-tg">상온·저온</span>' : `<span class="cs-tg">${esc(x.kinds[0])}</span>`}${x.carry ? '<span class="cs-tg" style="background:#7C3AED">합적재 · 매출만</span>' : ''}${canOrd ? `<span class="cs-ord"><button type="button" data-ord="${esc(x.c)}" data-dir="-1" ${i === 0 || CS.ordBusy ? 'disabled' : ''} aria-label="위로">▲</button><button type="button" data-ord="${esc(x.c)}" data-dir="1" ${i === sts.length - 1 || CS.ordBusy ? 'disabled' : ''} aria-label="아래로">▼</button></span>` : ''}</b>
-        <span class="ad">${x.addr ? esc(x.addr) : '주소록에 주소가 없어요'} · 코드 ${esc(x.c)}</span>${NAV_ON && !x.carry ? `<button type="button" class="nv-one" data-nv="go" data-c="${esc(x.c)}">🧭 이 점포 안내</button>` : ''}${x.tel ? `<a class="tel" href="tel:${esc(x.tel.replace(/[^\d]/g, ''))}">📞 ${esc(x.tel)}</a>` : ''}${csLiqBtn(x)}
+        <span class="ad">${x.addr ? esc(x.addr) : '주소록에 주소가 없어요'} · 코드 ${esc(x.c)}</span>${NAV_ON && !x.carry ? `<button type="button" class="nv-one" data-nv="go" data-c="${esc(x.c)}">이 점포 길안내</button>` : ''}${x.tel ? `<a class="tel" href="tel:${esc(x.tel.replace(/[^\d]/g, ''))}">📞 ${esc(x.tel)}</a>` : ''}${csLiqBtn(x)}
         <div class="cs-am"><div class="kv"><label>상온</label><b>${won(x.a.상온)}</b></div><div class="kv"><label>저온</label><b>${won(x.a.저온)}</b></div><div class="kv"><label>합계</label><b style="color:#FDE68A">${won(x.tot)}</b></div></div></div>`).join('')
       + (sts.length ? `<div class="card"><div class="cs-am"><div class="kv"><label>상온 합계</label><b>${won(sum('상온'))}</b></div><div class="kv"><label>저온 합계</label><b>${won(sum('저온'))}</b></div><div class="kv"><label>전체 합계</label><b style="color:#FDE68A">${won(sum())}</b></div></div></div>` : '');
     $('cs-list').onclick = nvClick;
@@ -1648,7 +1674,7 @@
       : nvBar(sts) + need.map((x, i) => { const ps = csPhotos(x.c), busy = CS.up[x.c];
         return `<div class="card cs-st ${ps.length ? 'ok' : ''}${NAV_ON && nvr.on && nvDone(x, nvr) ? ' nv-done' : ''}${nvCur && nvCur.c === x.c ? ' nv-cur' : ''}"><b><span class="cs-sq">${i + 1}</span>${esc(x.nm)}</b><span class="ad">${esc(x.addr || '')}</span>
           <div class="cs-ph">${ps.map((p) => `<a href="${csUrl(p)}" target="_blank" rel="noopener"><img src="${csUrl(p)}" alt="배송사진"></a>`).join('')}
-          <label class="pbtn ${ps.length ? 'done' : ''}">${busy ? '올리는 중…' : ps.length ? '✓ 사진 추가' : '📷 배송완료사진'}<input type="file" accept="image/*" capture="environment" data-code="${esc(x.c)}" ${busy ? 'disabled' : ''}></label></div></div>`; }).join('');
+          <label class="pbtn ${ps.length ? 'done' : ''}">${busy ? '올리는 중…' : ps.length ? '✓ 사진 추가' : '배송완료사진'}<input type="file" accept="image/*" capture="environment" data-code="${esc(x.c)}" ${busy ? 'disabled' : ''}></label></div></div>`; }).join('');
     $('cw-list').onclick = nvClick;
     $('cw-list').querySelectorAll('input[type=file]').forEach((el) => { el.onchange = () => { const f = el.files && el.files[0]; if (f) csUpload(el.dataset.code, f); el.value = ''; }; });
   }
@@ -1681,7 +1707,7 @@
     if (!cur) return `<div class="card nv-bar done"><b>오늘 점포 ${stops.length}곳 모두 완료했어요 👍</b><div class="nv-btns"><button type="button" data-nv="stop">주행 끝</button></div></div>`;
     const ci = stops.indexOf(cur) + 1;
     return `<div class="card nv-bar on"><div class="nv-now"><span class="nv-pg">${ci} / ${stops.length}</span><b>${esc(cur.nm)}</b></div>
-      <div class="nv-btns"><button type="button" class="nv-go" data-nv="go" data-c="${esc(cur.c)}">🧭 안내</button><button type="button" data-nv="done" data-c="${esc(cur.c)}">완료</button><button type="button" data-nv="stop">주행 끝</button></div>${sub}</div>`;
+      <div class="nv-btns"><button type="button" class="nv-go" data-nv="go" data-c="${esc(cur.c)}">길안내</button><button type="button" data-nv="done" data-c="${esc(cur.c)}">완료</button><button type="button" data-nv="stop">주행 끝</button></div>${sub}</div>`;
   }
   function nvModal(html, onClick) {
     const ov = document.createElement('div'); ov.className = 'lq-ov';
@@ -1730,7 +1756,7 @@
     if (!nx) return nvModal(`<b style="font-size:18px">오늘 점포 ${stops.length}곳을 모두 마쳤어요 👍</b><div style="font-size:14px;opacity:.8;margin-top:6px">업무 탭에서 특이사항을 적고 업무종료를 눌러 주세요.</div><button type="button" data-k="ok" style="text-align:center">확인</button>`, () => {});
     const n = stops.indexOf(nx) + 1;
     nvModal(`<b style="font-size:18px">다음: ${n}번 ${esc(nx.nm)}</b><div style="font-size:14px;opacity:.8;margin-top:4px">${esc(nx.addr || '')}</div><div style="font-size:16px;margin-top:10px">안내할까요?</div>
-      <div class="row"><button type="button" data-k="go" class="on">🧭 안내</button><button type="button" data-k="skip">건너뛰기</button></div>`,
+      <div class="row"><button type="button" data-k="go" class="on">길안내</button><button type="button" data-k="skip">건너뛰기</button></div>`,
       (k) => { if (k === 'go') nvGo(nx.c); });
   }
   async function nvStart() {
