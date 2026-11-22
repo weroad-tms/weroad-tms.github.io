@@ -250,7 +250,7 @@
   .mm-big{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center}
   .mm-big div{background:rgba(0,0,0,.22);border-radius:14px;padding:12px 4px}.mm-big b{display:block;font-size:30px;font-weight:800}.mm-big span{font-size:13px;color:#9AA0A6}
   .mm-big .g b{color:#34C27A}.mm-big .r b{color:#FF6B6B}
-  .mm-rows{margin-top:12px;font-size:15px}.mm-rows div{display:flex;justify-content:space-between;padding:7px 2px;border-top:1px solid rgba(255,255,255,.07)}.mm-rows span{color:#9AA0A6}
+  .mm-rows{margin-top:12px;font-size:15px}.mm-goal .gs{margin-left:auto;font-size:13px;font-weight:800;padding:4px 10px;border-radius:12px}.mm-goal .gs.ok{background:rgba(52,199,89,.18);color:#6EE7A0}.mm-goal .gs.no{background:rgba(239,68,68,.16);color:#FCA5A5}.mm-goal .mm-h{display:flex;align-items:center;gap:8px}.gl{display:grid;grid-template-columns:22px 1fr auto;gap:8px;align-items:center;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.07);font-size:15px}.gl i{font-style:normal;font-weight:900;text-align:center}.gl.g-ok i{color:#6EE7A0}.gl.g-no i{color:#FCA5A5}.gl.g-wait i{color:#9AA0A6}.gl b{font-variant-numeric:tabular-nums;white-space:nowrap;text-align:right}.gl b small{display:block;font-size:12px;font-weight:600;opacity:.6}.gl.g-no b{color:#FCA5A5}.gl-h{margin-top:10px;font-size:13px;font-weight:800;opacity:.7}.gl-n{margin-top:12px;font-size:15px;line-height:1.6}.gl-n span{font-size:13px;opacity:.65}.car-go{margin:8px 0 4px;border:0;border-radius:10px;padding:9px 14px;font:inherit;font-size:14px;font-weight:800;background:#334155;color:#fff}.mm-rows div{display:flex;justify-content:space-between;padding:7px 2px;border-top:1px solid rgba(255,255,255,.07)}.mm-rows span{color:#9AA0A6}
   .mm-ev{padding:12px 0;border-top:1px solid rgba(255,255,255,.08)}.mm-ev:first-child{border-top:0}
   .mm-ev .t{display:flex;gap:8px;align-items:center;font-size:14px;color:#9AA0A6}.mm-ev .t b{color:#EDEFF1;font-weight:700;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .mm-k{font-size:12px;font-weight:800;padding:2px 8px;border-radius:8px;flex:none}.mm-k.good{background:#1F4D36;color:#7BE3A8}.mm-k.bad{background:#5A2323;color:#FF9C9C}.mm-k.check{background:#3A3F45;color:#C9CED4}
@@ -666,7 +666,7 @@
 
 
   // 11/20 앱 안 업데이트: 서버의 새 index.html 빌드 번호가 다르면 [업데이트] 버튼 → 새로 불러오기 (홈 화면에 다시 추가할 필요 없음)
-  const BUILD = '20261122-9';
+  const BUILD = '20261122-10';
   try { document.getElementById('ver').textContent = 'v' + BUILD.slice(2, 8) + '-' + BUILD.split('-')[1]; } catch (e) {}
   async function updCheck() {
     try {
@@ -693,12 +693,38 @@
   $('mm-prev').onclick = () => mmShift(-1); $('mm-next').onclick = () => mmShift(1);
 
   // 편의점: 업무시작(센터에서 눌렀나) · 업무종료 · 점포별 사진 · 상품 누락(관리자 기록)
+  // 11/22 이번 달 달성 현황 — car_tier 서버 기준과 같은 계산 (스낵: 코스별 하나라도 통과 / 편의점: 한 달 합계)
+  function mmGoal(rows, empty) {
+    const cur = MM.ym === mmYm(new Date()), pct = (a, b) => b ? Math.floor(a / b * 1000) / 10 : null;
+    const line = (lab, val, ok, wait) => `<div class="gl ${ok ? 'g-ok' : wait ? 'g-wait' : 'g-no'}"><i>${ok ? '✓' : wait ? '…' : '✕'}</i><span>${lab}</span><b>${val}</b></div>`;
+    let body = '', pass = false;
+    if (!empty) for (const r of rows) {
+      const d = +r.days || 0, dayWait = cur && d < 10;
+      const ls = [line('운행 10일 이상', `${d}일`, d >= 10, dayWait)];
+      let ok = d >= 10;
+      for (const [lab, a, b, min] of r.rates) { const v = pct(a, b), o = v != null && v >= min; ok = ok && o; ls.push(line(`${lab} ${min}% 이상`, v == null ? '—' : `${v}%<small>${a || 0}/${b || 0}</small>`, o, false)); }
+      for (const [lab, v, unit] of r.zeros) { const o = !(+v); ok = ok && o; ls.push(line(`${lab} 0${unit}`, `${+v || 0}${unit}`, o, false)); }
+      if (ok) pass = true;
+      body += (rows.length > 1 ? `<div class="gl-h">${esc(r.title)}</div>` : '') + ls.join('');
+    }
+    const t = carTier && carTier.n === cfg.n ? carTier : { tier: 0, months: 0, good: 0 }, ti = +t.tier || 0, m = +t.months || 0, g = +t.good || 0;
+    const NEED = [[1, 0], [3, 0], [6, CVS() ? 0 : 3], [10, CVS() ? 0 : 8]];
+    let nx = '';
+    if (ti >= 4) nx = '블랙까지 모두 열었어요.';
+    else { const [nm, ng] = NEED[ti], rest = [nm > m ? `기준 달성 ${nm - m}개월` : '', ng > g ? `고객 칭찬 ${ng - g}건` : ''].filter(Boolean).join(' · ');
+      nx = `다음 색 <b>${CAR_TIER[ti + 1]}</b>까지: ${rest ? rest + ' 더' : '다음 달 1일 반영되면 열려요'}`; }
+    const st = empty ? '' : cur ? (pass ? '<span class="gs ok">지금까지 기준 통과 중</span>' : '<span class="gs no">아직 기준 미달</span>') : (pass ? '<span class="gs ok">이 달 기준 통과</span>' : '<span class="gs no">이 달 기준 미달</span>');
+    return `<div class="card mm-goal" id="mm-goal"><div class="mm-h">${cur ? '이번 달' : '이 달'} 달성 현황${st}</div>
+      ${empty ? '<div class="note">이 달 기록이 아직 없어요. 기록은 배송 다음 날 반영돼요.</div>' : body}
+      <div class="gl-n">${nx}<br><span>지금 누적: 기준 달성 ${m}개월${CVS() ? '' : ` · 고객 칭찬 ${g}건`}${cur ? ' · 이번 달은 다음 달 1일에 반영돼요' : ''}</span></div></div>`;
+  }
   async function mmCvs() {
     let r; try { r = await rpc('cvs_my_month', { p_name: cfg.n, p_token: cfg.tok, p_ym: MM.ym }); } catch (e) { $('mm-body').innerHTML = `<div class="card msg">불러오지 못했어요: ${mmEsc(e.message)}</div>`; return; }
     const s = (r && r.sum) || {}, ds = (r && r.days) || [];
-    if (!ds.length) { $('mm-body').innerHTML = '<div class="card msg">이 달 기록이 아직 없어요.</div>'; return; }
+    if (!ds.length) { $('mm-body').innerHTML = mmGoal([], true); return; }
+    const goal = mmGoal([{ title: '편의점', days: s.days, rates: [['점포 사진', s.photo, s.stores, 98], ['센터에서 업무시작', s.start_ok, s.days, 90]], zeros: [['몰아서 올리기', s.bulk, '회'], ['상품 누락', s.miss, '건']] }], false);
     const pl = { ok: '센터에서', out: '센터 밖', nogps: '위치 없음' };
-    $('mm-body').innerHTML = `<div class="card"><div class="mm-h">이번 달 운행<small>${s.days || 0}일</small></div>
+    $('mm-body').innerHTML = goal + `<div class="card"><div class="mm-h">이번 달 운행<small>${s.days || 0}일</small></div>
       <div class="mm-big"><div class="g"><b>${s.start_ok || 0}</b><span>센터에서 업무시작</span></div><div><b>${s.photo || 0}<small style="font-size:15px;color:#9AA0A6">/${s.stores || 0}</small></b><span>배송사진</span></div><div class="${s.miss ? 'r' : ''}"><b>${s.miss || 0}</b><span>상품 누락</span></div></div>
       <div class="mm-rows"><div><span>업무시작 누른 날</span><b>${s.start || 0} / ${s.days || 0}일</b></div><div><span>업무종료 누른 날</span><b>${s.end || 0} / ${s.days || 0}일</b></div><div><span>사진 한꺼번에 올린 날</span><b>${s.bulk || 0}일</b></div></div>
       <details style="margin-top:10px"><summary style="font-size:14px;color:#9AA0A6;cursor:pointer;padding:6px 0">날짜별 보기</summary>${ds.map((d) => `<div class="mm-day"><b>${+String(d.d).slice(5, 7)}/${+String(d.d).slice(8, 10)}</b><span>${d.start ? `시작 ${d.start}${d.start_place ? ' · ' + (pl[d.start_place] || '') : ''}` : '시작 없음'} · ${d.end ? '종료 ' + d.end : '종료 없음'} · 사진 ${d.photo}/${d.stores}${d.bulk ? ' · 한꺼번에' : ''}</span><span>${d.miss ? `<span class="mm-k bad">누락 ${d.miss}</span>` : ''}</span></div>`).join('')}</details></div>`;
@@ -710,9 +736,10 @@
     if (CVS()) return mmCvs();
     let r; try { r = await rpc('my_month', { p_name: cfg.n, p_token: cfg.tok, p_ym: MM.ym }); } catch (e) { $('mm-body').innerHTML = `<div class="card msg">불러오지 못했어요: ${mmEsc(e.message)}</div>`; return; }
     const cs = (r && r.courses) || [], ev = (r && r.evals) || [];
-    if (!cs.length && !ev.length) { $('mm-body').innerHTML = '<div class="card msg">이 달 기록이 아직 없어요. 기록은 배송 다음 날 반영돼요.</div>'; return; }
+    if (!cs.length && !ev.length) { $('mm-body').innerHTML = mmGoal([], true); return; }
+    const goal = mmGoal(cs.map((c) => ({ title: `${c.shift === '야간' ? '야간' : '주간'} · ${c.course || ''}`, days: c.days, rates: [['배송 완료', c.done, c.stops, 99], ['배송 사진', c.photo, c.stops, 98]], zeros: [['몰아서 완료', c.bulk, '회'], ['고객 개선 요청', c.bad, '건']] })), !cs.length);
     const kn = { good: '칭찬', bad: '개선 요청', check: '의견' };
-    $('mm-body').innerHTML = cs.map((c) => `<div class="card"><div class="mm-h">${c.shift === '야간' ? '야간' : '주간'} 운행<small class="${c.shift === '야간' ? 'n' : ''}">${mmEsc(c.course)}</small></div>
+    $('mm-body').innerHTML = goal + cs.map((c) => `<div class="card"><div class="mm-h">${c.shift === '야간' ? '야간' : '주간'} 운행<small class="${c.shift === '야간' ? 'n' : ''}">${mmEsc(c.course)}</small></div>
       <div class="mm-big"><div><b>${c.mission || 0}</b><span>완료 배송</span></div><div class="g"><b>${c.good || 0}</b><span>고객 칭찬</span></div><div class="r"><b>${c.bad || 0}</b><span>고객 의견</span></div></div>
       <div class="mm-rows"><div><span>운행일</span><b>${c.days}일</b></div><div><span>배송완료 처리</span><b>${c.done} / ${c.stops}곳</b></div><div><span>배송사진 등록</span><b>${c.photo} / ${c.stops}곳</b></div><div><span>한꺼번에 완료 처리</span><b>${c.bulk}회</b></div><div><span>센터 도착 기록</span><b>${c.arrive_days} / ${c.days}일</b></div></div>
       <details style="margin-top:10px"><summary style="font-size:14px;color:#9AA0A6;cursor:pointer;padding:6px 0">날짜별 보기</summary>${(c.list || []).map((d) => `<div class="mm-day"><b>${+d.d.slice(5, 7)}/${+d.d.slice(8)}</b><span>완료 ${d.done}/${d.stops} · 사진 ${d.photo}${d.arrive ? ` · 센터 ${d.arrive_day ? d.arrive_day + ' ' : ''}${d.arrive}` : ''}${d.bulk ? ' · 한꺼번에 처리' : ''}</span><span>${d.good ? `<span class="mm-k good">칭찬 ${d.good}</span>` : ''}${d.bad ? ` <span class="mm-k bad">의견 ${d.bad}</span>` : ''}</span></div>`).join('')}</details></div>`).join('')
@@ -824,9 +851,10 @@
     $('car-hero').innerHTML = carSvg(carSel);
     const need = CVS() ? CAR_NEED_CVS : CAR_NEED, open = (k) => isMaster() || carOpen(k);
     $('car-g').innerHTML = CAR_TIER.map((k) => `<button class="${k === carSel ? 'on' : ''}${open(k) ? '' : ' lock'}" data-car="${k}" ${open(k) ? '' : 'aria-disabled="true"'}>${carSvg(k)}${k}${open(k) ? '' : `<small>🔒 ${need[k]}</small>`}</button>`).join('')
-      + `<div class="car-rule"><b>색은 이렇게 열려요</b>매달 기준을 넘은 달을 모아서 셉니다. 한 번 열린 색은 닫히지 않아요.<br>· 기준(한 달): ${CVS() ? '운행 10일 이상 · 점포 사진 98% 이상 · 몰아서 올리기 0회 · 센터에서 업무시작 90% 이상 · 상품누락 0건' : '운행 10일 이상 · 배송 완료 99% 이상 · 배송 사진 98% 이상 · 몰아서 완료 0회 · 고객 개선 요청 0건'}<br>· 지금: 기준 달성 <b style="display:inline">${carTier && carTier.n === cfg.n ? carTier.months || 0 : 0}개월</b>${CVS() ? '' : ` · 고객 칭찬 ${carTier && carTier.n === cfg.n ? carTier.good || 0 : 0}건`}<br><span style="opacity:.7">앱 안 표시일 뿐이고 운송료·배차와는 상관없어요. 매달 1일에 지난달이 반영돼요.</span></div>`;
+      + `<div class="car-rule"><b>색은 이렇게 열려요</b>매달 기준을 넘은 달을 모아서 셉니다. 한 번 열린 색은 닫히지 않아요.<br>· 기준(한 달): ${CVS() ? '운행 10일 이상 · 점포 사진 98% 이상 · 몰아서 올리기 0회 · 센터에서 업무시작 90% 이상 · 상품누락 0건' : '운행 10일 이상 · 배송 완료 99% 이상 · 배송 사진 98% 이상 · 몰아서 완료 0회 · 고객 개선 요청 0건'}<br><button type="button" class="car-go" data-cargo="1">이번 달 달성 현황 보기 ›</button><br>· 지금: 기준 달성 <b style="display:inline">${carTier && carTier.n === cfg.n ? carTier.months || 0 : 0}개월</b>${CVS() ? '' : ` · 고객 칭찬 ${carTier && carTier.n === cfg.n ? carTier.good || 0 : 0}건`}<br><span style="opacity:.7">앱 안 표시일 뿐이고 운송료·배차와는 상관없어요. 매달 1일에 지난달이 반영돼요.</span></div>`;
   }
   $('hm-chg').onclick = () => { carSel = carGet(); carUi(); carTierLoad(); $('car-ov').hidden = false; $('car-ov').scrollTop = 0; try { history.pushState({ car: 1 }, ''); } catch (e) { /* noop */ } };
+  $('car-g').addEventListener('click', (ev) => { if (!ev.target.closest('[data-cargo]')) return; $('car-ov').hidden = true; try { if (history.state && history.state.car) history.replaceState(null, ''); } catch (e) { /* noop */ } const tb = tabBtn('mm'); if (tb) tb.click(); setTimeout(() => { try { window.scrollTo(0, 0); } catch (e) { /* noop */ } }, 300); });
   $('car-g').onclick = (ev) => { const b = ev.target.closest('[data-car]'); if (b && !b.classList.contains('lock')) { carSel = b.dataset.car; carUi(); } };
   const carClose = () => { if (history.state && history.state.car) history.back(); else $('car-ov').hidden = true; };
   $('car-x').onclick = carClose;
