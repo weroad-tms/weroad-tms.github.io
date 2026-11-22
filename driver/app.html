@@ -173,7 +173,7 @@
   .sh-h{display:flex;align-items:center;gap:8px}.sh-h .sq{min-width:28px;height:28px;border-radius:9px;background:#3E6AF2;display:grid;place-items:center;font-weight:800}
   .sh-h b{flex:1;font-size:16.5px;line-height:1.35}.sh-a{font-size:13.5px;opacity:.75;margin:4px 0 0 36px}.sh-m{font-size:15px;font-weight:800;color:#FDE68A;white-space:nowrap}
   .sh-tg{display:flex;flex-wrap:wrap;gap:5px;margin:7px 0 0 36px}.sh-tg span{font-size:12px;font-weight:800;border-radius:999px;padding:3px 9px}
-  .t-new{background:#EA580C;color:#fff}.t-chg{background:#7C3AED;color:#fff}.t-voc{background:#B42318;color:#fff}.t-conf{background:#B54708;color:#fff}.t-fz{background:#0EA5E9;color:#fff}.t-nol{background:#FACC15;color:#1F2937}
+  .t-new{background:#EA580C;color:#fff}.t-sec{background:#475569;color:#fff}.t-chg{background:#7C3AED;color:#fff}.t-voc{background:#B42318;color:#fff}.t-conf{background:#B54708;color:#fff}.t-fz{background:#0EA5E9;color:#fff}.t-nol{background:#FACC15;color:#1F2937}
   .sh-x{margin:7px 0 0 36px;font-size:13.5px;line-height:1.5;background:rgba(0,0,0,.18);border-radius:10px;padding:7px 10px}.sh-x b{color:#FCA5A5}
   .sh-btn{margin:9px 0 0 36px;border:0;border-radius:12px;padding:11px 14px;font:inherit;font-size:15px;font-weight:800;background:#3E6AF2;color:#fff;width:calc(100% - 36px)}.sh-btn.ok{background:rgba(20,184,166,.22);color:#CCFBF1}
   .sh-ov{position:fixed;inset:0;z-index:40;background:#0A0F14;display:flex;flex-direction:column}.sh-ov[hidden]{display:none}
@@ -666,7 +666,7 @@
 
 
   // 11/20 앱 안 업데이트: 서버의 새 index.html 빌드 번호가 다르면 [업데이트] 버튼 → 새로 불러오기 (홈 화면에 다시 추가할 필요 없음)
-  const BUILD = '20261122-10';
+  const BUILD = '20261122-11';
   try { document.getElementById('ver').textContent = 'v' + BUILD.slice(2, 8) + '-' + BUILD.split('-')[1]; } catch (e) {}
   async function updCheck() {
     try {
@@ -703,7 +703,7 @@
       const ls = [line('운행 10일 이상', `${d}일`, d >= 10, dayWait)];
       let ok = d >= 10;
       for (const [lab, a, b, min] of r.rates) { const v = pct(a, b), o = v != null && v >= min; ok = ok && o; ls.push(line(`${lab} ${min}% 이상`, v == null ? '—' : `${v}%<small>${a || 0}/${b || 0}</small>`, o, false)); }
-      for (const [lab, v, unit] of r.zeros) { const o = !(+v); ok = ok && o; ls.push(line(`${lab} 0${unit}`, `${+v || 0}${unit}`, o, false)); }
+      for (const [lab, v, unit, mx] of r.zeros) { const lim = +mx || 0, o = (+v || 0) <= lim; ok = ok && o; ls.push(line(`${lab} ${lim ? lim + unit + ' 이하' : '0' + unit}`, `${+v || 0}${unit}`, o, false)); }
       if (ok) pass = true;
       body += (rows.length > 1 ? `<div class="gl-h">${esc(r.title)}</div>` : '') + ls.join('');
     }
@@ -737,11 +737,11 @@
     let r; try { r = await rpc('my_month', { p_name: cfg.n, p_token: cfg.tok, p_ym: MM.ym }); } catch (e) { $('mm-body').innerHTML = `<div class="card msg">불러오지 못했어요: ${mmEsc(e.message)}</div>`; return; }
     const cs = (r && r.courses) || [], ev = (r && r.evals) || [];
     if (!cs.length && !ev.length) { $('mm-body').innerHTML = mmGoal([], true); return; }
-    const goal = mmGoal(cs.map((c) => ({ title: `${c.shift === '야간' ? '야간' : '주간'} · ${c.course || ''}`, days: c.days, rates: [['배송 완료', c.done, c.stops, 99], ['배송 사진', c.photo, c.stops, 98]], zeros: [['몰아서 완료', c.bulk, '회'], ['고객 개선 요청', c.bad, '건']] })), !cs.length);
+    const goal = mmGoal(cs.map((c) => ({ title: `${c.shift === '야간' ? '야간' : '주간'} · ${c.course || ''}`, days: c.days, rates: [['배송 완료', c.done, c.stops, 99], ['배송 사진', c.photo, c.stops, 98]], zeros: [['몰아서 완료', c.bulk, '회', 1], ['고객 개선 요청', c.bad, '건']] })), !cs.length);
     const kn = { good: '칭찬', bad: '개선 요청', check: '의견' };
     $('mm-body').innerHTML = goal + cs.map((c) => `<div class="card"><div class="mm-h">${c.shift === '야간' ? '야간' : '주간'} 운행<small class="${c.shift === '야간' ? 'n' : ''}">${mmEsc(c.course)}</small></div>
       <div class="mm-big"><div><b>${c.mission || 0}</b><span>완료 배송</span></div><div class="g"><b>${c.good || 0}</b><span>고객 칭찬</span></div><div class="r"><b>${c.bad || 0}</b><span>고객 의견</span></div></div>
-      <div class="mm-rows"><div><span>운행일</span><b>${c.days}일</b></div><div><span>배송완료 처리</span><b>${c.done} / ${c.stops}곳</b></div><div><span>배송사진 등록</span><b>${c.photo} / ${c.stops}곳</b></div><div><span>한꺼번에 완료 처리</span><b>${c.bulk}회</b></div><div><span>센터 도착 기록</span><b>${c.arrive_days} / ${c.days}일</b></div></div>
+      <div class="mm-rows"><div><span>운행일</span><b>${c.days}일</b></div>${c.ex ? `<div><span>관리자 조정 (취소 등 제외)</span><b>${c.ex}곳</b></div>` : ''}${c.sec ? `<div><span>보안 거래처 (사진 없이 완료)</span><b>${c.sec}곳</b></div>` : ''}<div><span>배송완료 처리</span><b>${c.done} / ${c.stops}곳</b></div><div><span>배송사진 등록</span><b>${c.photo} / ${c.stops}곳</b></div><div><span>한꺼번에 완료 처리</span><b>${c.bulk}회</b></div><div><span>센터 도착 기록</span><b>${c.arrive_days} / ${c.days}일</b></div></div>
       <details style="margin-top:10px"><summary style="font-size:14px;color:#9AA0A6;cursor:pointer;padding:6px 0">날짜별 보기</summary>${(c.list || []).map((d) => `<div class="mm-day"><b>${+d.d.slice(5, 7)}/${+d.d.slice(8)}</b><span>완료 ${d.done}/${d.stops} · 사진 ${d.photo}${d.arrive ? ` · 센터 ${d.arrive_day ? d.arrive_day + ' ' : ''}${d.arrive}` : ''}${d.bulk ? ' · 한꺼번에 처리' : ''}</span><span>${d.good ? `<span class="mm-k good">칭찬 ${d.good}</span>` : ''}${d.bad ? ` <span class="mm-k bad">의견 ${d.bad}</span>` : ''}</span></div>`).join('')}</details></div>`).join('')
       + `<div class="card"><div class="mm-h">고객사 평가<small>${ev.length}건</small></div>${ev.length ? ev.map((e) => `<div class="mm-ev"><div class="t"><span class="mm-k ${e.kind}">${kn[e.kind] || e.kind}</span><b>${mmEsc(e.shop)}</b><span>${+e.d.slice(5, 7)}/${+e.d.slice(8)}</span></div><p>${mmEsc(e.memo)}</p></div>`).join('') : '<div class="mm-sub" style="text-align:left">이 달 고객사 평가가 아직 없어요.</div>'}</div>`;
   }
@@ -851,7 +851,7 @@
     $('car-hero').innerHTML = carSvg(carSel);
     const need = CVS() ? CAR_NEED_CVS : CAR_NEED, open = (k) => isMaster() || carOpen(k);
     $('car-g').innerHTML = CAR_TIER.map((k) => `<button class="${k === carSel ? 'on' : ''}${open(k) ? '' : ' lock'}" data-car="${k}" ${open(k) ? '' : 'aria-disabled="true"'}>${carSvg(k)}${k}${open(k) ? '' : `<small>🔒 ${need[k]}</small>`}</button>`).join('')
-      + `<div class="car-rule"><b>색은 이렇게 열려요</b>매달 기준을 넘은 달을 모아서 셉니다. 한 번 열린 색은 닫히지 않아요.<br>· 기준(한 달): ${CVS() ? '운행 10일 이상 · 점포 사진 98% 이상 · 몰아서 올리기 0회 · 센터에서 업무시작 90% 이상 · 상품누락 0건' : '운행 10일 이상 · 배송 완료 99% 이상 · 배송 사진 98% 이상 · 몰아서 완료 0회 · 고객 개선 요청 0건'}<br><button type="button" class="car-go" data-cargo="1">이번 달 달성 현황 보기 ›</button><br>· 지금: 기준 달성 <b style="display:inline">${carTier && carTier.n === cfg.n ? carTier.months || 0 : 0}개월</b>${CVS() ? '' : ` · 고객 칭찬 ${carTier && carTier.n === cfg.n ? carTier.good || 0 : 0}건`}<br><span style="opacity:.7">앱 안 표시일 뿐이고 운송료·배차와는 상관없어요. 매달 1일에 지난달이 반영돼요.</span></div>`;
+      + `<div class="car-rule"><b>색은 이렇게 열려요</b>매달 기준을 넘은 달을 모아서 셉니다. 한 번 열린 색은 닫히지 않아요.<br>· 기준(한 달): ${CVS() ? '운행 10일 이상 · 점포 사진 98% 이상 · 몰아서 올리기 0회 · 센터에서 업무시작 90% 이상 · 상품누락 0건' : '운행 10일 이상 · 배송 완료 99% 이상 · 배송 사진 98% 이상 · 몰아서 완료 1회 이하 · 고객 개선 요청 0건'}<br><button type="button" class="car-go" data-cargo="1">이번 달 달성 현황 보기 ›</button><br>· 지금: 기준 달성 <b style="display:inline">${carTier && carTier.n === cfg.n ? carTier.months || 0 : 0}개월</b>${CVS() ? '' : ` · 고객 칭찬 ${carTier && carTier.n === cfg.n ? carTier.good || 0 : 0}건`}<br><span style="opacity:.7">앱 안 표시일 뿐이고 운송료·배차와는 상관없어요. 매달 1일에 지난달이 반영돼요.</span></div>`;
   }
   $('hm-chg').onclick = () => { carSel = carGet(); carUi(); carTierLoad(); $('car-ov').hidden = false; $('car-ov').scrollTop = 0; try { history.pushState({ car: 1 }, ''); } catch (e) { /* noop */ } };
   $('car-g').addEventListener('click', (ev) => { if (!ev.target.closest('[data-cargo]')) return; $('car-ov').hidden = true; try { if (history.state && history.state.car) history.replaceState(null, ''); } catch (e) { /* noop */ } const tb = tabBtn('mm'); if (tb) tb.click(); setTimeout(() => { try { window.scrollTo(0, 0); } catch (e) { /* noop */ } }, 300); });
@@ -1017,7 +1017,8 @@
       if (sd.doneYN === 'Y') { DM.wk = null; alert('이미 완료된 일정이에요.'); return dmReload(); }
       const steps = DM_STEPS[sd.stepCase];
       if (!steps) { DM.wk.busy = ''; DM.wk.err = `이 작업 유형(${sd.stepCase || '-'})은 아직 위로드에서 못 해요. [기존 배송화면]으로 진행해 주세요.`; return dmUi(); }
-      DM.wk.steps = steps; DM.wk.idx = dmFirstTodo(steps, t);
+      const sec = dmSecOf(id), st2 = sec ? steps.filter(([k]) => k !== 'img') : steps;   // 11/22 보안 거래처: 사진 단계 없음
+      DM.wk.sec = sec; DM.wk.steps = st2; DM.wk.idx = dmFirstTodo(st2, t);
       await dmWkStep();
     } catch (e) { if (DM.wk) { DM.wk.busy = ''; DM.wk.err = e.message; dmUi(); } }
   }
@@ -1048,7 +1049,7 @@
   function dmWkBack() { const W = DM.wk; if (!W || W.idx < 1 || W.done) return; W.top = Math.max(W.top || 0, W.idx); W.idx -= 1; W.edit = true; W.mark = false; return dmWkStep(); }
   async function dmWkDone(btn) {
     const W = DM.wk; btn.disabled = true; btn.textContent = '완료 처리 중…';
-    try { await dmCall('PATCH', `schedules/details/${W.id}/done-task`); W.done = true; dmDraft('insp-' + W.id, null); dmDraft('stock-' + W.id, null); dmReload(); dmUi(); }
+    try { await dmCall('PATCH', `schedules/details/${W.id}/done-task`); W.done = true; if (W.sec) rpc('secure_done_put', { p_name: cfg.n, p_token: cfg.tok, p_date: DM.d || dmToday(), p_code: W.sec }).catch(() => {}); dmDraft('insp-' + W.id, null); dmDraft('stock-' + W.id, null); dmReload(); dmUi(); }
     catch (e) { btn.disabled = false; btn.textContent = '작업 완료하기'; alert((e.message || '완료가 안 됐어요') + '\n\n계속 안 되면 [기존 배송화면]에서 완료해 주세요.'); }
   }
   async function dmWkSend(btn) {   // 현재 단계 저장 → 다음 단계
@@ -1152,7 +1153,7 @@
         <button type="button" class="dm-go" data-dm="send">케어서비스 작업 내용 등록하기</button>`;
     } else if (k === 'fin') {
       void ty; body = W.done ? `<div class="card msg" style="text-align:center;font-size:17px">✅ 작업이 완료되었습니다.<br><b>${esc(W.name)}</b> 끝!</div><button type="button" class="dm-go" data-dm="wkx">목록으로</button>`
-        : `<div class="card msg" style="text-align:center;font-size:16px;line-height:1.6">모든 단계를 마쳤어요.<br>고칠 게 있으면 <b>이전 단계</b>로 돌아가세요.<br>다 맞으면 <b>작업 완료하기</b>를 눌러 주세요.</div><button type="button" class="dm-go" data-dm="done">작업 완료하기</button>`;
+        : `<div class="card msg" style="text-align:center;font-size:16px;line-height:1.6">${W.sec ? '<b>보안 거래처</b>라 사진 없이 완료해요.<br>' : ''}${W.steps.length > 1 ? '모든 단계를 마쳤어요.<br>고칠 게 있으면 <b>이전 단계</b>로 돌아가세요.<br>' : ''}다 맞으면 <b>작업 완료하기</b>를 눌러 주세요.</div><button type="button" class="dm-go" data-dm="done">작업 완료하기</button>`;
     }
     const back = W.idx > 0 && !(k === 'fin' && W.done) ? `<button type="button" class="dm-back" data-dm="back">← 이전 단계 (${esc(DM_LBL(W.steps[W.idx - 1][0], W.steps[W.idx - 1][1]))}) 고치기</button>` : '';
     w.innerHTML = head + bar + (W.edit && k !== 'fin' ? '<div class="card msg">이전에 저장한 내용을 고치는 중이에요. 고친 뒤 저장하면 다음 단계로 가요.</div>' : '') + body + back;
@@ -1162,8 +1163,8 @@
     if (!today || x.doneYN === 'Y') return '';
     if (gate && !x.deliveryStartAt && !x.taskStartAt) return x.startDeliveryAvailable === false ? '' : `<div class="acts main"><span class="dm-hint">${esc(gate)}</span></div>`;   // 11/22 안내는 출발할 차례인 곳에만 한 번
     return `<div class="acts main">${
-      x.taskStartAt ? `<button type="button" class="y" data-dm="wk" data-id="${esc(id)}">작업 이어하기 · 사진</button>`
-      : x.deliveryStartAt ? `<button type="button" class="y" data-dm="task" data-id="${esc(id)}">작업 시작 · 사진</button><button type="button" data-dm="goX" data-id="${esc(id)}">출발 취소</button>`
+      x.taskStartAt ? `<button type="button" class="y" data-dm="wk" data-id="${esc(id)}">${dmSecOf(id) ? '작업 이어하기' : '작업 이어하기 · 사진'}</button>`
+      : x.deliveryStartAt ? `<button type="button" class="y" data-dm="task" data-id="${esc(id)}">${dmSecOf(id) ? '작업 시작' : '작업 시작 · 사진'}</button><button type="button" data-dm="goX" data-id="${esc(id)}">출발 취소</button>`
       : uni ? '<span class="dm-hint">출근 복장 사진을 먼저 등록해 주세요</span>'
       : x.startDeliveryAvailable === false ? '<span class="dm-hint">앞 거래처를 끝내면 출발할 수 있어요</span>'
       : `<button type="button" class="y" data-dm="go" data-id="${esc(id)}">출발</button>`}</div>`;
@@ -1511,6 +1512,7 @@
     if (!force && SH.fd === L.d) return;
     try { const j = await rpc('day_flags_get', { p_name: cfg.n, p_token: cfg.tok, p_date: L.d }); SH.flags = (j && j.flags) || {}; SH.reads = new Set((j && j.reads) || []); SH.fd = L.d; }
     catch (e) { SH.flags = {}; SH.fd = ''; }
+    await secLoad();
   }
   // 주소: 풀필먼트 주소가 비면 위펀오피스 거래처 주소록(위로드가 올림)에서 점포코드 → 거래처명 순으로 찾음
   const nk = (s) => 'n:' + String(s || '').replace(/[\s()\[\]·.,\-_/]/g, '').toLowerCase();
@@ -1554,6 +1556,7 @@
     for (const r of L.recs) { if (m[r.code]) continue; const k = k2(r.name); const x = ls.find((y) => !used.has(y) && kk(y).includes(k)); if (x) { used.add(x); m[r.code] = x; } }
     for (const r of L.recs) { if (m[r.code]) continue; const k = k2(r.name); if (k.length < 3) continue;
       const x = ls.find((y) => !used.has(y) && kk(y).some((z) => z.length > 2 && (z.includes(k) || k.includes(z)))); if (x) { used.add(x); m[r.code] = x; } }
+    DM.code = {}; for (const c in m) DM.code[String(dmId(m[c]))] = c;
     return { m, rest: ls.filter((y) => !used.has(y)).sort((a, b) => (+a.sequence || 999) - (+b.sequence || 999)) };
   }
   function shDmHtml(x, gate) {
@@ -1585,6 +1588,10 @@
     catch (e) { alert('순서를 못 바꿨어요\n\n' + (e.message || '사유를 받지 못했어요')); }
     await dmReload(); shUi();
   }
+  // 11/22 보안 거래처 (위로드 웹에서 관리자가 등록) — 사진 단계 없이 작업 완료, 평가에서 사진 면제
+  var SEC = {};
+  async function secLoad() { try { const j = await rpc('secure_codes', { p_name: cfg.n, p_token: cfg.tok }); SEC = j && typeof j === 'object' ? j : {}; } catch (e) { /* 다음에 */ } }
+  function dmSecOf(id) { try { const c = (DM.code || {})[String(id)]; return c && SEC && SEC[c] ? c : ''; } catch (e) { return ''; } }
   const fOf = (r) => SH.flags[String(r.code)] || null;
   const reqOf = (r) => { const f = fOf(r); if (!f) return false; return f.card !== undefined ? !!(f.card && f.pub) : !!(f.req && f.pub); };   // 11/8: 물류팀이 요약카드를 작성한 거래처만 필수
   const noLoc = (r) => (r.needA && !r.amb) || (r.needC && !r.chl);
@@ -1609,7 +1616,7 @@
     // 11/22 배송 순서를 바꾸면 실적표도 그 순서로 (짝 맞은 거래처끼리 자리만 바꿈, 짝 없는 곳은 제자리)
     const ord = rs.slice(); if (dmOk) { const slots = [], ms = []; rs.forEach((r, k) => { if (MT.m[r.code]) { slots.push(k); ms.push(r); } }); ms.sort((a, b) => (+MT.m[a.code].sequence || 999) - (+MT.m[b.code].sequence || 999)); slots.forEach((k, j) => { ord[k] = ms[j]; }); }
     const body = ord.map((r, i) => { const f = fOf(r) || {}, need = reqOf(r), rd = SH.reads.has(String(r.code)), m = am(r), dx = MT.m[r.code];
-      const tg = [f.new ? '<span class="t-new">첫 배송</span>' : '', f.chg ? `<span class="t-chg">담당 변경 (평소 ${esc(f.chg)})</span>` : '', f.voc ? '<span class="t-voc">최근 VOC</span>' : '', f.conf ? '<span class="t-conf">혼동 주의</span>' : '', r.frozen ? '<span class="t-fz">냉동 배송 있음</span>' : '', noLoc(r) ? '<span class="t-nol">로케이션 없음</span>' : ''].join('');
+      const tg = [f.new ? '<span class="t-new">첫 배송</span>' : '', f.chg ? `<span class="t-chg">담당 변경 (평소 ${esc(f.chg)})</span>` : '', f.voc ? '<span class="t-voc">최근 VOC</span>' : '', f.conf ? '<span class="t-conf">혼동 주의</span>' : '', r.frozen ? '<span class="t-fz">냉동 배송 있음</span>' : '', noLoc(r) ? '<span class="t-nol">로케이션 없음</span>' : '', SEC[String(r.code)] ? '<span class="t-sec">보안 거래처 · 사진 없이 완료</span>' : ''].join('');
       const ex = [f.voc ? f.voc.map((v) => `<div class="bx voc"><b class="h">최근 VOC · ${esc(String(v.d || '').slice(5).replace('-', '/'))}</b>${esc(v.t)}</div>`).join('') : '', f.conf ? `<div class="bx conf"><b class="h">혼동 주의</b>같은 건물에 다른 거래처: ${f.conf.map(esc).join(' · ')} — 층·호 꼭 확인</div>` : '', noLoc(r) ? '<div class="bx nol"><b class="h">로케이션 없음</b>도크장 앞 파레트 확인</div>' : ''].join('');
       const ad = addrOf(r);
       const cl = String(f.cl || ''), ci = cl.indexOf(' - '), wnm = ci >= 0 ? cl.slice(ci + 3) : cl, wco = ci >= 0 ? cl.slice(0, ci) : '';   // 11/22 위펀오피스 기준정보 이름 (금액은 판매가 그대로)
