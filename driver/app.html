@@ -676,7 +676,7 @@
 
 
   // 11/20 앱 안 업데이트: 서버의 새 index.html 빌드 번호가 다르면 [업데이트] 버튼 → 새로 불러오기 (홈 화면에 다시 추가할 필요 없음)
-  const BUILD = '20261124-3';
+  const BUILD = '20261124-4';
   try { document.getElementById('ver').textContent = 'v' + BUILD.slice(2, 8) + '-' + BUILD.split('-')[1]; } catch (e) {}
   async function updCheck() {
     try {
@@ -1628,7 +1628,7 @@
   function shDmHtml(x, gate) {
     const id = dmId(x), b = dmBr(x), [sc, st] = dmState(x), open = DM.open === String(id), d = DM.det[id] || null, db = dmBr(d || x), today = dmActDay();
     const tags = [x.stockSurveyYN === 'Y' && '<span class="w">재고조사</span>', x.examineYN === 'Y' && '<span class="w">검수</span>', x.coffeeMachineYN === 'Y' && '<span>커피머신</span>', b.entranceType === '보안카드' && '<span>출입증</span>', b.unableDeliveryTime && `<span>배송 불가 ${esc(b.unableDeliveryTime)}</span>`].filter(Boolean).join('');
-    return `<div class="sh-dm"><div class="sh-dmh"><span class="dm-st ${sc}">${esc(st || '배송')}</span>${shSeqHtml(x, today)}<button type="button" class="sh-dmi${mnOf(x) ? ' mnn' : mnNeed(x) ? ' need' : ''}" data-dm="open" data-id="${esc(id)}">${mnOf(x) ? '배송 정보 · 메모NEW' : mnNeed(x) ? '배송 정보 확인 (필수)' : '배송 정보'} ${open ? '▴' : '▾'}</button></div>
+    return `<div class="sh-dm"><div class="sh-dmh"><span class="dm-st ${sc}">${esc(st || '배송')}</span>${shSeqHtml(x, today)}<button type="button" class="sh-dmi${mnOf(x) ? ' mnn' : mnNeed(x) ? ' need' : ''}" data-dm="open" data-id="${esc(id)}">${mnOf(x) ? '메모NEW 보기' : mnNeed(x) ? '배송 정보 (필수)' : '배송 정보'} ${open ? '▴' : '▾'}</button></div>
       ${tags ? `<div class="dm-tg">${tags}</div>` : ''}${dmActsHtml(x, id, today, false, gate)}${open ? dmDetHtml(x, d, db, id, today, false, true) : ''}</div>`;
   }
   // 11/22 배송 순서 바꾸기 — 딜리버리웹 '배송 순서 변경하기'와 같은 요청 (출발했거나 끝난 곳은 위에 고정, 그 아래에서만 옮김)
@@ -1675,7 +1675,7 @@
     const am = (r) => { const f = fOf(r) || {}; const a = Number(r.amtA || 0), c = Number(r.amtC || 0); return a || c ? { a, c, s: a + c } : { a: null, c: null, s: Number(f.amt || 0) }; };
     const T = rs.reduce((o, r) => { const m = am(r); o.a += m.a || 0; o.c += m.c || 0; o.s += m.s || 0; return o; }, { a: 0, c: 0, s: 0 });
     const cell = (v) => v == null ? '—' : v ? won(v) : '0';
-    $('sh-prog').innerHTML = rs.length ? `<div class="kv"><label>거래처</label><b>${rs.length}<i>곳</i></b></div><div class="kv"><label>상온</label><b>${won(T.a)}<i>원</i></b></div><div class="kv"><label>저온</label><b>${won(T.c)}<i>원</i></b></div><div class="kv"><label>합계</label><b style="color:#FDE68A">${won(T.s)}<i>원</i></b></div>${pend.cards.length ? `<div class="kv"><label>요약카드 확인</label><b>${pend.cards.length}곳 남음</b></div>` : ''}${pend.memos.length ? `<div class="kv"><label>배송메모 확인</label><b>${pend.memos.length}곳 남음</b></div>` : ''}` : '';
+    $('sh-prog').innerHTML = rs.length ? `<div class="kv"><label>거래처</label><b>${rs.length}<i>곳</i></b></div><div class="kv"><label>상온</label><b>${won(T.a)}<i>원</i></b></div><div class="kv"><label>저온</label><b>${won(T.c)}<i>원</i></b></div><div class="kv"><label>합계</label><b style="color:#FDE68A">${won(T.s)}<i>원</i></b></div>${pend.cards.length ? `<div class="kv"><label>요약카드 확인</label><b>${pend.cards.length}곳 남음</b></div>` : ''}${pend.memos.length ? `<div class="kv"><label>메모 확인</label><b>${pend.memos.length}곳 남음</b></div>` : ''}` : '';
     if (!rs.length) { $('sh-list').innerHTML = SH.busy || L.busy ? '<div class="card msg">불러오는 중…</div>' : `<div class="card msg">${dLbl(L.d)} 배정된 거래처가 아직 없어요.</div>`; return; }
     // 착지 수에 맞춰 글씨 크기 자동 (8곳 이하 크게 → 20곳이면 작게)
     const n = rs.length, z = n <= 8 ? 1 : n >= 20 ? 0.78 : 1 - (n - 8) * 0.22 / 12;
