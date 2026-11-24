@@ -676,7 +676,7 @@
 
 
   // 11/20 앱 안 업데이트: 서버의 새 index.html 빌드 번호가 다르면 [업데이트] 버튼 → 새로 불러오기 (홈 화면에 다시 추가할 필요 없음)
-  const BUILD = '20261124-2';
+  const BUILD = '20261124-3';
   try { document.getElementById('ver').textContent = 'v' + BUILD.slice(2, 8) + '-' + BUILD.split('-')[1]; } catch (e) {}
   async function updCheck() {
     try {
@@ -1601,7 +1601,7 @@
   }
   async function mnScan() {
     if (!MN_ON() || !shDmOn() || isMaster() || SH.mnBusy || !(DM.sch && DM.d === L.d)) return;
-    const D = L.d, ls = (DM.sch.details || []).filter((x) => x.doneYN !== 'Y');
+    const D = L.d, ls = DM.sch.details || [];   // 끝난 거래처도 메모는 보고 (기준값을 일찍 쌓아 두려고)
     SH.mnBusy = true;
     try {
       if (SH.mnD !== D) { SH.prevK = null; SH.mv = new Set(); SH.mnSeen = {}; }
