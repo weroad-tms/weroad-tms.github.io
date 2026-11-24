@@ -276,6 +276,9 @@
   .mnew::before{content:'';width:8px;height:8px;border-radius:50%;background:#B42318}
   @keyframes mnb{0%,100%{box-shadow:0 0 0 0 rgba(242,194,48,.75);opacity:1}50%{box-shadow:0 0 0 7px rgba(242,194,48,0);opacity:.55}}
   @media (prefers-reduced-motion:reduce){.mnew{animation:none}}
+  .sh-dmi.need{background:#3E6AF2;color:#fff}.sh-dmi.mnn{background:#F2C230;color:#17191C;animation:mnb 1s ease-in-out infinite}
+  .mn-sec .memo{background:rgba(242,194,48,.22);outline:2px solid #F2C230}.mn-tag{display:inline-block;margin-left:6px;padding:2px 8px;border-radius:999px;background:#F2C230;color:#17191C;font-size:12px;font-weight:900}
+  .mn-prev{margin-top:8px}.mn-prev summary{font-size:13px;opacity:.8}.mn-prev .memo{opacity:.75;background:rgba(255,255,255,.06);outline:0;margin-top:6px}
   .mn-body .mn-at{font-size:13px;opacity:.75;margin:0 0 8px}.mn-body pre{white-space:pre-wrap;font:inherit;font-size:16px;line-height:1.6;margin:0;padding:12px;border-radius:10px;background:rgba(242,194,48,.12)}
   .mn-body details{margin-top:12px}.mn-body summary{font-size:13.5px;opacity:.8}.mn-body details pre{background:rgba(255,255,255,.06);font-size:14px;opacity:.8}
   .sh-btn.ok{background:rgba(255,255,255,.08);color:#C9CED4;font-weight:700}
@@ -673,7 +676,7 @@
 
 
   // 11/20 앱 안 업데이트: 서버의 새 index.html 빌드 번호가 다르면 [업데이트] 버튼 → 새로 불러오기 (홈 화면에 다시 추가할 필요 없음)
-  const BUILD = '20261124-1';
+  const BUILD = '20261124-2';
   try { document.getElementById('ver').textContent = 'v' + BUILD.slice(2, 8) + '-' + BUILD.split('-')[1]; } catch (e) {}
   async function updCheck() {
     try {
@@ -812,7 +815,7 @@
       if (!L.recs.length) return null;
       const amt = L.recs.reduce((a, r) => a + Number(r.amtA || 0) + Number(r.amtC || 0), 0), pend = shPending();
       const ls = (DM.sch && DM.d === L.d && Array.isArray(DM.sch.details)) ? DM.sch.details : [];
-      return { d: L.d, n: L.recs.length, amt, lbl: '매출', loads: pend.loads, badges: [pend.memos && pend.memos.length && ['y', `메모NEW ${pend.memos.length}곳`], pend.cards.length && ['y', `요약카드 확인 ${pend.cards.length}곳`], pend.loads && ['k', `상차 체크 ${pend.loads}건 남음`], ls.length && ['k', `배송 완료 ${ls.filter((x) => x.doneYN === 'Y').length} / ${ls.length}`]].filter(Boolean) };
+      return { d: L.d, n: L.recs.length, amt, lbl: '매출', loads: pend.loads, badges: [pend.memos && pend.memos.filter((m) => mnOf(m.x)).length && ['y', `메모NEW ${pend.memos.filter((m) => mnOf(m.x)).length}곳`], pend.memos && pend.memos.length && ['k', `배송메모 확인 ${pend.memos.length}곳 남음`], pend.cards.length && ['y', `요약카드 확인 ${pend.cards.length}곳`], pend.loads && ['k', `상차 체크 ${pend.loads}건 남음`], ls.length && ['k', `배송 완료 ${ls.filter((x) => x.doneYN === 'Y').length} / ${ls.length}`]].filter(Boolean) };
     } catch (e) { return null; }
   }
   function hmLive(t) {   // 메뉴 밑 작은 글씨를 그날 숫자로
@@ -954,6 +957,7 @@
     DM.open = DM.open === String(id) ? '' : String(id); dmRender(); if (!DM.open) return;
     try {
       if (!DM.det[id]) { DM.det[id] = await dmGet('schedules/details/' + id); dmRender(); }
+      { const x0 = ((DM.sch && DM.sch.details) || []).find((y) => String(dmId(y)) === String(id)); if (x0 && !DM.det[id]._err) mnViewed(x0); }   // 11/24 배송메모 확인 기록
       const bid = dmBr(DM.det[id]).branchId;
       if (bid && !DM.ref[bid]) { try { DM.ref[bid] = await dmGet('reference', { branchId: bid }); } catch (e) { DM.ref[bid] = { err: e.message }; } dmRender(); }
     } catch (e) { DM.det[id] = { _err: e.message }; dmRender(); }
@@ -1169,6 +1173,7 @@
   function dmActsHtml(x, id, today, uni, gate) {
     if (!today || x.doneYN === 'Y') return '';
     if (gate && !x.deliveryStartAt && !x.taskStartAt) return x.startDeliveryAvailable === false ? '' : `<div class="acts main"><span class="dm-hint">${esc(gate)}</span></div>`;   // 11/22 안내는 출발할 차례인 곳에만 한 번
+    if (x.startDeliveryAvailable !== false && mnNeed(x)) return `<div class="acts main"><button type="button" class="y mn-go" data-dm="open" data-id="${esc(id)}">${mnOf(x) ? '바뀐 배송메모 확인하고 출발' : '배송메모 확인하고 출발'}</button></div>`;   // 11/24 거래처마다 배송 정보를 열어야 출발
     return `<div class="acts main">${
       x.taskStartAt ? `<button type="button" class="y" data-dm="wk" data-id="${esc(id)}">${dmSecOf(id) ? '작업 이어하기' : '작업 이어하기 · 사진'}</button>`
       : x.deliveryStartAt ? `<button type="button" class="y" data-dm="task" data-id="${esc(id)}">${dmSecOf(id) ? '작업 시작' : '작업 시작 · 사진'}</button><button type="button" data-dm="goX" data-id="${esc(id)}">출발 취소</button>`
@@ -1188,7 +1193,7 @@
           det = `<div class="dm-d">
             <div class="sec"><label>주소</label>${esc(db.address || '-')}</div>
             ${db.workingTime || db.unableDeliveryTime ? `<div class="sec"><label>근무 시간</label>${esc(db.workingTime || '-')}${db.unableDeliveryTime ? ` · <b style="color:#FDE68A">배송 불가 ${esc(db.unableDeliveryTime)}</b>` : ''}</div>` : ''}
-            <div class="sec"><label>주차/출입 참고사항</label><div class="memo">${db.parkingMemo ? esc(String(db.parkingMemo).replace(/\r\n/g, '\n')) : '등록된 주차/출입 참고사항이 없어요.'}</div></div>
+            ${(() => { const bid = String(db.branchId || ''), nw = bid && (SH.mn[bid] || SH.mnSeen[bid]); return `<div class="sec${nw ? ' mn-sec' : ''}"><label>주차/출입 참고사항${nw ? ` <span class="mn-tag">NEW · ${esc(mnAt(nw.at))} 변경</span>` : ''}</label><div class="memo">${db.parkingMemo ? esc(String(db.parkingMemo).replace(/\r\n/g, '\n')) : '등록된 주차/출입 참고사항이 없어요.'}</div>${nw && nw.prev ? `<details class="mn-prev"><summary>바뀌기 전 메모 보기</summary><div class="memo">${esc(nw.prev)}</div></details>` : ''}</div>`; })()}
             <div class="sec"><label>연락 가능 고객</label>${mem.length ? mem.map((m, k) => `<a class="dm-btn" style="display:inline-block;margin:0 6px 6px 0;text-decoration:none" href="tel:${esc(String(m.cellphone).replace(/[^0-9]/g, ''))}">📞 ${esc(m.branchMemberName || m.name || ('담당 ' + (k + 1)))}</a>`).join('') : '-'}</div>
             ${d.stepCase ? `<div class="sec"><label>작업 단계</label>${esc(DM_STEP[d.stepCase] || d.stepCase)}</div>` : ''}
             ${d.notice ? `<div class="sec"><label>공지</label><div class="memo">${esc(d.notice)}</div></div>` : ''}
@@ -1514,10 +1519,10 @@
   document.querySelectorAll('button[data-copy]').forEach((b) => { b.onclick = async () => { const t = $(b.dataset.copy).textContent; try { await navigator.clipboard.writeText(t); b.textContent = '복사됨'; setTimeout(() => { b.textContent = '복사'; }, 1500); } catch (e) { prompt('복사해 주세요', t); } }; });
 
   // ---- 11/6 일일실적표 · 카드 필수 확인 · 배송 탭 잠금 (상차 체크 전부 + 카드 확인)
-  const SH = { flags: {}, reads: new Set(), fd: '', busy: false, addr: {}, mn: {}, mnBusy: false };
-  // 11/24 메모NEW — 테스트 주소(?mn=1)로 먼저 켬, 상진님 '전체 켜줘' 뒤 기본값을 켜기로 바꿈 (?mn=0 이면 끔)
+  const SH = { flags: {}, reads: new Set(), fd: '', busy: false, addr: {}, mn: {}, mnBusy: false, mv: new Set(), mnSeen: {}, prevK: null, mnD: '' };
+  // 11/24 메모NEW·배송메모 확인 — 상진님 '전체 켜줘'로 기본 켬 (?mn=0 이면 이 기기만 끔, ?mn=1 다시 켬)
   try { const v = new URLSearchParams(location.search).get('mn'); if (v === '1' || v === '0') localStorage.setItem('wr-mn', v); } catch (e) { /* noop */ }
-  const MN_ON = () => { try { return localStorage.getItem('wr-mn') === '1'; } catch (e) { return false; } };
+  const MN_ON = () => { try { return localStorage.getItem('wr-mn') !== '0'; } catch (e) { return true; } };
   async function shFlags(force) {
     if (!force && SH.fd === L.d) return;
     try { const j = await rpc('day_flags_get', { p_name: cfg.n, p_token: cfg.tok, p_date: L.d }); SH.flags = (j && j.flags) || {}; SH.reads = new Set((j && j.reads) || []); SH.fd = L.d; }
@@ -1569,51 +1574,61 @@
     DM.code = {}; for (const c in m) DM.code[String(dmId(m[c]))] = c;
     return { m, rest: ls.filter((y) => !used.has(y)).sort((a, b) => (+a.sequence || 999) - (+b.sequence || 999)) };
   }
-  // ===== 11/24 메모NEW (상진님): 거래처의 '기타 주차 및 출입 관련 메모'(딜리버리 branch.parkingMemo = 위펀오피스 거래처 상세)가 바뀌면
-  //  · 실적표 거래처 이름 옆에 깜빡이는 [메모NEW] → 누르면 바뀐 메모를 보여주고 불이 꺼짐 (서버 memo_acks 에 기록)
-  //  · 클릭 강제: 안 누른 메모NEW가 남아 있으면 출발 버튼이 잠김 (요약카드 확인·상차 체크와 같은 잠금)
-  //  · 판정은 서버 memo_seen: 거래처(branchId)마다 마지막 메모와 비교해 다르면 버전↑ · 바뀐 지 30일 안 + 이 기사가 그 버전을 안 눌렀으면 NEW
-  //  · 처음 보는 거래처는 기준값으로만 저장 (NEW 아님)
+  // ===== 11/24 배송메모 확인 (상진님) — 스낵 기사앱
+  //  · 모든 거래처: 출발 전에 [배송 정보](주차·출입 메모)를 열어야 출발 버튼이 나옴 (거래처마다 · 그날 한 번)
+  //  · 예외: 직전 배송일에도 같은 거래처를 맡았으면 안 열어도 됨 (기계처럼 누르는 것 방지)
+  //  · 메모NEW가 우선: 위펀오피스 거래처 상세 '기타 주차 및 출입 관련 메모'가 바뀌었고 이 기사가 바뀐 메모를 아직 안 봤으면
+  //    예외 거래처여도 [메모NEW] 깜빡임 + 배송 정보를 열어야 출발 → 열면 불이 꺼짐 (바뀐 지 30일 안 · 기사마다 따로)
+  //  · 판정: 서버 memo_day(=memo_seen) — 거래처(branchId)마다 마지막 메모와 비교, 처음 보는 거래처는 기준값만 저장
+  //  · 기록: memo_view(그날 연 거래처) · memo_acks(본 메모 버전)
   const mnBid = (x) => { const b = dmBr(x), d = DM.det[dmId(x)], bd = d && !d._err ? dmBr(d) : {}; return String(b.branchId || bd.branchId || ''); };
+  const mnKey = (x) => nk(String(dmBr(x).companyName || '') + String(dmBr(x).branchName || ''));   // 날짜가 달라도 같은 거래처인지 (이름 기준)
   const mnOf = (x) => { if (!MN_ON() || !x) return null; const k = mnBid(x); return k && SH.mn[k] ? { bid: k, ...SH.mn[k] } : null; };
-  function mnList() {
-    if (!MN_ON() || !shDmOn() || !(DM.sch && DM.d === L.d)) return [];
-    return ((DM.sch && DM.sch.details) || []).filter((x) => x.doneYN !== 'Y' && mnOf(x)).map((x) => ({ name: dmBr(x).branchName || dmBr(x).companyName || '거래처', x }));
+  const mnLive = () => MN_ON() && shDmOn() && !isMaster() && !!(DM.sch && DM.d === L.d && SH.mnD === L.d);
+  function mnNeed(x) {   // 이 거래처에 출발하려면 배송 정보를 열어야 하나
+    if (!mnLive() || !x || x.doneYN === 'Y' || x.deliveryStartAt || x.taskStartAt) return false;
+    if (mnOf(x)) return true;   // 메모NEW 우선
+    const bid = mnBid(x); if (bid && SH.mv.has(bid)) return false;
+    if (SH.prevK && SH.prevK.has(mnKey(x))) return false;   // 직전 배송일에도 내가 맡은 거래처
+    return true;
   }
-  const mnBtn = (x) => { const m = mnOf(x); return m && x.doneYN !== 'Y' ? `<button type="button" class="mnew" data-mnew="${esc(m.bid)}" aria-label="바뀐 주차·출입 메모 보기">메모NEW</button>` : ''; };
+  function mnList() { if (!mnLive()) return []; return ((DM.sch && DM.sch.details) || []).filter(mnNeed).map((x) => ({ name: dmBr(x).branchName || dmBr(x).companyName || '거래처', x })); }
+  const mnBtn = (x) => { const m = mnOf(x); return m && x.doneYN !== 'Y' ? `<button type="button" class="mnew" data-mnew="${esc(dmId(x))}" aria-label="바뀐 주차·출입 메모 보기">메모NEW</button>` : ''; };
+  async function mnPrev() {   // 직전 배송일(4일 안) 내 배송 거래처
+    for (let k = 1; k <= 4; k++) { const d = dmAdd(L.d, -k);
+      try { const s = await dmGet('schedules', { deliveryDate: d }); const ls = s && Array.isArray(s.details) ? s.details : []; if (ls.length) return new Set(ls.map(mnKey)); } catch (e) { return null; } }
+    return new Set();
+  }
   async function mnScan() {
-    if (!MN_ON() || !shDmOn() || SH.mnBusy || !(DM.sch && DM.d === L.d)) return;
-    const ls = (DM.sch.details || []).filter((x) => x.doneYN !== 'Y'); if (!ls.length) { SH.mn = {}; return; }
+    if (!MN_ON() || !shDmOn() || isMaster() || SH.mnBusy || !(DM.sch && DM.d === L.d)) return;
+    const D = L.d, ls = (DM.sch.details || []).filter((x) => x.doneYN !== 'Y');
     SH.mnBusy = true;
     try {
+      if (SH.mnD !== D) { SH.prevK = null; SH.mv = new Set(); SH.mnSeen = {}; }
+      if (!SH.prevK || SH.prevD !== D) { SH.prevK = await mnPrev(); SH.prevD = D; }
       // 목록에 메모가 없으면 거래처 상세를 읽음 (한 번 읽은 건 그대로 씀 · 4곳씩)
       const need = ls.filter((x) => !('parkingMemo' in dmBr(x)) && !DM.det[dmId(x)]);
       for (let i = 0; i < need.length; i += 4) await Promise.all(need.slice(i, i + 4).map(async (x) => { try { DM.det[dmId(x)] = await dmGet('schedules/details/' + dmId(x)); } catch (e) { /* 이 거래처는 이번엔 건너뜀 */ } }));
       const rows = [];
       for (const x of ls) { const b = dmBr(x), d = DM.det[dmId(x)], bd = d && !d._err ? dmBr(d) : null, src = 'parkingMemo' in b ? b : bd && 'parkingMemo' in bd ? bd : null, bid = mnBid(x);
         if (src && bid) rows.push({ bid, name: [b.companyName, b.branchName].filter(Boolean).join(' - '), memo: String(src.parkingMemo == null ? '' : src.parkingMemo) }); }
-      if (rows.length) { const r = await rpc('memo_seen', { p_name: cfg.n, p_token: cfg.tok, p_rows: rows }); SH.mn = r && typeof r === 'object' ? r : {}; }
-    } catch (e) { log('메모NEW 확인 실패 ' + e.message); }
+      const r = await rpc('memo_day', { p_name: cfg.n, p_token: cfg.tok, p_date: D, p_rows: rows });
+      if (L.d === D) { SH.mn = (r && r.new) || {}; SH.mv = new Set((r && r.views) || []); SH.mnD = D; }
+    } catch (e) { log('배송메모 확인 실패 ' + e.message); }
     SH.mnBusy = false; shUi(); if (document.body.classList.contains('hm')) hmRender();
   }
-  let mnCur = null;
-  async function mnOpen(bid) {
-    const m = SH.mn[bid]; if (!m) return;
-    const x = ((DM.sch && DM.sch.details) || []).find((y) => mnBid(y) === bid), nm = x ? (dmBr(x).branchName || dmBr(x).companyName || '거래처') : '거래처';
-    const at = m.at ? new Date(m.at) : null, atS = at ? `${at.getMonth() + 1}/${at.getDate()} ${String(at.getHours()).padStart(2, '0')}:${String(at.getMinutes()).padStart(2, '0')}` : '';
-    shCur = null; mnCur = bid;
-    $('sh-ovt').textContent = nm + ' · 메모 변경';
-    $('sh-ovf').hidden = true; $('sh-ovf').removeAttribute('src'); $('sh-ovb').hidden = false;
-    $('sh-ovb').innerHTML = `<div class="mn-body"><p class="mn-at">주차·출입 메모가 바뀌었어요${atS ? ` · ${atS} 확인` : ''}</p><pre>${m.memo ? esc(m.memo) : '(메모가 지워졌어요)'}</pre>${m.prev ? `<details><summary>이전 메모 보기</summary><pre>${esc(m.prev)}</pre></details>` : ''}</div>`;
-    $('sh-ov').hidden = false;
-    // 누르는 순간 불을 끄고 서버에 기록
-    delete SH.mn[bid]; shUi(); if (document.body.classList.contains('hm')) hmRender();
-    try { await rpc('memo_ack', { p_name: cfg.n, p_token: cfg.tok, p_bid: bid, p_ver: +m.ver || 1 }); } catch (e) { /* 다음 확인 때 다시 NEW로 뜨면 한 번 더 누르면 됨 */ }
+  async function mnViewed(x) {   // 배송 정보를 열고 상세가 보이면 → 확인 기록 (메모NEW면 불 끔)
+    if (!MN_ON() || isMaster() || !x) return; const bid = mnBid(x); if (!bid) return;
+    const m = SH.mn[bid], D = DM.d || L.d; if (!m && SH.mv.has(bid)) return;
+    if (m) { SH.mnSeen[bid] = m; delete SH.mn[bid]; }
+    SH.mv.add(bid); dmRender(); if (document.body.classList.contains('hm')) hmRender();
+    try { await rpc('memo_view', { p_name: cfg.n, p_token: cfg.tok, p_date: D, p_bid: bid, p_ver: m ? +m.ver || 1 : 0 }); } catch (e) { /* 다음에 다시 열면 기록 */ }
   }
+  const mnAt = (s) => { const d = s ? new Date(s) : null; return d ? `${d.getMonth() + 1}/${d.getDate()} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}` : ''; };
   function shDmHtml(x, gate) {
     const id = dmId(x), b = dmBr(x), [sc, st] = dmState(x), open = DM.open === String(id), d = DM.det[id] || null, db = dmBr(d || x), today = dmActDay();
     const tags = [x.stockSurveyYN === 'Y' && '<span class="w">재고조사</span>', x.examineYN === 'Y' && '<span class="w">검수</span>', x.coffeeMachineYN === 'Y' && '<span>커피머신</span>', b.entranceType === '보안카드' && '<span>출입증</span>', b.unableDeliveryTime && `<span>배송 불가 ${esc(b.unableDeliveryTime)}</span>`].filter(Boolean).join('');
-    return `<div class="sh-dm"><div class="sh-dmh"><span class="dm-st ${sc}">${esc(st || '배송')}</span>${shSeqHtml(x, today)}<button type="button" class="sh-dmi" data-dm="open" data-id="${esc(id)}">배송 정보 ${open ? '▴' : '▾'}</button></div>
+    return `<div class="sh-dm"><div class="sh-dmh"><span class="dm-st ${sc}">${esc(st || '배송')}</span>${shSeqHtml(x, today)}<button type="button" class="sh-dmi${mnOf(x) ? ' mnn' : mnNeed(x) ? ' need' : ''}" data-dm="open" data-id="${esc(id)}">${mnOf(x) ? '배송 정보 · 메모NEW' : mnNeed(x) ? '배송 정보 확인 (필수)' : '배송 정보'} ${open ? '▴' : '▾'}</button></div>
       ${tags ? `<div class="dm-tg">${tags}</div>` : ''}${dmActsHtml(x, id, today, false, gate)}${open ? dmDetHtml(x, d, db, id, today, false, true) : ''}</div>`;
   }
   // 11/22 배송 순서 바꾸기 — 딜리버리웹 '배송 순서 변경하기'와 같은 요청 (출발했거나 끝난 곳은 위에 고정, 그 아래에서만 옮김)
@@ -1660,11 +1675,11 @@
     const am = (r) => { const f = fOf(r) || {}; const a = Number(r.amtA || 0), c = Number(r.amtC || 0); return a || c ? { a, c, s: a + c } : { a: null, c: null, s: Number(f.amt || 0) }; };
     const T = rs.reduce((o, r) => { const m = am(r); o.a += m.a || 0; o.c += m.c || 0; o.s += m.s || 0; return o; }, { a: 0, c: 0, s: 0 });
     const cell = (v) => v == null ? '—' : v ? won(v) : '0';
-    $('sh-prog').innerHTML = rs.length ? `<div class="kv"><label>거래처</label><b>${rs.length}<i>곳</i></b></div><div class="kv"><label>상온</label><b>${won(T.a)}<i>원</i></b></div><div class="kv"><label>저온</label><b>${won(T.c)}<i>원</i></b></div><div class="kv"><label>합계</label><b style="color:#FDE68A">${won(T.s)}<i>원</i></b></div>${pend.cards.length ? `<div class="kv"><label>요약카드 확인</label><b>${pend.cards.length}곳 남음</b></div>` : ''}${pend.memos.length ? `<div class="kv"><label>메모NEW</label><b>${pend.memos.length}곳 남음</b></div>` : ''}` : '';
+    $('sh-prog').innerHTML = rs.length ? `<div class="kv"><label>거래처</label><b>${rs.length}<i>곳</i></b></div><div class="kv"><label>상온</label><b>${won(T.a)}<i>원</i></b></div><div class="kv"><label>저온</label><b>${won(T.c)}<i>원</i></b></div><div class="kv"><label>합계</label><b style="color:#FDE68A">${won(T.s)}<i>원</i></b></div>${pend.cards.length ? `<div class="kv"><label>요약카드 확인</label><b>${pend.cards.length}곳 남음</b></div>` : ''}${pend.memos.length ? `<div class="kv"><label>배송메모 확인</label><b>${pend.memos.length}곳 남음</b></div>` : ''}` : '';
     if (!rs.length) { $('sh-list').innerHTML = SH.busy || L.busy ? '<div class="card msg">불러오는 중…</div>' : `<div class="card msg">${dLbl(L.d)} 배정된 거래처가 아직 없어요.</div>`; return; }
     // 착지 수에 맞춰 글씨 크기 자동 (8곳 이하 크게 → 20곳이면 작게)
     const n = rs.length, z = n <= 8 ? 1 : n >= 20 ? 0.78 : 1 - (n - 8) * 0.22 / 12;
-    const dmOk = shDmOn(), MT = dmOk ? shDmMatch() : { m: {}, rest: [] }, gate = dmOk && (pend.cards.length || pend.loads || pend.memos.length) ? [pend.loads ? `상차 체크 ${pend.loads}건` : '', pend.cards.length ? `요약카드 확인 ${pend.cards.length}곳` : '', pend.memos.length ? `메모NEW ${pend.memos.length}곳` : ''].filter(Boolean).join('·') + '을 끝내면 출발할 수 있어요' : '';
+    const dmOk = shDmOn(), MT = dmOk ? shDmMatch() : { m: {}, rest: [] }, gate = dmOk && (pend.cards.length || pend.loads) ? [pend.loads ? `상차 체크 ${pend.loads}건` : '', pend.cards.length ? `요약카드 확인 ${pend.cards.length}곳` : ''].filter(Boolean).join('·') + '을 끝내면 출발할 수 있어요' : '';
     // 11/22 배송 순서를 바꾸면 실적표도 그 순서로 (짝 맞은 거래처끼리 자리만 바꿈, 짝 없는 곳은 제자리)
     const ord = rs.slice(); if (dmOk) { const slots = [], ms = []; rs.forEach((r, k) => { if (MT.m[r.code]) { slots.push(k); ms.push(r); } }); ms.sort((a, b) => (+MT.m[a.code].sequence || 999) - (+MT.m[b.code].sequence || 999)); slots.forEach((k, j) => { ord[k] = ms[j]; }); }
     const body = ord.map((r, i) => { const f = fOf(r) || {}, need = reqOf(r), rd = SH.reads.has(String(r.code)), m = am(r), dx = MT.m[r.code];
@@ -1692,7 +1707,7 @@
   $('sh-list').onchange = (ev) => { const sl = ev.target.closest && ev.target.closest('select[data-dmseq]'); if (sl) dmSeq(sl.dataset.dmseq, +sl.value, sl); };
   $('sh-list').onclick = (ev) => {
     if (ev.target.closest('[data-zclose]')) { SH.zoom = null; shUi(); return; }
-    const mb = ev.target.closest('button[data-mnew]'); if (mb) { mnOpen(mb.dataset.mnew); return; }
+    const mb = ev.target.closest('button[data-mnew]'); if (mb) { if (DM.open !== String(mb.dataset.mnew)) dmDetail(mb.dataset.mnew); return; }
     if (ev.target.closest('[data-dm]')) return dmClick(ev);   // 11/21 배송 버튼
     const b = ev.target.closest('button[data-card]');
     if (!b) { if (ev.target.closest('button, select, a, input, label, .sh-zoom')) return; const zr = ev.target.closest('.shr[data-zc]'); if (zr) { SH.zoom = zr.dataset.zc; shUi(); window.scrollTo(0, 0); } return; }
@@ -1707,7 +1722,6 @@
   };
   $('sh-ovx').onclick = async () => {
     $('sh-ov').hidden = true; $('sh-ovf').removeAttribute('src');
-    mnCur = null;
     const r = shCur; shCur = null; if (!r) return;
     if (reqOf(r) && !SH.reads.has(String(r.code))) { SH.reads.add(String(r.code)); shUi(); try { await rpc('card_read', { p_name: cfg.n, p_token: cfg.tok, p_date: L.d, p_code: String(r.code) }); } catch (e) { /* 다음에 다시 기록 */ } }
   };
@@ -1716,9 +1730,9 @@
     if (!L.recs.length || L.loadedFor !== L.d) { try { await lcLoad(); L.loadedFor = L.d; } catch (e) { /* 아래에서 판단 */ } }
     await shFlags();
     const p = shPending();
-    if (!p.cards.length && !p.loads && !p.memos.length) { $('dl-lock').hidden = true; $('dl-w').hidden = false; dlOpen(); return; }
+    if (!p.cards.length && !p.loads) { $('dl-lock').hidden = true; $('dl-w').hidden = false; dlOpen(); return; }
     $('dl-w').hidden = true; $('dl-lock').hidden = false;
-    $('dl-lock').innerHTML = `<b>배송 시작 전에 끝내 주세요</b>${p.loads ? `· 상차 체크 <b style="display:inline">${p.loads}건</b> 남음 (상차 탭에서 ☐ 체크)<br>` : ''}${p.cards.length ? `· 요약카드 확인 <b style="display:inline">${p.cards.length}곳</b> 남음: ${p.cards.slice(0, 4).map((r) => esc(r.name)).join(', ')}${p.cards.length > 4 ? ' 외' : ''}<br>` : ''}${p.memos.length ? `· 메모NEW <b style="display:inline">${p.memos.length}곳</b> 남음 (실적표에서 깜빡이는 메모NEW 누르기)<br>` : ''}${p.loads ? '<button data-go="lc">상차 탭으로</button>' : ''}${p.cards.length || p.memos.length ? '<button data-go="sh">실적표로</button>' : ''}<button data-go="dl">다시 확인</button>`;
+    $('dl-lock').innerHTML = `<b>배송 시작 전에 끝내 주세요</b>${p.loads ? `· 상차 체크 <b style="display:inline">${p.loads}건</b> 남음 (상차 탭에서 ☐ 체크)<br>` : ''}${p.cards.length ? `· 요약카드 확인 <b style="display:inline">${p.cards.length}곳</b> 남음: ${p.cards.slice(0, 4).map((r) => esc(r.name)).join(', ')}${p.cards.length > 4 ? ' 외' : ''}<br>` : ''}${p.loads ? '<button data-go="lc">상차 탭으로</button>' : ''}${p.cards.length ? '<button data-go="sh">실적표로</button>' : ''}<button data-go="dl">다시 확인</button>`;
   }
   $('dl-lock').onclick = (ev) => { const b = ev.target.closest('button[data-go]'); if (b) showTab(b.dataset.go); };
   if (!$('main').hidden) { aUi(); aLoad(); }
