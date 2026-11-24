@@ -680,7 +680,7 @@
 
 
   // 11/20 앱 안 업데이트: 서버의 새 index.html 빌드 번호가 다르면 [업데이트] 버튼 → 새로 불러오기 (홈 화면에 다시 추가할 필요 없음)
-  const BUILD = '20261124-5';
+  const BUILD = '20261124-6';
   try { document.getElementById('ver').textContent = 'v' + BUILD.slice(2, 8) + '-' + BUILD.split('-')[1]; } catch (e) {}
   async function updCheck() {
     try {
@@ -971,7 +971,7 @@
   //  · 단계 순서: 딜리버리웹 표에서 재고조사만 맨 앞으로 (11/21 상진님: 현장에선 재고조사 → 진열이 맞는 순서)
   //    중간 '진열 완료' 화면은 없애고 마지막에 한 번만 완료(done-task)
   //  · 이어하기: 서버 tasks 의 사진·검수·재고조사 기록을 보고 아직 안 한 첫 단계부터 (서버 curStep 은 딜리버리웹 순서 기준이라 안 씀)
-  //  · 안 되는 경우는 언제든 [기존 배송화면]으로 같은 작업을 이어서 할 수 있음 (서버 기록은 하나)
+  //  · 안 되는 경우는 언제든 [구 버전화면]으로 같은 작업을 이어서 할 수 있음 (서버 기록은 하나)
   const DM_STEPS = (() => { const B = ['img', 'BEFORE_DISPLAY'], A = ['img', 'AFTER_DISPLAY'], I = ['insp', 'INSPECTION'], FD = ['fin', 'DISPLAY'], S = ['stock', 'STOCK_SURVEY'], FS = ['fin', 'STOCK_SURVEY'], BC = ['img', 'BEFORE_COFFEE'], CC = ['coffee', 'CLEANING'], AC = ['img', 'AFTER_COFFEE'], FC = ['fin', 'CLEANING'];
     const F = ['fin', 'ALL']; void FD; void FS; void FC;
     return { D: [B, A, F], DE: [B, I, A, F], DS: [S, B, A, F], DES: [S, B, I, A, F], DC: [B, A, BC, CC, AC, F], DEC: [B, I, A, BC, CC, AC, F], S: [S, F], C: [BC, CC, AC, F] }; })();
@@ -1010,14 +1010,14 @@
       else if (a === 'goX') { if (!confirm('출발을 취소할까요?')) return; await dmCall('DELETE', `schedules/details/${id}/cancel-delivery`); }
       else if (a === 'task') { await dmCall('PATCH', `schedules/details/${id}/start-task`); await dmReload(); return dmWkGo(id); }
       await dmReload();
-    } catch (e) { alert((e.message || '안 됐어요') + '\n\n계속 안 되면 [기존 배송화면]에서 진행해 주세요.'); }
+    } catch (e) { alert((e.message || '안 됐어요') + '\n\n계속 안 되면 [구 버전화면]에서 진행해 주세요.'); }
     finally { btn.disabled = false; btn.textContent = old; }
   }
   async function dmUniform(f, lab) {   // 출근 복장 사진 (오늘 첫 출발 전에 1장)
     const t0 = lab.firstChild.textContent; lab.firstChild.textContent = '올리는 중…';
     try { const r = await dmUp(f, 0); const j = await dmCall('PATCH', `schedules/${DM.sch.id}/uniformV2`, undefined, { contentLength: r.contentLength, originalFileName: r.originalFileName, preSignedUrl: r.uploadUrl, type: r.type });
       DM.sch.uniformYN = (j && j.uniformYN) || 'Y'; dmUi(); }
-    catch (e) { lab.firstChild.textContent = t0; alert('출근 복장 등록이 안 됐어요: ' + e.message + '\n\n[기존 배송화면]에서 등록해 주세요.'); }
+    catch (e) { lab.firstChild.textContent = t0; alert('출근 복장 등록이 안 됐어요: ' + e.message + '\n\n[구 버전화면]에서 등록해 주세요.'); }
   }
   function dmWkGo(id) {   // 11/21 실적표에서 작업 시작 → 단계 화면(배송 패널)으로, 끝나면 실적표로 돌아옴
     DM.from = $('t-sh').hidden ? '' : 'sh';
@@ -1032,7 +1032,7 @@
       if (!DM.wk || DM.wk.id !== String(id)) return;
       if (sd.doneYN === 'Y') { DM.wk = null; alert('이미 완료된 일정이에요.'); return dmReload(); }
       const steps = DM_STEPS[sd.stepCase];
-      if (!steps) { DM.wk.busy = ''; DM.wk.err = `이 작업 유형(${sd.stepCase || '-'})은 아직 위로드에서 못 해요. [기존 배송화면]으로 진행해 주세요.`; return dmUi(); }
+      if (!steps) { DM.wk.busy = ''; DM.wk.err = `이 작업 유형(${sd.stepCase || '-'})은 아직 위로드에서 못 해요. [구 버전화면]으로 진행해 주세요.`; return dmUi(); }
       const sec = dmSecOf(id), st2 = sec ? steps.filter(([k]) => k !== 'img') : steps;   // 11/22 보안 거래처: 사진 단계 없음
       DM.wk.sec = sec; DM.wk.steps = st2; DM.wk.idx = dmFirstTodo(st2, t);
       await dmWkStep();
@@ -1066,7 +1066,7 @@
   async function dmWkDone(btn) {
     const W = DM.wk; btn.disabled = true; btn.textContent = '완료 처리 중…';
     try { await dmCall('PATCH', `schedules/details/${W.id}/done-task`); W.done = true; if (W.sec) rpc('secure_done_put', { p_name: cfg.n, p_token: cfg.tok, p_date: DM.d || dmToday(), p_code: W.sec }).catch(() => {}); dmDraft('insp-' + W.id, null); dmDraft('stock-' + W.id, null); dmReload(); dmUi(); }
-    catch (e) { btn.disabled = false; btn.textContent = '작업 완료하기'; alert((e.message || '완료가 안 됐어요') + '\n\n계속 안 되면 [기존 배송화면]에서 완료해 주세요.'); }
+    catch (e) { btn.disabled = false; btn.textContent = '작업 완료하기'; alert((e.message || '완료가 안 됐어요') + '\n\n계속 안 되면 [구 버전화면]에서 완료해 주세요.'); }
   }
   async function dmWkSend(btn) {   // 현재 단계 저장 → 다음 단계
     const W = DM.wk, [k, ty] = W.steps[W.idx], old = btn.textContent; btn.disabled = true; btn.textContent = '저장 중…';
@@ -1094,7 +1094,7 @@
         await dmCall('POST', `task-inspections/details/${W.id}/coffee`, undefined, { checkedChecklistIds: W.chk.map((c) => c.id), memoText: W.memo.t ? W.memo.text.trim() : undefined, memos });
       }
       return dmWkNext();
-    } catch (e) { alert((e.message || '저장이 안 됐어요') + '\n\n계속 안 되면 [기존 배송화면]에서 이어서 진행해 주세요.'); }
+    } catch (e) { alert((e.message || '저장이 안 됐어요') + '\n\n계속 안 되면 [구 버전화면]에서 이어서 진행해 주세요.'); }
     finally { if (btn.isConnected) { btn.disabled = false; btn.textContent = old; } }
   }
   async function dmWkFiles(files) {
@@ -1136,7 +1136,7 @@
   }
   function dmWkUi() {
     const w = $('dm-w'), W = DM.wk;
-    const head = `<div class="dm-top"><button type="button" data-dm="wkx">← 목록</button><b>${esc(W.name)}</b><button type="button" data-dm="old">기존 배송화면</button></div>`;
+    const head = `<div class="dm-top"><button type="button" data-dm="wkx">← 목록</button><b>${esc(W.name)}</b><button type="button" data-dm="old">구 버전화면</button></div>`;
     if (!W.steps) { w.innerHTML = head + `<div class="card ${W.err ? 'warn' : 'msg'}">${esc(W.err || W.busy)}</div>`; return; }
     const [k, ty] = W.steps[W.idx];
     const bar = `<div class="dm-pg"><b>${W.idx + 1}/${W.steps.length} · ${esc(DM_LBL(k, ty))}</b><div>${W.steps.map((st, i) => `<i class="${i < W.idx ? 'd' : i === W.idx ? 'c' : ''}"></i>`).join('')}</div></div>`;
@@ -1208,7 +1208,7 @@
             <div class="acts">
               ${isFinite(lat) && lat && !gate ? `<button type="button" class="y" data-dm="nav" data-id="${esc(id)}">길안내</button>` : ''}
               ${d.orderUrl ? `<a href="${esc(d.orderUrl)}" target="_blank" rel="noopener">거래명세서 ↗</a>` : ''}
-              <button type="button" data-dm="old">기존 배송화면</button>
+              <button type="button" data-dm="old">구 버전화면</button>
               ${dmRaw() ? `<button type="button" data-dm="raw" data-id="${esc(id)}">원본 복사 (점검용)</button>` : ''}
             </div></div>`;
         }
@@ -1220,9 +1220,9 @@
     if (DM.wk) return dmWkUi();
     const dd = DM.d || dmToday(), wk = [0, 6].includes(new Date(dd + 'T00:00:00Z').getUTCDay());
     const top = (txt) => `<div class="dm-top"><button type="button" data-dm="dp" aria-label="전날">◀</button><b style="text-align:center">${dmLbl(dd)}</b><button type="button" data-dm="dn" aria-label="다음날">▶</button></div>
-      <div class="dm-top"><b>${txt}</b><button type="button" data-dm="re">새로고침</button><button type="button" data-dm="old">기존 배송화면</button></div>`;
+      <div class="dm-top"><b>${txt}</b><button type="button" data-dm="re">새로고침</button><button type="button" data-dm="old">구 버전화면</button></div>`;
     if (DM.cand) { w.innerHTML = top('담당자 선택') + `<div class="card msg">이 번호에 배송 담당자가 여럿이에요. 본인을 골라 주세요.</div>` + DM.cand.map((c) => `<button type="button" class="dm-btn" style="display:block;width:100%;margin-bottom:8px;text-align:left" data-dm="cand" data-id="${esc(c.id || c.deliveryManagerId || '')}">${esc(c.name || c.deliveryManagerName || c.id || '')} ${esc(c.companyName || c.branchName || '')}</button>`).join(''); return; }
-    if (DM.err) { w.innerHTML = top('배송') + `<div class="card warn">배송 정보를 못 불러왔어요: ${esc(DM.err)}<br>[기존 배송화면]으로 진행해 주세요.</div>`; return; }
+    if (DM.err) { w.innerHTML = top('배송') + `<div class="card warn">배송 정보를 못 불러왔어요: ${esc(DM.err)}<br>[구 버전화면]으로 진행해 주세요.</div>`; return; }
     const list = (DM.sch && Array.isArray(DM.sch.details)) ? DM.sch.details.slice().sort((a, b) => (+a.sequence || 999) - (+b.sequence || 999)) : [];
     if (!list.length) { w.innerHTML = top('배송') + `<div class="card msg">${DM.busy || (dmLbl(dd) + ' 배송이 없어요.' + (wk ? ` <button type="button" class="dm-btn" data-dm="nb" style="margin-left:6px">다음 배송일(${dmLbl(dmNextBiz(dd))}) 보기</button>` : ''))}</div>`; return; }
     const done = list.filter((x) => x.doneYN === 'Y').length, cur = list.find((x) => x.doneYN !== 'Y' && !ndOf(x));
@@ -1663,11 +1663,11 @@
     await dmReload(); shUi();
   }
   // 11/24 배송 못 함 · 사유 — 기사가 고르면 서버 nodlv 에 남고, 위로드 웹(관리자)에서 고치거나 추가, 기사평가·운송사 품질 자료에서 씀
-  //  · 테스트 주소 ?nd=1 로 이 기기만 켬 (끄기 ?nd=0) — 상진님 '전체 켜줘' 뒤 기본값 켬으로
+  //  · 11/24 전체 켬 (?nd=0 이면 이 기기만 끔, ?nd=1 다시 켬)
   //  · 출발한 거래처면 딜리버리웹 출발도 취소, 뒤에 아직 출발 안 한 곳이 있으면 이 거래처를 맨 뒤 순서로 옮김 (다음 거래처 출발이 막히지 않게)
   //  · 작업 완료 처리는 하지 않음 (딜리버리웹엔 미완료로 남음)
   try { const v = q.get('nd'); if (v === '1' || v === '0') localStorage.setItem('wr-nd', v); } catch (e) { /* noop */ }   // q = 처음 주소 (?t= 링크는 주소를 지우므로 먼저 읽어 둔 값)
-  function ND_ON() { try { return localStorage.getItem('wr-nd') === '1'; } catch (e) { return false; } }
+  function ND_ON() { try { return localStorage.getItem('wr-nd') !== '0'; } catch (e) { return true; } }   // 11/24 상진님 '전체 켜줘' → 기본 켬 (?nd=0 이 기기만 끔)
   var ND_R = ['거래처 부재', '출입 불가', '거래처 요청 취소', '상품 누락·파손', '기사 사정', '기타'];
   var ND_H = { '거래처 부재': '문이 닫혀 있거나 받을 사람이 없음', '출입 불가': '건물·보안 출입이 막힘', '거래처 요청 취소': '거래처가 오늘 받지 않겠다고 함', '상품 누락·파손': '상차 때 상품이 빠졌거나 파손됨', '기사 사정': '차량 고장·시간 부족 등', '기타': '내용을 직접 적어 주세요' };
   var ND = { m: {} };
@@ -1753,9 +1753,9 @@
         ${(() => { const ad2 = ad || (dx && dmBr(dx).address) || ''; return `<div class="sha">${ad2 ? esc(ad2) : '<span style="opacity:.5">주소 정보 없음</span>'}${(dx && dx.coordinate && +dx.coordinate.latitude) || ad2 ? `<button type="button" class="sh-nv" data-dm="nav" data-id="${dx ? esc(dmId(dx)) : ''}" data-addr="${esc(ad2)}" data-nm="${esc(wnm || r.name)}">길안내</button>` : ''}</div>`; })()}
         <div class="shm"><span><label>상온</label>${cell(m.a)}</span><span><label>저온</label>${cell(m.c)}</span><span class="t"><label>합계</label>${won(m.s)}</span></div>
         ${tg ? `<div class="sh-tg">${tg}</div>` : ''}${ex ? `<div class="sh-x">${ex}</div>` : ''}${need || f.pub ? `<button class="sh-btn ${rd || !need ? 'ok' : ''}" data-card="${esc(r.code)}">${need ? (rd ? '✓ 요약카드 확인함' : '요약카드 확인 (필수)') : '요약카드 보기'}</button>` : ''}${dx ? shDmHtml(dx, gate) : ''}</div>`; }).join('');
-    const dmTop = !dmOk ? '' : DM.err ? `<div class="card warn">배송 정보를 못 불러왔어요: ${esc(DM.err)} <button type="button" class="dm-btn" data-dm="old">기존 배송화면</button></div>`
+    const dmTop = !dmOk ? '' : DM.err ? `<div class="card warn">배송 정보를 못 불러왔어요: ${esc(DM.err)} <button type="button" class="dm-btn" data-dm="old">구 버전화면</button></div>`
       : SH.dmBusy && !(DM.sch && DM.d === L.d) ? '<div class="card msg">배송 진행 상태 읽는 중…</div>'
-      : `<div class="sh-dmbar"><span>배송 ${((DM.sch && DM.sch.details) || []).length}곳 · 완료 ${((DM.sch && DM.sch.details) || []).filter((x) => x.doneYN === 'Y').length}</span><button type="button" class="dm-btn" data-dm="old">기존 배송화면</button></div>`;
+      : `<div class="sh-dmbar"><span>배송 ${((DM.sch && DM.sch.details) || []).length}곳 · 완료 ${((DM.sch && DM.sch.details) || []).filter((x) => x.doneYN === 'Y').length}</span><button type="button" class="dm-btn" data-dm="old">구 버전화면</button></div>`;
     const restH = dmOk && MT.rest.length ? `<div class="card shl"><div class="sh-dmrest">실적표에 없는 배송 ${MT.rest.length}곳</div>${MT.rest.map((x) => `<div class="shr"><div class="shn"><b>${esc(dmBr(x).branchName || dmBr(x).companyName || '거래처')}</b>${mnBtn(x)}</div><div class="sha">${esc(dmBr(x).companyName || '')}</div>${shDmHtml(x, gate)}</div>`).join('')}</div>` : '';
     // 11/22 거래처 1곳 크게 보기 (카드 빈 곳을 누르면 열림)
     let zH = ''; if (SH.zoom) { const tmp = document.createElement('div'); tmp.innerHTML = body; const zr = tmp.querySelector(`.shr[data-zc="${CSS.escape(String(SH.zoom))}"]`);
