@@ -122,7 +122,11 @@
   .dm-h{display:flex;align-items:flex-start;gap:10px}.dm-h .n{min-width:28px;height:28px;border-radius:9px;background:#3E6AF2;display:grid;place-items:center;font-weight:900;font-size:13px;flex:none}
   .dm-h .t{flex:1;min-width:0}.dm-h .t b{display:block;font-size:16.5px;line-height:1.3}.dm-h .t span{display:block;font-size:13px;opacity:.7;margin-top:2px}
   .dm-st{flex:none;font-size:12.5px;font-weight:800;border-radius:999px;padding:4px 9px;background:rgba(255,255,255,.1)}
-  .dm-st.go{background:#3E6AF2}.dm-st.work{background:#F2C230;color:#17191C}.dm-st.ok{background:rgba(34,197,94,.25);color:#86EFAC}
+  .dm-st.go{background:#3E6AF2}.dm-st.nd{background:rgba(239,68,68,.28);color:#FCA5A5}.dm-it.nd{opacity:.6}
+  .dm-d .acts.main button.nd-b,.sh-dm .acts.main button.nd-b,.acts.main button.nd-b{flex:none;background:rgba(239,68,68,.18);color:#FCA5A5;font-size:14px;padding:14px 12px}.nd-row{margin-top:8px;text-align:right}.nd-row .nd-b{border:0;border-radius:10px;padding:10px 14px;font:inherit;font-size:14px;font-weight:700;background:rgba(239,68,68,.15);color:#FCA5A5}.nd-box{flex:1;font-size:14px;line-height:1.5;color:#FCA5A5;margin:8px 0}
+  .nd-ov{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9999;display:flex;align-items:flex-end}.nd-sh{background:#1F2226;width:100%;border-radius:20px 20px 0 0;padding:18px 16px calc(18px + env(safe-area-inset-bottom));color:#fff;max-height:90vh;overflow:auto}
+  .nd-sh h3{margin:0 0 4px;font-size:18px}.nd-sh p{margin:0 0 12px;font-size:13.5px;opacity:.75}.nd-r{display:block;width:100%;text-align:left;border:1.5px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05);color:#fff;border-radius:12px;padding:14px;margin-bottom:8px;font:inherit;font-size:16px;font-weight:700}.nd-r.on{border-color:#F2C230;background:rgba(242,194,48,.15)}
+  .nd-sh textarea{width:100%;box-sizing:border-box;border-radius:12px;border:1px solid rgba(255,255,255,.15);background:#111316;color:#fff;font:inherit;font-size:15px;padding:12px;min-height:70px;margin:4px 0 12px}.nd-bt{display:flex;gap:8px}.nd-bt button{flex:1;border:0;border-radius:12px;padding:15px;font:inherit;font-size:16px;font-weight:800;background:rgba(255,255,255,.1);color:#fff}.nd-bt .y{background:#EF4444}.nd-bt button:disabled{opacity:.5}.dm-st.work{background:#F2C230;color:#17191C}.dm-st.ok{background:rgba(34,197,94,.25);color:#86EFAC}
   .dm-tg{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}.dm-tg span{font-size:11.5px;font-weight:800;border-radius:999px;padding:2px 8px;background:rgba(255,255,255,.1);color:#D7DADF}
   .dm-tg .w{background:rgba(242,194,48,.2);color:#FDE68A}
   .dm-d{margin-top:12px;border-top:1px solid rgba(255,255,255,.08);padding-top:10px}
@@ -676,7 +680,7 @@
 
 
   // 11/20 앱 안 업데이트: 서버의 새 index.html 빌드 번호가 다르면 [업데이트] 버튼 → 새로 불러오기 (홈 화면에 다시 추가할 필요 없음)
-  const BUILD = '20261124-4';
+  const BUILD = '20261124-5';
   try { document.getElementById('ver').textContent = 'v' + BUILD.slice(2, 8) + '-' + BUILD.split('-')[1]; } catch (e) {}
   async function updCheck() {
     try {
@@ -933,6 +937,7 @@
   function dmState(x) {   // 딜리버리웹과 같은 규칙
     if (!x) return ['', ''];
     if (x.doneYN === 'Y') return ['ok', '완료 ' + dmHm(x.taskDoneAt)];
+    if (ndOf(x)) return ['nd', '배송 못 함'];
     if (x.taskStartAt) return ['work', '작업 중'];
     if (x.deliveryStartAt) return ['go', '출발 ' + dmHm(x.deliveryStartAt)];
     return ['', x.startDeliveryAvailable === false ? '대기' : '출발 전'];
@@ -948,7 +953,7 @@
         DM.auto = true; const ls = Array.isArray(d.details) ? d.details : [];
         if (!ls.length || ls.every((x) => x.doneYN === 'Y')) { const nx = dmNextBiz(DM.d), d2 = await dmGet('schedules', { deliveryDate: nx }); if (d2 && Array.isArray(d2.details) && d2.details.length) { DM.d = nx; d = d2; } }
       }
-      if (d) { DM.sch = d; DM.at = Date.now(); DM.det = {}; DM.open = ''; } }
+      if (d) { DM.sch = d; DM.at = Date.now(); DM.det = {}; DM.open = ''; ndLoad(); } }
     catch (e) { DM.err = e.message; }
     DM.busy = ''; dmUi();
   }
@@ -985,7 +990,7 @@
   const dmActDay = () => { const d = DM.d || dmToday(), t = dmToday(); return d >= dmAdd(t, -1) && d <= dmNextBiz(t); };
   const dmItem = (id) => ((DM.sch && DM.sch.details) || []).find((x) => String(dmId(x)) === String(id));
   async function dmReload() {   // 목록만 다시 (열어 둔 카드는 그대로)
-    try { const d = await dmGet('schedules', dmIsToday() ? undefined : { deliveryDate: DM.d }); if (d) { DM.sch = d; DM.at = Date.now(); DM.err = ''; } } catch (e) { DM.err = e.message; }
+    try { const d = await dmGet('schedules', dmIsToday() ? undefined : { deliveryDate: DM.d }); if (d) { DM.sch = d; DM.at = Date.now(); DM.err = ''; ndLoad(); } } catch (e) { DM.err = e.message; }
     dmRender();
   }
   function dmPos() {   // 출발은 현재 위치가 필요 (딜리버리웹과 같음)
@@ -1172,6 +1177,7 @@
   }
   function dmActsHtml(x, id, today, uni, gate) {
     if (!today || x.doneYN === 'Y') return '';
+    if (ndOf(x)) { const r = ndOf(x); return `<div class="acts main"><div class="nd-box"><b>배송 못 함</b> · ${esc(r.reason)}${r.note ? ' — ' + esc(r.note) : ''}${r.src === 'admin' ? '<br>(관리자 정리)' : ''}</div>${r.src === 'admin' ? '' : `<button type="button" class="nd-b" data-dm="ndx" data-id="${esc(id)}">되돌리기</button>`}</div>`; }
     if (gate && !x.deliveryStartAt && !x.taskStartAt) return x.startDeliveryAvailable === false ? '' : `<div class="acts main"><span class="dm-hint">${esc(gate)}</span></div>`;   // 11/22 안내는 출발할 차례인 곳에만 한 번
     if (x.startDeliveryAvailable !== false && mnNeed(x)) return `<div class="acts main"><button type="button" class="y mn-go" data-dm="open" data-id="${esc(id)}">${mnOf(x) ? '바뀐 배송메모 확인하고 출발' : '배송메모 확인하고 출발'}</button></div>`;   // 11/24 거래처마다 배송 정보를 열어야 출발
     return `<div class="acts main">${
@@ -1179,7 +1185,7 @@
       : x.deliveryStartAt ? `<button type="button" class="y" data-dm="task" data-id="${esc(id)}">${dmSecOf(id) ? '작업 시작' : '작업 시작 · 사진'}</button><button type="button" data-dm="goX" data-id="${esc(id)}">출발 취소</button>`
       : uni ? '<span class="dm-hint">출근 복장 사진을 먼저 등록해 주세요</span>'
       : x.startDeliveryAvailable === false ? '<span class="dm-hint">앞 거래처를 끝내면 출발할 수 있어요</span>'
-      : `<button type="button" class="y" data-dm="go" data-id="${esc(id)}">출발</button>`}</div>`;
+      : `<button type="button" class="y" data-dm="go" data-id="${esc(id)}">출발</button>`}</div>${ndBtn(x, id)}`;
   }
   function dmDetHtml(x, d, db, id, today, uni, gate) {   // 11/21 배송 화면·실적표 같이 씀
       let det = '';
@@ -1219,7 +1225,7 @@
     if (DM.err) { w.innerHTML = top('배송') + `<div class="card warn">배송 정보를 못 불러왔어요: ${esc(DM.err)}<br>[기존 배송화면]으로 진행해 주세요.</div>`; return; }
     const list = (DM.sch && Array.isArray(DM.sch.details)) ? DM.sch.details.slice().sort((a, b) => (+a.sequence || 999) - (+b.sequence || 999)) : [];
     if (!list.length) { w.innerHTML = top('배송') + `<div class="card msg">${DM.busy || (dmLbl(dd) + ' 배송이 없어요.' + (wk ? ` <button type="button" class="dm-btn" data-dm="nb" style="margin-left:6px">다음 배송일(${dmLbl(dmNextBiz(dd))}) 보기</button>` : ''))}</div>`; return; }
-    const done = list.filter((x) => x.doneYN === 'Y').length, cur = list.find((x) => x.doneYN !== 'Y');
+    const done = list.filter((x) => x.doneYN === 'Y').length, cur = list.find((x) => x.doneYN !== 'Y' && !ndOf(x));
     const today = dmActDay(), uni = false;   // 11/21 출근 복장 사진은 생략 (상진님) — 다시 쓰려면 DM.sch.uniformYN === 'N' 로
     w.innerHTML = top(`배송 ${list.length}곳 · 완료 ${done}`) + (DM.busy ? `<div class="card msg">${DM.busy}</div>` : '')
       + (uni ? `<div class="card warn"><b>오늘의 출근 복장 사진</b>을 먼저 등록해 주세요. (등록해야 출발할 수 있어요)<br><label class="dm-btn y" style="display:inline-block;margin-top:8px" data-uni="1">출근 복장 촬영<input type="file" accept="image/*" capture hidden></label></div>` : '')
@@ -1227,7 +1233,7 @@
       const id = dmId(x), b = dmBr(x), [sc, st] = dmState(x), open = DM.open === String(id), d = DM.det[id] || null, db = dmBr(d || x);
       const tags = [x.stockSurveyYN === 'Y' && '<span class="w">재고조사</span>', x.examineYN === 'Y' && '<span class="w">검수</span>', x.coffeeMachineYN === 'Y' && '<span>커피머신</span>', b.entranceType === '보안카드' && '<span>출입증 카드지참</span>', b.unableDeliveryTime && `<span>배송 불가 ${esc(b.unableDeliveryTime)}</span>`, x.meridiem === 'AM' && '<span>오전</span>', x.meridiem === 'PM' && '<span>오후</span>'].filter(Boolean).join('');
       const det = open ? dmDetHtml(x, d, db, id, today, uni) : '';
-      return `<div class="dm-it${x.doneYN === 'Y' ? ' done' : ''}${cur && dmId(cur) === id ? ' cur' : ''}" data-dm="open" data-id="${esc(id)}">
+      return `<div class="dm-it${x.doneYN === 'Y' ? ' done' : ''}${ndOf(x) ? ' nd' : ''}${cur && dmId(cur) === id ? ' cur' : ''}" data-dm="open" data-id="${esc(id)}">
         <div class="dm-h"><span class="n">${i + 1}</span><div class="t"><b>${esc(b.branchName || b.companyName || x.companyName || '거래처')}</b><span>${esc(b.branchName && b.companyName ? b.companyName : '')}${x.deliveryCycle ? (b.branchName && b.companyName ? ' · ' : '') + esc(x.deliveryCycle) : ''}</span></div>${st ? `<span class="dm-st ${sc}">${esc(st)}</span>` : ''}</div>
         ${tags ? `<div class="dm-tg">${tags}</div>` : ''}${det}</div>`;
     }).join('');
@@ -1245,6 +1251,8 @@
     if (a === 'dp' || a === 'dn' || a === 'nb') { const d0 = DM.d || dmToday(); DM.d = a === 'nb' ? dmNextBiz(d0) : dmAdd(d0, a === 'dp' ? -1 : 1); DM.sch = null; return dmOpen(true); }
     if (a === 'old') { DM.iframe = true; DM.wk = null; if ($('t-dl').hidden) return showTab('dl'); return dlOpen(); }
     if (a === 'go' || a === 'goX' || a === 'task') return dmAct(a, id, b);
+    if (a === 'nd') return ndOpen(id);
+    if (a === 'ndx') return ndUndo(id, b);
     if (a === 'wk') return dmWkGo(id);
     if (DM.wk) { const W = DM.wk;
       if (a === 'wkx') { DM.wk = null; if (DM.from === 'sh') { DM.from = ''; showTab('sh'); } else dmUi(); return dmReload(); }
@@ -1653,6 +1661,60 @@
     try { await dmCall('PATCH', `schedules/${DM.sch.id}/sequences`, undefined, { schedules }); }
     catch (e) { alert('순서를 못 바꿨어요\n\n' + (e.message || '사유를 받지 못했어요')); }
     await dmReload(); shUi();
+  }
+  // 11/24 배송 못 함 · 사유 — 기사가 고르면 서버 nodlv 에 남고, 위로드 웹(관리자)에서 고치거나 추가, 기사평가·운송사 품질 자료에서 씀
+  //  · 테스트 주소 ?nd=1 로 이 기기만 켬 (끄기 ?nd=0) — 상진님 '전체 켜줘' 뒤 기본값 켬으로
+  //  · 출발한 거래처면 딜리버리웹 출발도 취소, 뒤에 아직 출발 안 한 곳이 있으면 이 거래처를 맨 뒤 순서로 옮김 (다음 거래처 출발이 막히지 않게)
+  //  · 작업 완료 처리는 하지 않음 (딜리버리웹엔 미완료로 남음)
+  try { const v = q.get('nd'); if (v === '1' || v === '0') localStorage.setItem('wr-nd', v); } catch (e) { /* noop */ }   // q = 처음 주소 (?t= 링크는 주소를 지우므로 먼저 읽어 둔 값)
+  function ND_ON() { try { return localStorage.getItem('wr-nd') === '1'; } catch (e) { return false; } }
+  var ND_R = ['거래처 부재', '출입 불가', '거래처 요청 취소', '상품 누락·파손', '기사 사정', '기타'];
+  var ND_H = { '거래처 부재': '문이 닫혀 있거나 받을 사람이 없음', '출입 불가': '건물·보안 출입이 막힘', '거래처 요청 취소': '거래처가 오늘 받지 않겠다고 함', '상품 누락·파손': '상차 때 상품이 빠졌거나 파손됨', '기사 사정': '차량 고장·시간 부족 등', '기타': '내용을 직접 적어 주세요' };
+  var ND = { m: {} };
+  function ndOf(x) { return (ND && ND_ON() && x && x.doneYN !== 'Y' && ND.m[String(dmId(x))]) || null; }
+  function ndBtn(x, id) { return ND_ON() && !isMaster() ? `<div class="nd-row"><button type="button" class="nd-b" data-dm="nd" data-id="${esc(id)}">배송 못 함 (사유 남기기)</button></div>` : ''; }
+  async function ndLoad() {
+    if (!ND_ON() || isMaster() || !DM.d) return;
+    try { const j = await rpc('nodlv_my', { p_name: cfg.n, p_token: cfg.tok, p_d: DM.d }); const m = {}; for (const r of (Array.isArray(j) ? j : [])) m[String(r.id)] = r; ND.m = m; dmRender(); } catch (e) { log('배송 못 함 기록 읽기 실패 ' + e.message); }
+  }
+  function ndOpen(id) {
+    const x = dmItem(id); if (!x) return; const b = dmBr(x), nm = b.branchName || b.companyName || '거래처';
+    const ov = document.createElement('div'); ov.className = 'nd-ov';
+    ov.innerHTML = `<div class="nd-sh"><h3>배송 못 함 · ${esc(nm)}</h3><p>사유를 골라 주세요. 관리자에게 그대로 전달돼요.</p>${ND_R.map((r) => `<button type="button" class="nd-r" data-r="${esc(r)}">${esc(r)}<br><span style="font-size:13px;font-weight:500;opacity:.7">${esc(ND_H[r])}</span></button>`).join('')}<textarea maxlength="100" placeholder="자세한 내용 (기타는 필수, 100자 이내)"></textarea><div class="nd-bt"><button type="button" data-c="x">닫기</button><button type="button" class="y" data-c="ok" disabled>배송 못 함으로 저장</button></div></div>`;
+    document.body.appendChild(ov);
+    let pick = '';
+    const ok = ov.querySelector('[data-c="ok"]'), ta = ov.querySelector('textarea');
+    const chk = () => { ok.disabled = !pick || (pick === '기타' && !ta.value.trim()); };
+    ta.oninput = chk;
+    ov.onclick = async (ev) => {
+      if (ev.target === ov || ev.target.closest('[data-c="x"]')) return ov.remove();
+      const r = ev.target.closest('.nd-r'); if (r) { pick = r.dataset.r; ov.querySelectorAll('.nd-r').forEach((e) => e.classList.toggle('on', e === r)); chk(); return; }
+      if (!ev.target.closest('[data-c="ok"]') || ok.disabled) return;
+      ok.disabled = true; ok.textContent = '저장 중…';
+      try {
+        const x0 = dmItem(id) || x;
+        if (x0.deliveryStartAt && !x0.taskStartAt) { try { await dmCall('DELETE', `schedules/details/${id}/cancel-delivery`); } catch (e) { log('배송 못 함: 출발 취소 실패 ' + e.message); } }
+        const rec = await rpc('nodlv_put', { p_name: cfg.n, p_token: cfg.tok, p_d: DM.d || dmToday(), p_id: String(id), p_bid: String(b.branchId || ''), p_store: [b.companyName, b.branchName].filter(Boolean).join(' - ') || nm, p_reason: pick, p_note: ta.value.trim() || null });
+        if (rec) ND.m[String(id)] = rec;
+        await ndToEnd(id);
+        ov.remove(); DM.open = ''; await dmReload();
+      } catch (e) { ok.disabled = false; ok.textContent = '배송 못 함으로 저장'; alert('저장이 안 됐어요: ' + (e.message || '') + '\n\n다시 눌러 주세요.'); }
+    };
+  }
+  async function ndToEnd(id) {   // 뒤에 출발 안 한 거래처가 있으면 이 거래처를 맨 뒤로 (실패해도 기록은 이미 저장됨)
+    try {
+      const ls = dmSeqList(), i = ls.findIndex((y) => String(dmId(y)) === String(id)); if (i < 0 || !DM.sch || !DM.sch.id) return;
+      const arr = ls.slice(); arr.push(arr.splice(i, 1)[0]); if (arr.every((y, k) => y === ls[k])) return;
+      const t = arr.filter((y) => !y.taskStartAt), fixed = arr.length - t.length;
+      if (!t.length) return;
+      await dmCall('PATCH', `schedules/${DM.sch.id}/sequences`, undefined, { schedules: t.map((y, j) => ({ deliveryScheduleDetailId: dmId(y), meridiem: y.meridiem, sequence: fixed + j + 1 })) });
+    } catch (e) { log('배송 못 함: 순서 옮기기 실패 ' + e.message); }
+  }
+  async function ndUndo(id, btn) {
+    if (!confirm('배송 못 함을 되돌릴까요?\n다시 출발할 수 있어요.')) return;
+    btn.disabled = true;
+    try { await rpc('nodlv_del', { p_name: cfg.n, p_token: cfg.tok, p_id: String(id) }); delete ND.m[String(id)]; await dmReload(); }
+    catch (e) { btn.disabled = false; alert('되돌리지 못했어요: ' + (e.message || '')); }
   }
   // 11/22 보안 거래처 (위로드 웹에서 관리자가 등록) — 사진 단계 없이 작업 완료, 평가에서 사진 면제
   var SEC = {};
