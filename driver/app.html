@@ -279,7 +279,15 @@
   .mnew{display:inline-flex;align-items:center;align-self:center;gap:4px;margin-left:auto;flex:0 0 auto;border:0;border-radius:999px;padding:6px 11px;min-height:34px;font:inherit;font-size:13px;font-weight:900;letter-spacing:.2px;background:#F2C230;color:#17191C;animation:mnb 1s ease-in-out infinite}
   .mnew::before{content:'';width:8px;height:8px;border-radius:50%;background:#B42318}
   @keyframes mnb{0%,100%{box-shadow:0 0 0 0 rgba(242,194,48,.75);opacity:1}50%{box-shadow:0 0 0 7px rgba(242,194,48,0);opacity:.55}}
-  @media (prefers-reduced-motion:reduce){.mnew{animation:none}}
+  @keyframes ndp{0%,100%{box-shadow:0 0 0 0 rgba(62,106,242,.8)}50%{box-shadow:0 0 0 7px rgba(62,106,242,0)}}
+  .sh-dmi.need{animation:ndp 1.2s ease-in-out infinite}
+  .ack-sec .memo{outline:2px solid #3E6AF2;border-radius:8px}.ack-down{margin-top:8px;font-size:13px;color:#9DB8FF}
+  .ack-box{margin:12px 0 4px;padding:14px;border-radius:12px;background:rgba(62,106,242,.14);border:1px solid rgba(62,106,242,.5);text-align:center}.ack-box p{margin:0 0 10px;font-size:13px;color:#C9D6FF;line-height:1.5}
+  .ack-b{width:100%;border:0;border-radius:11px;padding:15px;font:inherit;font-size:17px;font-weight:900;background:#3E6AF2;color:#fff;animation:ndp 1.2s ease-in-out infinite}.ack-b:disabled{opacity:.5;animation:none}
+  .ack-ok{margin:10px 0 2px;padding:10px;border-radius:10px;background:rgba(34,197,94,.14);color:#86EFAC;font-size:14px;font-weight:800;text-align:center}
+  .hm-step{display:block;font-style:normal;font-size:10px;font-weight:800;letter-spacing:.6px;color:#8FB0FF}.hm-q .hm-step{margin-bottom:-2px}.hm-row .hm-step{margin-bottom:1px}
+  .tabs button[data-step]::before{content:attr(data-step);display:block;font-size:10px;font-weight:800;letter-spacing:.4px;opacity:.75;margin-bottom:1px}
+  @media (prefers-reduced-motion:reduce){.mnew,.sh-dmi.need,.ack-b{animation:none}}
   .sh-dmi.need{background:#3E6AF2;color:#fff}.sh-dmi.mnn{background:#F2C230;color:#17191C;animation:mnb 1s ease-in-out infinite}
   .mn-sec .memo{background:rgba(242,194,48,.22);outline:2px solid #F2C230}.mn-tag{display:inline-block;margin-left:6px;padding:2px 8px;border-radius:999px;background:#F2C230;color:#17191C;font-size:12px;font-weight:900}
   .mn-prev{margin-top:8px}.mn-prev summary{font-size:13px;opacity:.8}.mn-prev .memo{opacity:.75;background:rgba(255,255,255,.06);outline:0;margin-top:6px}
@@ -327,7 +335,7 @@
   <div id="pd" hidden></div>
   <div id="home"><div class="hm-nm" id="hm-nm">—</div><div class="hm-sub" id="hm-sub"></div><div class="hm-st" id="hm-st"><i></i><span id="hm-stt">—</span></div><div class="hm-car" id="hm-car"></div><button class="hm-chg" id="hm-chg">내 차 바꾸기</button><div class="hm-q" id="hm-q"></div><div class="hm-day" id="hm-day" hidden></div><div class="hm-rows" id="hm-rows"></div><button class="hm-chg" id="hm-loc">위치정보 동의 관리</button></div>
   <div id="hbk"><button id="hbk-b" aria-label="홈으로"><svg width="26" height="26" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" stroke="#EDEFF1" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></button><b id="hbk-t"></b></div>
-  <div class="tabs"><button data-tab="cs" hidden>실적표</button><button data-tab="cw" hidden>업무</button><button data-tab="loc">운행 시작</button><button data-tab="lc">상차</button><button data-tab="sh">실적표</button><button data-tab="dl">배송</button><button data-tab="mm" hidden>내 운행 기록</button><button class="on" data-tab="rec">퇴근</button></div>
+  <div class="tabs"><button data-tab="cs" hidden>실적표</button><button data-tab="cw" hidden>업무</button><button data-tab="sh">실적표</button><button data-tab="loc">운행 시작</button><button data-tab="lc">상차</button><button data-tab="dl">배송</button><button data-tab="mm" hidden>내 운행 기록</button><button class="on" data-tab="rec">퇴근</button></div>
   <div id="t-cs" hidden>
     <div class="card">
       <div class="sh-top"><div class="name"><span id="cs-nm">—</span><span class="tmchip">편의점</span><small id="cs-sub">일일실적표 · 거래처 정보 · 상온/저온/합계 매출</small></div></div>
@@ -800,13 +808,20 @@
     $('hm-nm').textContent = cfg.n || '—';
     $('hm-sub').textContent = isMaster() ? '관리자 계정' : (TNAME[TEAM] || '') + ' 기사';
     $('hm-car').innerHTML = carSvg(carGet()); if (!carTier || carTier.n !== cfg.n || Date.now() - (carTier.at || 0) > 6 * 3600e3) setTimeout(carTierLoad, 1500);
-    hmExtra();
+    stepMark(); hmExtra();
     $('hm-rows').innerHTML = [...document.querySelectorAll('.tabs button')].filter((b) => !b.hidden).map((b) => { const l = hmLbl(b.dataset.tab); const live = hmLive(b.dataset.tab); if (live) l.s = live;
-      return `<button class="hm-row" data-hm="${b.dataset.tab}"><svg width="26" height="26" viewBox="0 0 24 24" aria-hidden="true"><path d="${l.d}" stroke="#A9AFB6" stroke-width="1.9" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg><span><b>${l.t}</b>${l.s ? `<small>${l.s}</small>` : ''}</span><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7" stroke="#6B7178" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></button>`; }).join('');
+      return `<button class="hm-row" data-hm="${b.dataset.tab}"><svg width="26" height="26" viewBox="0 0 24 24" aria-hidden="true"><path d="${l.d}" stroke="#A9AFB6" stroke-width="1.9" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg><span>${STEP[b.dataset.tab] ? `<em class="hm-step">STEP ${STEP[b.dataset.tab]}</em>` : ''}<b>${l.t}</b>${l.s ? `<small>${l.s}</small>` : ''}</span><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7" stroke="#6B7178" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></button>`; }).join('');
     hmStat();
   }
   // 11/21 홈 시안 나머지 (상진님): 바로가기 4개 · 오늘 일정 카드 · 메뉴 밑 그날 숫자
-  const HM_Q = { snack: [['loc', '운행 시작'], ['lc', '상차'], ['sh', '실적표'], ['rec', '퇴근']], cvs: [['cs', '실적표'], ['cw', '업무시작'], ['cw', '배송사진'], ['rec', '퇴근']] };
+  const HM_Q = { snack: [['sh', '실적표'], ['loc', '운행 시작'], ['lc', '상차'], ['rec', '퇴근']], cvs: [['cs', '실적표'], ['cw', '업무시작'], ['cw', '배송사진'], ['rec', '퇴근']] };
+  // 11/26 스낵 순서: 실적표 → 운행 시작 → 상차 → 퇴근 (상진님) — 보이는 것만 STEP 1, 2… 로 번호
+  var STEP = {};
+  function stepMark() {
+    STEP = {};
+    if (!CVS() && !isMaster()) HM_Q.snack.filter(([t]) => !tabBtn(t).hidden).forEach(([t], i) => { STEP[t] = i + 1; });
+    document.querySelectorAll('.tabs button').forEach((b) => { if (STEP[b.dataset.tab]) b.dataset.step = 'STEP ' + STEP[b.dataset.tab]; else delete b.dataset.step; });
+  }
   const hmW = (n) => Number(n || 0).toLocaleString('ko-KR');
   function hmDayData() {   // 오늘(또는 다음) 일정 요약
     try {
@@ -837,8 +852,8 @@
   function hmExtra() {
     const team = CVS() ? 'cvs' : 'snack', ic = (t) => hmLbl(t).d;
     const q = isMaster() ? [] : HM_Q[team].filter(([t]) => !tabBtn(t).hidden);
-    $('hm-q').innerHTML = q.map(([t, l], i) => `<button type="button" data-hm="${t}" class="${i === 0 ? 'on' : ''}"><span><svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path d="${l === '배송사진' ? 'M4 8h3l2-3h6l2 3h3v11H4zM12 17a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z' : ic(t)}" stroke="#EDEFF1" stroke-width="1.9" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span>${l}</button>`).join('');
-    $('hm-q').style.gridTemplateColumns = `repeat(${Math.max(q.length, 1)}, minmax(0, 1fr))`;
+    $('hm-q').innerHTML = q.map(([t, l], i) => `<button type="button" data-hm="${t}" class="${i === 0 ? 'on' : ''}">${team === 'snack' ? `<em class="hm-step">STEP ${i + 1}</em>` : ''}<span><svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path d="${l === '배송사진' ? 'M4 8h3l2-3h6l2 3h3v11H4zM12 17a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z' : ic(t)}" stroke="#EDEFF1" stroke-width="1.9" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span>${l}</button>`).join('');
+    $('hm-q').style.gridTemplateColumns = `repeat(${Math.max(q.length, 1)}, minmax(0, 1fr))`; stepMark();
     const D = isMaster() ? null : hmDayData();
     $('hm-day').hidden = !D;
     if (D) $('hm-day').innerHTML = `<div class="l">${esc(dLbl(D.d))} 일정</div><div class="v"><b>${D.n}<i> 곳</i></b><b class="m">${D.lbl} ${hmW(D.amt)}<i>원</i></b></div>${D.badges.length ? `<div class="bg">${D.badges.map(([k, t]) => `<span class="${k}">${esc(t)}</span>`).join('')}</div>` : ''}`;
@@ -962,7 +977,7 @@
     DM.open = DM.open === String(id) ? '' : String(id); dmRender(); if (!DM.open) return;
     try {
       if (!DM.det[id]) { DM.det[id] = await dmGet('schedules/details/' + id); dmRender(); }
-      { const x0 = ((DM.sch && DM.sch.details) || []).find((y) => String(dmId(y)) === String(id)); if (x0 && !DM.det[id]._err) mnViewed(x0); }   // 11/24 배송메모 확인 기록
+      // 11/26 열기만 해서는 확인 처리 안 함 → 맨 아래 [확인했습니다]를 눌러야 기록 (data-dm="ack")
       const bid = dmBr(DM.det[id]).branchId;
       if (bid && !DM.ref[bid]) { try { DM.ref[bid] = await dmGet('reference', { branchId: bid }); } catch (e) { DM.ref[bid] = { err: e.message }; } dmRender(); }
     } catch (e) { DM.det[id] = { _err: e.message }; dmRender(); }
@@ -1179,7 +1194,7 @@
     if (!today || x.doneYN === 'Y') return '';
     if (ndOf(x)) { const r = ndOf(x); return `<div class="acts main"><div class="nd-box"><b>배송 못 함</b> · ${esc(r.reason)}${r.note ? ' — ' + esc(r.note) : ''}${r.src === 'admin' ? '<br>(관리자 정리)' : ''}</div>${r.src === 'admin' ? '' : `<button type="button" class="nd-b" data-dm="ndx" data-id="${esc(id)}">되돌리기</button>`}</div>`; }
     if (gate && !x.deliveryStartAt && !x.taskStartAt) return x.startDeliveryAvailable === false ? '' : `<div class="acts main"><span class="dm-hint">${esc(gate)}</span></div>`;   // 11/22 안내는 출발할 차례인 곳에만 한 번
-    if (x.startDeliveryAvailable !== false && mnNeed(x)) return `<div class="acts main"><button type="button" class="y mn-go" data-dm="open" data-id="${esc(id)}">${mnOf(x) ? '바뀐 배송메모 확인하고 출발' : '배송메모 확인하고 출발'}</button></div>`;   // 11/24 거래처마다 배송 정보를 열어야 출발
+    if (x.startDeliveryAvailable !== false && mnNeed(x)) return `<div class="acts main"><button type="button" class="y mn-go" data-dm="open" data-id="${esc(id)}">${mnOf(x) ? '👆 바뀐 주차/출입 메모 확인하고 출발' : '👆 배송 정보 눌러서 확인하고 출발'}</button></div>`;   // 11/24 거래처마다 배송 정보를 열어야 출발
     return `<div class="acts main">${
       x.taskStartAt ? `<button type="button" class="y" data-dm="wk" data-id="${esc(id)}">${dmSecOf(id) ? '작업 이어하기' : '작업 이어하기 · 사진'}</button>`
       : x.deliveryStartAt ? `<button type="button" class="y" data-dm="task" data-id="${esc(id)}">${dmSecOf(id) ? '작업 시작' : '작업 시작 · 사진'}</button><button type="button" data-dm="goX" data-id="${esc(id)}">출발 취소</button>`
@@ -1199,11 +1214,12 @@
           det = `<div class="dm-d">
             <div class="sec"><label>주소</label>${esc(db.address || '-')}</div>
             ${db.workingTime || db.unableDeliveryTime ? `<div class="sec"><label>근무 시간</label>${esc(db.workingTime || '-')}${db.unableDeliveryTime ? ` · <b style="color:#FDE68A">배송 불가 ${esc(db.unableDeliveryTime)}</b>` : ''}</div>` : ''}
-            ${(() => { const bid = String(db.branchId || ''), nw = bid && (SH.mn[bid] || SH.mnSeen[bid]); return `<div class="sec${nw ? ' mn-sec' : ''}"><label>주차/출입 참고사항${nw ? ` <span class="mn-tag">NEW · ${esc(mnAt(nw.at))} 변경</span>` : ''}</label><div class="memo">${db.parkingMemo ? esc(String(db.parkingMemo).replace(/\r\n/g, '\n')) : '등록된 주차/출입 참고사항이 없어요.'}</div>${nw && nw.prev ? `<details class="mn-prev"><summary>바뀌기 전 메모 보기</summary><div class="memo">${esc(nw.prev)}</div></details>` : ''}</div>`; })()}
+            ${(() => { const bid = String(db.branchId || ''), nw = bid && (SH.mn[bid] || SH.mnSeen[bid]); const nd = mnNeed(x); return `<div class="sec${nw ? ' mn-sec' : ''}${nd ? ' ack-sec' : ''}"><label>주차/출입 참고사항${nw ? ` <span class="mn-tag">NEW · ${esc(mnAt(nw.at))} 변경</span>` : ''}</label><div class="memo">${db.parkingMemo ? esc(String(db.parkingMemo).replace(/\r\n/g, '\n')) : '등록된 주차/출입 참고사항이 없어요.'}</div>${nw && nw.prev ? `<details class="mn-prev"><summary>바뀌기 전 메모 보기</summary><div class="memo">${esc(nw.prev)}</div></details>` : ''}${nd ? '<div class="ack-down">읽은 뒤 맨 아래 <b>[확인했습니다]</b>를 눌러야 출발할 수 있어요 ↓</div>' : ''}</div>`; })()}
             <div class="sec"><label>연락 가능 고객</label>${mem.length ? mem.map((m, k) => `<a class="dm-btn" style="display:inline-block;margin:0 6px 6px 0;text-decoration:none" href="tel:${esc(String(m.cellphone).replace(/[^0-9]/g, ''))}">📞 ${esc(m.branchMemberName || m.name || ('담당 ' + (k + 1)))}</a>`).join('') : '-'}</div>
             ${d.stepCase ? `<div class="sec"><label>작업 단계</label>${esc(DM_STEP[d.stepCase] || d.stepCase)}</div>` : ''}
             ${d.notice ? `<div class="sec"><label>공지</label><div class="memo">${esc(d.notice)}</div></div>` : ''}
             <div class="sec"><label>배송 참고사항</label>${ref && ref.err ? '못 불러왔어요' : notes.length ? notes.map((n) => `<div class="dm-note"><i>${esc(String(n.createAt || '').slice(0, 10))}${n.topFixed ? ' · 고정' : ''}</i>${esc(n.contents || '')}</div>`).join('') : '등록된 배송 참고사항이 없어요.'}</div>
+            ${mnNeed(x) ? `<div class="ack-box"><p>주차/출입 참고사항을 다 읽었으면 눌러 주세요.<br>눌러야 출발 버튼이 나와요.</p><button type="button" class="ack-b" data-dm="ack" data-id="${esc(id)}">확인했습니다</button></div>` : mnLive() && x.doneYN !== 'Y' && SH.mv.has(mnBid(x)) ? '<div class="ack-ok">✓ 주차/출입 참고사항 확인했어요</div>' : ''}
             ${gate ? '' : dmActsHtml(x, id, today, uni)}
             <div class="acts">
               ${isFinite(lat) && lat && !gate ? `<button type="button" class="y" data-dm="nav" data-id="${esc(id)}">길안내</button>` : ''}
@@ -1247,6 +1263,7 @@
     const a = b.dataset.dm, id = b.dataset.id;
     if (a === 'open') { if (ev.target.closest('.dm-d')) return; return dmDetail(id); }
     ev.stopPropagation();
+    if (a === 'ack') { const x0 = ((DM.sch && DM.sch.details) || []).find((y) => String(dmId(y)) === String(id)); if (x0) { b.disabled = true; await mnViewed(x0); } return; }   // 11/26 [확인했습니다]
     if (a === 're') { DM.det = {}; DM.ref = {}; return dmOpen(true); }
     if (a === 'dp' || a === 'dn' || a === 'nb') { const d0 = DM.d || dmToday(); DM.d = a === 'nb' ? dmNextBiz(d0) : dmAdd(d0, a === 'dp' ? -1 : 1); DM.sch = null; return dmOpen(true); }
     if (a === 'old') { DM.iframe = true; DM.wk = null; if ($('t-dl').hidden) return showTab('dl'); return dlOpen(); }
@@ -1330,6 +1347,7 @@
     if (first) { let t = ''; try { t = sessionStorage.getItem('wr-tab') || ''; } catch (e) { /* noop */ } if (!t || tabBtn(t).hidden) t = isMaster() ? 'lc' : (localStorage.getItem(LS + '-on') === '1') ? 'lc' : (!corp || new Date().getHours() < 14) ? 'sh' : 'rec'; hmKeep = hmWant(); showTab(t); hmKeep = false; if (hmWant()) goHome(); }
     else if (!cur || cur.hidden) { hmKeep = document.body.classList.contains('hm'); showTab(isMaster() ? 'lc' : 'loc'); hmKeep = false; }
     if (typeof aUi === 'function' && A) aUi();
+    try { stepMark(); } catch (e) { /* noop */ }
     if (document.body.classList.contains('hm')) hmRender();
   }
   function rUi() {
@@ -1636,7 +1654,7 @@
   function shDmHtml(x, gate) {
     const id = dmId(x), b = dmBr(x), [sc, st] = dmState(x), open = DM.open === String(id), d = DM.det[id] || null, db = dmBr(d || x), today = dmActDay();
     const tags = [x.stockSurveyYN === 'Y' && '<span class="w">재고조사</span>', x.examineYN === 'Y' && '<span class="w">검수</span>', x.coffeeMachineYN === 'Y' && '<span>커피머신</span>', b.entranceType === '보안카드' && '<span>출입증</span>', b.unableDeliveryTime && `<span>배송 불가 ${esc(b.unableDeliveryTime)}</span>`].filter(Boolean).join('');
-    return `<div class="sh-dm"><div class="sh-dmh"><span class="dm-st ${sc}">${esc(st || '배송')}</span>${shSeqHtml(x, today)}<button type="button" class="sh-dmi${mnOf(x) ? ' mnn' : mnNeed(x) ? ' need' : ''}" data-dm="open" data-id="${esc(id)}">${mnOf(x) ? '메모NEW 보기' : mnNeed(x) ? '배송 정보 (필수)' : '배송 정보'} ${open ? '▴' : '▾'}</button></div>
+    return `<div class="sh-dm"><div class="sh-dmh"><span class="dm-st ${sc}">${esc(st || '배송')}</span>${shSeqHtml(x, today)}<button type="button" class="sh-dmi${mnOf(x) ? ' mnn' : mnNeed(x) ? ' need' : ''}" data-dm="open" data-id="${esc(id)}">${mnOf(x) ? '메모NEW 보기' : mnNeed(x) ? '👆 배송 정보 (필수)' : '배송 정보'} ${open ? '▴' : '▾'}</button></div>
       ${tags ? `<div class="dm-tg">${tags}</div>` : ''}${dmActsHtml(x, id, today, false, gate)}${open ? dmDetHtml(x, d, db, id, today, false, true) : ''}</div>`;
   }
   // 11/22 배송 순서 바꾸기 — 딜리버리웹 '배송 순서 변경하기'와 같은 요청 (출발했거나 끝난 곳은 위에 고정, 그 아래에서만 옮김)
