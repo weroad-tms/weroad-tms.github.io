@@ -48,6 +48,7 @@
   .row{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-top:1px solid #EEF2F7;font-size:17px}.row:first-child{border-top:0}
   .row small{display:block;color:#5B6575;font-size:14px}
   .tag.t-in{background:#EEF1F6;color:#5B6577}
+  .tag.t-wf{background:#E8F0FD;color:#1F5FBF}.tag.t-fl{background:#FFEBD9;color:#B4540F}
   .tag{font-size:13px;font-weight:800;border-radius:6px;padding:2px 7px;margin-left:6px}
   .t-wait{background:#FFF1D6;color:#8A5300}.t-ok{background:#DCFCE7;color:#166534}.t-no{background:#FEE2E2;color:#B91C1C}
   .muted{color:#5B6575;font-size:15px}
@@ -168,6 +169,11 @@
   const CAT_RE = [[/오일|필터|휠터|소모/, '오일·소모품'], [/타이어|펑크/, '타이어'], [/브레이크|패드|라이닝/, '브레이크'], [/얼라|쇼바|스프링|허브|아암|암|조향|하체|샤우드|샤프트|베어링/, '하체·조향'], [/엔진|미션|밋션|데후|클러치|인젝터|DPF|센서|터보/i, '엔진·미션'], [/냉동|에어컨|냉각|부동액|라디에이터/, '냉각·에어컨'], [/전구|등|램프|카메라|배선|전기/, '전기·등화'], [/배터리/, '배터리'], [/유리|와이퍼/, '유리·와이퍼'], [/판금|도색|도장/, '판금·도색'], [/검사/, '정기검사']];
   const catOf = (t) => { for (const [re, c] of CAT_RE) if (re.test(t)) return c; return '기타'; };
 
+  // 11/26 청구처: 위펀(스낵 차량) / 위펀풀필먼트(편의점 차량) — 차량 목록의 co로 정함. 목록에 없는 번호는 위펀
+  const CO = { wf: '위펀', wfl: '위펀풀필먼트' };
+  const coOf = (p) => { const n = String(p || '').replace(/\s/g, ''); const v = fleet.find((x) => String(x.plate).replace(/\s/g, '') === n); return v && v.co === 'wfl' ? 'wfl' : 'wf'; };
+  const split = () => fleet.some((v) => v.co === 'wfl');
+  const coTag = (p) => split() ? `<span class="tag ${coOf(p) === 'wfl' ? 't-fl' : 't-wf'}">${CO[coOf(p)]}</span>` : '';
   let fleet = [], car = null, lines = [], photos = [], hist = [], editNo = '', ym = today().slice(0, 7);
   const show = (v) => { ['home', '1', '2', '3', '4', 'done'].forEach((k) => { $('v-' + k).hidden = k !== v; }); window.scrollTo(0, 0); if (v === '1') setTimeout(() => $('p4').focus(), 50); };
   document.addEventListener('click', (e) => { const b = e.target.closest('[data-go]'); if (b) { if (b.dataset.go === '1' && $('v-done').hidden === false) reset(); show(b.dataset.go); } });
@@ -195,7 +201,7 @@
     const d = $('p4').value.replace(/\D/g, '').slice(0, 4); $('p4').value = d;
     if (d.length < 2) { $('cars').innerHTML = ''; return; }
     const m = fleet.filter((v) => String(v.plate).replace(/\s/g, '').endsWith(d) || (d.length < 4 && String(v.plate).includes(d)));
-    $('cars').innerHTML = m.slice(0, 6).map((v) => `<button data-p="${v.plate}">${v.plate}<small>${v.model || ''}</small></button>`).join('')
+    $('cars').innerHTML = m.slice(0, 6).map((v) => `<button data-p="${v.plate}">${v.plate}<small>${v.model || ''}${split() ? ` · <b style="color:${v.co === 'wfl' ? '#B4540F' : '#1F5FBF'}">${CO[v.co === 'wfl' ? 'wfl' : 'wf']} 청구</b>` : ''}</small></button>`).join('')
       + (d.length === 4 && !m.length ? `<div class="warn">위펀 차량 목록에 없는 번호예요. 번호를 다시 확인하거나 아래를 눌러 주세요.</div><button data-p="?${d}">목록에 없음 — ****${d}로 등록<small>위펀 담당자가 확인해요</small></button>` : '');
   };
   $('cars').onclick = (e) => { const b = e.target.closest('button[data-p]'); if (!b) return; car = b.dataset.p; $('carT').textContent = car.replace(/^\?/, '****'); show('2'); };
@@ -227,7 +233,7 @@
   function shrink(file) { return new Promise((res) => { const img = new Image(); img.onload = () => { const s = Math.min(1, 1000 / Math.max(img.width, img.height)); const c = document.createElement('canvas'); c.width = Math.round(img.width * s); c.height = Math.round(img.height * s); c.getContext('2d').drawImage(img, 0, 0, c.width, c.height); res(c.toDataURL('image/jpeg', 0.7)); }; img.onerror = () => res(''); img.src = URL.createObjectURL(file); }); }
   $('next3').onclick = () => {
     const x = tot(), km = $('km').value.replace(/\D/g, '');
-    $('conf').innerHTML = `<div class="row"><span>차량</span><b>${$('carT').textContent}</b></div><div class="row"><span>수리한 날</span><b>${$('dt').value}</b></div>`
+    $('conf').innerHTML = `<div class="row"><span>차량</span><b>${$('carT').textContent}</b></div>${split() ? `<div class="row"><span>청구처</span><b style="color:${coOf(car) === 'wfl' ? '#B4540F' : '#1F5FBF'}">${CO[coOf(car)]}</b></div>` : ''}<div class="row"><span>수리한 날</span><b>${$('dt').value}</b></div>`
       + lines.map((l) => `<div class="row"><span>${l.name}</span><b>${won(l.amt)}원</b></div>`).join('')
       + `<div class="row"><span>부가세</span><b>${won(x.v)}원</b></div><div class="row"><span><b>합계</b></span><b style="color:#1F5FBF;font-size:22px">${won(x.t)}원</b></div>`
       + (km ? `<div class="row"><span>계기판</span><b>${won(km)} km</b></div>` : '') + (photos.length ? `<div class="row"><span>사진</span><b>${photos.length}장</b></div>` : '')
@@ -252,7 +258,7 @@
   };
 
   async function load() {
-    if (!fleet.length) { try { fleet = (await api('rpc/shop_plates', { method: 'POST', body: '{}' })) || []; } catch (e) { fleet = []; } }
+    if (!fleet.length) { try { fleet = (await api('rpc/shop_plates2', { method: 'POST', body: JSON.stringify({ p_code: code }) })) || []; } catch (e) { try { fleet = (await api('rpc/shop_plates', { method: 'POST', body: '{}' })) || []; } catch (e2) { fleet = []; } } }
     const cur = today().slice(0, 7);
     $('mTitle').textContent = (ym === cur ? '이번 달 · ' : '') + (+ym.slice(0, 4)) + '년 ' + (+ym.slice(5)) + '월';
     $('mNext').disabled = ym >= cur;
@@ -262,10 +268,10 @@
       const okN = hist.filter((r) => st(r) === 'ok').length, waitN = hist.filter((r) => st(r) === 'wait').length, noN = hist.filter((r) => st(r) === 'no').length;
       const total = hist.reduce((a, r) => a + (+r.amt || 0), 0);
       if (ym === cur) { $('mN').textContent = hist.length + '건'; $('mAmt').textContent = won(total) + '원'; }
-      $('mSum').innerHTML = `<div><span>전달</span><b>${hist.length}건</b></div><div><span>확인됨</span><b style="color:#1E7D4E">${okN}건</b></div><div><span>미확인 (100만원↑)</span><b style="color:#8A5A00">${waitN}건</b></div>` + (noN ? `<div style="grid-column:1/-1"><span>반려 (위펀 확인 필요)</span><b style="color:#B4232C">${noN}건</b></div>` : '') + `<div style="grid-column:1/-1"><span>합계 (부가세 포함)</span><b>${won(total)}원</b></div>`;
+      $('mSum').innerHTML = `<div><span>전달</span><b>${hist.length}건</b></div><div><span>확인됨</span><b style="color:#1E7D4E">${okN}건</b></div><div><span>미확인 (100만원↑)</span><b style="color:#8A5A00">${waitN}건</b></div>` + (noN ? `<div style="grid-column:1/-1"><span>반려 (위펀 확인 필요)</span><b style="color:#B4232C">${noN}건</b></div>` : '') + (split() ? ['wf', 'wfl'].map((c) => { const xs = hist.filter((r) => coOf(r.plate) === c); return `<div style="grid-column:1/-1"><span>${CO[c]} 청구 (${xs.length}건)</span><b style="color:${c === 'wfl' ? '#B4540F' : '#1F5FBF'}">${won(xs.reduce((a, r) => a + (+r.amt || 0), 0))}원</b></div>`; }).join('') : '') + `<div style="grid-column:1/-1"><span>합계 (부가세 포함)</span><b>${won(total)}원</b></div>`;
       $('hist').innerHTML = hist.map((r) => { const k = st(r), ok = String(r.ok || '');
         const tg = k === 'ok' ? `<span class="tag t-ok">확인됨</span>` : k === 'no' ? `<span class="tag t-no">반려</span>` : k === 'in' ? `<span class="tag t-in">접수됨</span>` : `<span class="tag t-wait">미확인</span>`;
-        return `<div class="rec"><div class="r1"><span>${String(r.date).slice(5).replace('-', '/')} <b>${r.plate}</b> ${tg}</span><b>${won(r.amt)}원</b></div><small>${String(r.desc || '').replace(/\s*\(공급가.*$/, '')}${r.photos ? ` · 사진 ${r.photos}장` : ''}${k === 'ok' ? ` · ${ok.replace(/^승인/, '확인')}` : k === 'no' ? ` · ${ok}` : ''}<br><span style="opacity:.7">${r.no}</span></small>` + (k === 'ok' || r.locked ? '' : `<div class="acts"><button data-e="${r.no}">고치기</button><button class="del" data-d="${r.no}">지우기</button></div>`) + `</div>`; }).join('') || '<div class="muted">이 달에 전달한 수리가 없어요.</div>';
+        return `<div class="rec"><div class="r1"><span>${String(r.date).slice(5).replace('-', '/')} <b>${r.plate}</b> ${tg}${coTag(r.plate)}</span><b>${won(r.amt)}원</b></div><small>${String(r.desc || '').replace(/\s*\(공급가.*$/, '')}${r.photos ? ` · 사진 ${r.photos}장` : ''}${k === 'ok' ? ` · ${ok.replace(/^승인/, '확인')}` : k === 'no' ? ` · ${ok}` : ''}<br><span style="opacity:.7">${r.no}</span></small>` + (k === 'ok' || r.locked ? '' : `<div class="acts"><button data-e="${r.no}">고치기</button><button class="del" data-d="${r.no}">지우기</button></div>`) + `</div>`; }).join('') || '<div class="muted">이 달에 전달한 수리가 없어요.</div>';
     } catch (e) { $('hist').textContent = '목록을 못 불러왔어요. 새로고침 해 주세요.'; }
   }
   load();
