@@ -274,6 +274,9 @@
   .sh-x .bx.voc{background:rgba(239,68,68,.14);border:1px solid rgba(239,68,68,.45)}.sh-x .bx.voc b.h{color:#FCA5A5}
   .sh-x .bx.conf{background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.4)}.sh-x .bx.conf b.h{color:#FCD34D}
   .sh-x .bx.nol{background:rgba(250,204,21,.1);border:1px solid rgba(250,204,21,.35)}.sh-x .bx.nol b.h{color:#FDE68A}
+  /* 11/26 주소 변경: 바뀐 뒤 처음 가는 기사에게만 */
+  .sh-x .bx.adr{background:rgba(56,189,248,.12);border:1px solid rgba(56,189,248,.5)}.sh-x .bx.adr b.h{color:#7DD3FC}.sh-x .bx.adr s{opacity:.6}
+  .sh-tg .t-adr::before{background:#38BDF8}.ad-tag{display:inline-block;margin-left:6px;padding:2px 8px;border-radius:999px;background:#38BDF8;color:#0B1A24;font-size:12px;font-weight:900}
   .sh-btn{background:#F2C230;color:#17191C;border-radius:12px;font-size:15.5px}
   /* 11/24 메모NEW: 위펀오피스 '기타 주차 및 출입 관련 메모'가 바뀌면 깜빡임 → 누르면 꺼짐 (누르기 전엔 출발 잠금) */
   .mnew{display:inline-flex;align-items:center;align-self:center;gap:4px;margin-left:auto;flex:0 0 auto;border:0;border-radius:999px;padding:6px 11px;min-height:34px;font:inherit;font-size:13px;font-weight:900;letter-spacing:.2px;background:#F2C230;color:#17191C;animation:mnb 1s ease-in-out infinite}
@@ -285,6 +288,26 @@
   .ack-box{margin:12px 0 4px;padding:14px;border-radius:12px;background:rgba(62,106,242,.14);border:1px solid rgba(62,106,242,.5);text-align:center}.ack-box p{margin:0 0 10px;font-size:13px;color:#C9D6FF;line-height:1.5}
   .ack-b{width:100%;border:0;border-radius:11px;padding:15px;font:inherit;font-size:17px;font-weight:900;background:#3E6AF2;color:#fff;animation:ndp 1.2s ease-in-out infinite}.ack-b:disabled{opacity:.5;animation:none}
   .ack-ok{margin:10px 0 2px;padding:10px;border-radius:10px;background:rgba(34,197,94,.14);color:#86EFAC;font-size:14px;font-weight:800;text-align:center}
+  /* 11/26 새 흐름(실적표→운행 시작→상차→배송→퇴근) */
+  .hm-q button.dn span{background:#1B3A2B}.hm-q button.dn span::after{content:'✓';position:absolute;margin:-30px 0 0 34px;width:20px;height:20px;border-radius:10px;background:#22C55E;color:#06210F;font-size:12px;font-weight:900;display:grid;place-items:center}.hm-q button span{position:relative}
+  .fl-next{display:block;width:100%;margin:12px 0 4px;padding:16px;border:0;border-radius:14px;background:#F2C230;color:#17191C;font:inherit;font-size:17px;font-weight:900;cursor:pointer}.fl-next small{display:block;font-size:12.5px;font-weight:700;opacity:.75;margin-top:2px}
+  .fl-ok{margin:10px 0;padding:12px 14px;border-radius:14px;background:rgba(34,197,94,.14);border:1px solid rgba(34,197,94,.5);color:#BBF7D0;font-weight:800}
+  .fl-cur{border:2px solid #F2C230;border-radius:18px;padding:14px;margin:0 0 14px;background:#1C1F23}
+  .fl-cur .fl-h{font-size:12px;font-weight:900;color:#F2C230;letter-spacing:.4px}.fl-cur .fl-n{font-size:21px;font-weight:900;margin:3px 0 2px;line-height:1.3}.fl-cur .fl-a{font-size:14px;color:#C9CED3}
+  .fl-ck{margin-top:12px;border-radius:14px;background:#24282D;padding:12px}.fl-ck h4{margin:0 0 8px;font-size:15px}.fl-ck h4 small{display:block;font-size:12.5px;font-weight:600;color:#9AA0A6;margin-top:2px}
+  .fl-it{display:flex;gap:10px;align-items:flex-start;width:100%;text-align:left;background:#1A1D21;border:1px solid #33383E;border-radius:12px;padding:11px 12px;margin:0 0 8px;color:#E6E8EA;font:inherit;font-size:14.5px;line-height:1.5;cursor:pointer}
+  .fl-it .bxk{flex:none;width:24px;height:24px;border-radius:7px;border:2px solid #6B7178;display:grid;place-items:center;font-weight:900;margin-top:1px}
+  .fl-it.on{border-color:#22C55E;background:rgba(34,197,94,.08)}.fl-it.on .bxk{background:#22C55E;border-color:#22C55E;color:#06210F}
+  .fl-it b.k{display:block;font-size:12.5px;font-weight:900;margin-bottom:2px}.fl-it .k.adr{color:#7DD3FC}.fl-it .k.mn{color:#F2C230}.fl-it .k.voc{color:#FCA5A5}.fl-it .k.conf{color:#FCD34D}.fl-it .k.new{color:#FDBA74}.fl-it .k.chg{color:#C4B5FD}.fl-it .k.etc{color:#A9AFB6}
+  .fl-it .memo{white-space:pre-wrap}.fl-it s{opacity:.6}.fl-it .cardb{display:inline-block;margin-top:6px;padding:6px 10px;border-radius:9px;background:#33383E;color:#fff;font-size:13px;font-weight:800}
+  .fl-go{display:block;width:100%;padding:15px;border:0;border-radius:13px;font:inherit;font-size:16px;font-weight:900;background:#F2C230;color:#17191C;cursor:pointer}.fl-go:disabled{background:#3A3F45;color:#8A9096;cursor:not-allowed}
+  .sh-ord{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:8px 0 0 36px}.sh-ord em{font-style:normal;font-size:12.5px;opacity:.65}.sh-mer{display:inline-flex;border:1px solid #3A3F45;border-radius:10px;overflow:hidden}.sh-mer button{border:0;background:#1A1D21;color:#C9CED3;font:inherit;font-size:13.5px;font-weight:800;padding:7px 12px;cursor:pointer}.sh-mer button.on{background:#F2C230;color:#17191C}.sh-mer button:disabled{opacity:.5}.sh-mer0{font-size:12.5px;font-weight:800;color:#FCA5A5}
+  .fl-cur .acts{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}.fl-cur .acts a,.fl-cur .acts button{flex:1;min-width:0;border:0;border-radius:12px;padding:13px 12px;font:inherit;font-size:15px;font-weight:800;background:rgba(255,255,255,.1);color:#fff;text-decoration:none;text-align:center;-webkit-appearance:none;appearance:none;cursor:pointer}
+  .fl-cur .acts.main button{padding:16px 12px;font-size:17px}.fl-cur .acts .y{background:#F2C230;color:#17191C}.fl-cur .acts button:disabled{opacity:.5}
+  .fl-cur .nd-row{margin-top:8px;text-align:left}.fl-cur .nd-row .nd-b{display:block;width:100%;padding:12px;-webkit-appearance:none;appearance:none}
+  .fl-cur .dm-hint{flex-basis:100%}.fl-cur .dm-d{margin-top:10px}
+  .hm-q.n5{gap:4px}.hm-q.n5 button{font-size:12.5px;white-space:nowrap;letter-spacing:-.2px}.hm-q.n5 button span{width:52px;height:52px}
+  .fl-rest{font-size:13px;font-weight:800;color:#9AA0A6;margin:6px 2px 8px}
   .hm-step{display:block;font-style:normal;font-size:10px;font-weight:800;letter-spacing:.6px;color:#8FB0FF}.hm-q .hm-step{margin-bottom:-2px}.hm-row .hm-step{margin-bottom:1px}
   .tabs button[data-step]::before{content:attr(data-step);display:block;font-size:10px;font-weight:800;letter-spacing:.4px;opacity:.75;margin-bottom:1px}
   @media (prefers-reduced-motion:reduce){.mnew,.sh-dmi.need,.ack-b{animation:none}}
@@ -399,6 +422,7 @@
     <div id="mm-body"><div class="card msg">불러오는 중…</div></div>
   </div>
   <div id="t-rec">
+    <div class="card" id="r-end" hidden><div class="name">운행 종료<small id="r-end-s">오늘 배송을 다 마쳤으면 눌러 주세요 · 위치 전송이 꺼져요</small></div><button class="big stop" id="r-out" style="margin-top:10px">운행 종료</button><div class="fl-ok" id="r-end-ok" hidden></div></div>
     <div class="card f">
       <div class="name" id="nm2">—<small>오늘 운행 마치고 적어 주세요</small></div>
       <label>차량번호</label><select id="r-v"></select>
@@ -683,12 +707,12 @@
   //                     지입기사(운송사)  = 그 외 → 출근(퇴근 버튼 포함)·로케이션만
   const tabBtn = (t) => document.querySelector('.tabs button[data-tab=' + t + ']');
   const isCorp = () => isMaster() || (R.mine || []).length > 0;
-  function showTab(t) { hmOff(t); document.querySelectorAll('.tabs button').forEach((x) => x.classList.toggle('on', x.dataset.tab === t)); $('t-rec').hidden = t !== 'rec'; $('t-loc').hidden = t !== 'loc'; $('t-lc').hidden = t !== 'lc'; $('t-dl').hidden = t !== 'dl'; $('t-sh').hidden = t !== 'sh'; $('t-cs').hidden = t !== 'cs'; $('t-cw').hidden = t !== 'cw'; $('t-mm').hidden = t !== 'mm'; if (t === 'mm') setTimeout(mmLoad, 0); if (t === 'cs' || t === 'cw') setTimeout(() => csLoad(false), 0); if (t === 'lc') setTimeout(lcLoad, 0); if (t === 'sh') setTimeout(shLoad, 0); if (t === 'dl') setTimeout(dlGate, 0); try { sessionStorage.setItem('wr-tab', t); } catch (e) { /* noop */ } }
+  function showTab(t) { hmOff(t); document.querySelectorAll('.tabs button').forEach((x) => x.classList.toggle('on', x.dataset.tab === t)); $('t-rec').hidden = t !== 'rec'; $('t-loc').hidden = t !== 'loc'; $('t-lc').hidden = t !== 'lc'; $('t-dl').hidden = t !== 'dl'; $('t-sh').hidden = t !== 'sh'; $('t-cs').hidden = t !== 'cs'; $('t-cw').hidden = t !== 'cw'; $('t-mm').hidden = t !== 'mm'; if (t === 'mm') setTimeout(mmLoad, 0); if (t === 'cs' || t === 'cw') setTimeout(() => csLoad(false), 0); if (t === 'lc') setTimeout(lcLoad, 0); if (t === 'sh') setTimeout(shLoad, 0); if (t === 'dl') setTimeout(dlGate, 0); if (t === 'rec') setTimeout(() => { try { flRecUi(); } catch (e) { /* noop */ } }, 0); try { sessionStorage.setItem('wr-tab', t); } catch (e) { /* noop */ } }
   document.querySelectorAll('.tabs button').forEach((b) => { b.onclick = () => showTab(b.dataset.tab); });
 
 
   // 11/20 앱 안 업데이트: 서버의 새 index.html 빌드 번호가 다르면 [업데이트] 버튼 → 새로 불러오기 (홈 화면에 다시 추가할 필요 없음)
-  const BUILD = '20261124-6';
+  const BUILD = '20261127-1';
   try { document.getElementById('ver').textContent = 'v' + BUILD.slice(2, 8) + '-' + BUILD.split('-')[1]; } catch (e) {}
   async function updCheck() {
     try {
@@ -786,7 +810,7 @@
   const carGet = () => { try { const k = localStorage.getItem('wr-car'); return CARS[k] && (isMaster() || carOpen(k)) ? k : '화이트'; } catch (e) { return '화이트'; } };
   function hmLbl(t) {
     const ic = { list: 'M8 6h12M8 12h12M8 18h12M4 6h.01M4 12h.01M4 18h.01', work: 'M12 7v5l3 2M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z', pin: 'M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21zM12 12a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z', box: 'M3 8l9-5 9 5v8l-9 5-9-5zM3 8l9 5 9-5M12 13v8', cam: 'M4 8h3l2-3h6l2 3h3v11H4zM12 17a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z', flag: 'M5 21V4h11l-2 4 2 4H5', star: 'M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z' };
-    const m = { cs: ['실적표', '거래처 · 매출 · 주류확인', 'list'], cw: ['업무', '업무시작 · 배송완료사진 · 업무종료', 'work'], sh: ['실적표', (() => { try { return shDmOn() ? '거래처 · 매출 · 출발 · 배송 사진' : '거래처 · 주소 · 매출'; } catch (e) { return '거래처 · 주소 · 매출'; } })(), 'list'], loc: ['운행 시작', '위치 전송 켜기 · 끄기', 'pin'], lc: ['상차', '로케이션 · 상차 체크', 'box'], dl: [(() => { try { return shDmOn() ? '작업 · 사진' : '배송'; } catch (e) { return '배송'; } })(), '출발 · 도착 · 배송 사진', 'cam'], rec: ['퇴근', '계기판 km · 주유 금액', 'flag'], mm: ['내 운행 기록', '완료 배송 · 고객 칭찬 · 고객 의견', 'star'] }[t] || [t, '', 'list'];
+    const m = { cs: ['실적표', '거래처 · 매출 · 주류확인', 'list'], cw: ['업무', '업무시작 · 배송완료사진 · 업무종료', 'work'], sh: ['실적표', (() => { try { return FL_ON() ? '거래처 · 주소 · 매출' : shDmOn() ? '거래처 · 매출 · 출발 · 배송 사진' : '거래처 · 주소 · 매출'; } catch (e) { return '거래처 · 주소 · 매출'; } })(), 'list'], loc: ['운행 시작', '위치 전송 켜기 · 끄기', 'pin'], lc: ['상차', '로케이션 · 상차 체크', 'box'], dl: [(() => { try { return FL_ON() ? '배송' : shDmOn() ? '작업 · 사진' : '배송'; } catch (e) { return '배송'; } })(), (() => { try { return FL_ON() ? '출발 전 확인 · 출발 · 작업 · 사진' : '출발 · 도착 · 배송 사진'; } catch (e) { return '출발 · 도착 · 배송 사진'; } })(), 'cam'], rec: ['퇴근', (() => { try { return FL_ON() ? (isCorp() ? '운행 종료 · 계기판 km · 주유 금액' : '운행 종료') : '계기판 km · 주유 금액'; } catch (e) { return '계기판 km · 주유 금액'; } })(), 'flag'], mm: ['내 운행 기록', '완료 배송 · 고객 칭찬 · 고객 의견', 'star'] }[t] || [t, '', 'list'];
     return { t: m[0], s: m[1], d: ic[m[2]] };
   }
   const hmWant = () => { try { return sessionStorage.getItem('wr-hm') !== '0'; } catch (e) { return true; } };
@@ -817,9 +841,10 @@
   const HM_Q = { snack: [['sh', '실적표'], ['loc', '운행 시작'], ['lc', '상차'], ['rec', '퇴근']], cvs: [['cs', '실적표'], ['cw', '업무시작'], ['cw', '배송사진'], ['rec', '퇴근']] };
   // 11/26 스낵 순서: 실적표 → 운행 시작 → 상차 → 퇴근 (상진님) — 보이는 것만 STEP 1, 2… 로 번호
   var STEP = {};
+  function hmQ(team) { return team === 'snack' && FL_ON() ? [['sh', '실적표'], ['loc', '운행 시작'], ['lc', '상차'], ['dl', '배송'], ['rec', '퇴근']] : HM_Q[team]; }
   function stepMark() {
     STEP = {};
-    if (!CVS() && !isMaster()) HM_Q.snack.filter(([t]) => !tabBtn(t).hidden).forEach(([t], i) => { STEP[t] = i + 1; });
+    if (!CVS() && !isMaster()) hmQ('snack').filter(([t]) => !tabBtn(t).hidden).forEach(([t], i) => { STEP[t] = i + 1; });
     document.querySelectorAll('.tabs button').forEach((b) => { if (STEP[b.dataset.tab]) b.dataset.step = 'STEP ' + STEP[b.dataset.tab]; else delete b.dataset.step; });
   }
   const hmW = (n) => Number(n || 0).toLocaleString('ko-KR');
@@ -834,7 +859,7 @@
       if (!L.recs.length) return null;
       const amt = L.recs.reduce((a, r) => a + Number(r.amtA || 0) + Number(r.amtC || 0), 0), pend = shPending();
       const ls = (DM.sch && DM.d === L.d && Array.isArray(DM.sch.details)) ? DM.sch.details : [];
-      return { d: L.d, n: L.recs.length, amt, lbl: '매출', loads: pend.loads, badges: [pend.memos && pend.memos.filter((m) => mnOf(m.x)).length && ['y', `메모NEW ${pend.memos.filter((m) => mnOf(m.x)).length}곳`], pend.memos && pend.memos.length && ['k', `배송메모 확인 ${pend.memos.length}곳 남음`], pend.cards.length && ['y', `요약카드 확인 ${pend.cards.length}곳`], pend.loads && ['k', `상차 체크 ${pend.loads}건 남음`], ls.length && ['k', `배송 완료 ${ls.filter((x) => x.doneYN === 'Y').length} / ${ls.length}`]].filter(Boolean) };
+      return { d: L.d, n: L.recs.length, amt, lbl: '매출', loads: pend.loads, badges: [((DM.sch && DM.sch.details) || []).filter(adOf).length && ['y', `주소 변경 ${((DM.sch && DM.sch.details) || []).filter(adOf).length}곳`], pend.memos && pend.memos.filter((m) => mnOf(m.x)).length && ['y', `메모NEW ${pend.memos.filter((m) => mnOf(m.x)).length}곳`], !FL_ON() && pend.memos && pend.memos.length && ['k', `배송메모 확인 ${pend.memos.length}곳 남음`], pend.cards.length && ['y', `요약카드 확인 ${pend.cards.length}곳`], pend.loads && ['k', `상차 체크 ${pend.loads}건 남음`], ls.length && ['k', `배송 완료 ${ls.filter((x) => x.doneYN === 'Y').length} / ${ls.length}`]].filter(Boolean) };
     } catch (e) { return null; }
   }
   function hmLive(t) {   // 메뉴 밑 작은 글씨를 그날 숫자로
@@ -842,7 +867,9 @@
       const D = hmDayData();
       if (t === 'loc' || (t === 'cw' && false)) return (document.getElementById('stt') || {}).textContent || '';
       if (!D) return '';
-      if (t === 'sh') return `${D.n}곳 · ${hmW(D.amt)}원${shDmOn() ? ' · 출발·배송 사진' : ''}`;
+      if (t === 'sh') return `${D.n}곳 · ${hmW(D.amt)}원${FL_ON() ? (flGet('sh') ? ' · 확인함 ✓' : '') : shDmOn() ? ' · 출발·배송 사진' : ''}`;
+      if (t === 'dl' && FL_ON()) { const ls = (DM.sch && DM.d === L.d && DM.sch.details) || []; return ls.length ? `배송 완료 ${ls.filter((x) => x.doneYN === 'Y').length} / ${ls.length}` : ''; }
+      if (t === 'rec' && FL_ON()) { const att = (A && A.st && A.st.att) || {}; return att.out_at ? '운행 종료 ✓' : att.in_at ? '배송 끝나면 운행 종료' : ''; }
       if (t === 'lc') return D.loads ? `상차 체크 ${D.loads}건 남음` : '상차 체크 다 했어요';
       if (t === 'cs') return `${D.n}곳 · ${hmW(D.amt)}원${D.badges.length ? ' · ' + D.badges[0][1] : ''}`;
       if (t === 'cw') return D.work && D.work.end_at ? '업무종료 ✓' : D.work && D.work.start_at ? `업무 중 · 배송사진 ${D.ph} / ${D.n}` : `업무시작 전 · 배송사진 0 / ${D.n}`;
@@ -851,9 +878,9 @@
   }
   function hmExtra() {
     const team = CVS() ? 'cvs' : 'snack', ic = (t) => hmLbl(t).d;
-    const q = isMaster() ? [] : HM_Q[team].filter(([t]) => !tabBtn(t).hidden);
-    $('hm-q').innerHTML = q.map(([t, l], i) => `<button type="button" data-hm="${t}" class="${i === 0 ? 'on' : ''}">${team === 'snack' ? `<em class="hm-step">STEP ${i + 1}</em>` : ''}<span><svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path d="${l === '배송사진' ? 'M4 8h3l2-3h6l2 3h3v11H4zM12 17a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z' : ic(t)}" stroke="#EDEFF1" stroke-width="1.9" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span>${l}</button>`).join('');
-    $('hm-q').style.gridTemplateColumns = `repeat(${Math.max(q.length, 1)}, minmax(0, 1fr))`; stepMark();
+    const q = isMaster() ? [] : hmQ(team).filter(([t]) => !tabBtn(t).hidden), fl = team === 'snack' && FL_ON(), fc = fl ? flCur() : '';
+    $('hm-q').innerHTML = q.map(([t, l], i) => `<button type="button" data-hm="${t}" class="${fl ? (t === fc ? 'on' : flDone(t) ? 'dn' : '') : i === 0 ? 'on' : ''}">${team === 'snack' ? `<em class="hm-step">STEP ${i + 1}</em>` : ''}<span><svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path d="${l === '배송사진' ? 'M4 8h3l2-3h6l2 3h3v11H4zM12 17a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z' : ic(t)}" stroke="#EDEFF1" stroke-width="1.9" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span>${l}</button>`).join('');
+    $('hm-q').style.gridTemplateColumns = `repeat(${Math.max(q.length, 1)}, minmax(0, 1fr))`; $('hm-q').classList.toggle('n5', q.length >= 5); stepMark();
     const D = isMaster() ? null : hmDayData();
     $('hm-day').hidden = !D;
     if (D) $('hm-day').innerHTML = `<div class="l">${esc(dLbl(D.d))} 일정</div><div class="v"><b>${D.n}<i> 곳</i></b><b class="m">${D.lbl} ${hmW(D.amt)}<i>원</i></b></div>${D.badges.length ? `<div class="bg">${D.badges.map(([k, t]) => `<span class="${k}">${esc(t)}</span>`).join('')}</div>` : ''}`;
@@ -1096,7 +1123,8 @@
   function dmWkBack() { const W = DM.wk; if (!W || W.idx < 1 || W.done) return; W.top = Math.max(W.top || 0, W.idx); W.idx -= 1; W.edit = true; W.mark = false; return dmWkStep(); }
   async function dmWkDone(btn) {
     const W = DM.wk; btn.disabled = true; btn.textContent = '완료 처리 중…';
-    try { await dmCall('PATCH', `schedules/details/${W.id}/done-task`); W.done = true; if (W.sec) rpc('secure_done_put', { p_name: cfg.n, p_token: cfg.tok, p_date: DM.d || dmToday(), p_code: W.sec }).catch(() => {}); dmDraft('insp-' + W.id, null); dmDraft('stock-' + W.id, null); dmReload(); dmUi(); }
+    try { await dmCall('PATCH', `schedules/details/${W.id}/done-task`); W.done = true; if (W.sec) rpc('secure_done_put', { p_name: cfg.n, p_token: cfg.tok, p_date: DM.d || dmToday(), p_code: W.sec }).catch(() => {}); dmDraft('insp-' + W.id, null); dmDraft('stock-' + W.id, null); dmReload(); dmUi();
+      if (FL_ON()) setTimeout(async () => { if (DM.wk !== W) return; DM.wk = null; DM.from = ''; DM.open = ''; await dmReload(); if (flDone('dl')) showTab('rec'); else { showTab('dl'); window.scrollTo(0, 0); } }, 1800); }
     catch (e) { btn.disabled = false; btn.textContent = '작업 완료하기'; alert((e.message || '완료가 안 됐어요') + '\n\n계속 안 되면 [구 버전화면]에서 완료해 주세요.'); }
   }
   async function dmWkSend(btn) {   // 현재 단계 저장 → 다음 단계
@@ -1229,7 +1257,7 @@
           const mem = Array.isArray(db.branchMembers) ? db.branchMembers.filter((m) => m && m.cellphone) : [];
           const co = d.coordinate || {}, lat = +co.latitude, lng = +co.longitude;
           det = `<div class="dm-d">
-            <div class="sec"><label>주소</label>${esc(db.address || '-')}</div>
+            <div class="sec"><label>주소${adOf(x) ? ` <span class="ad-tag">주소 변경 · ${esc(mnAt(adOf(x).at))}</span>` : ''}</label>${esc(db.address || '-')}${adOf(x) && adOf(x).prev ? `<div style="opacity:.6;margin-top:2px">이전 주소: <s>${esc(adOf(x).prev)}</s></div>` : ''}</div>
             ${db.workingTime || db.unableDeliveryTime ? `<div class="sec"><label>근무 시간</label>${esc(db.workingTime || '-')}${db.unableDeliveryTime ? ` · <b style="color:#FDE68A">배송 불가 ${esc(db.unableDeliveryTime)}</b>` : ''}</div>` : ''}
             ${(() => { const bid = String(db.branchId || ''), nw = bid && (SH.mn[bid] || SH.mnSeen[bid]); const nd = mnNeed(x); return `<div class="sec${nw ? ' mn-sec' : ''}${nd ? ' ack-sec' : ''}"><label>주차/출입 참고사항${nw ? ` <span class="mn-tag">NEW · ${esc(mnAt(nw.at))} 변경</span>` : ''}</label><div class="memo">${db.parkingMemo ? esc(String(db.parkingMemo).replace(/\r\n/g, '\n')) : '등록된 주차/출입 참고사항이 없어요.'}</div>${nw && nw.prev ? `<details class="mn-prev"><summary>바뀌기 전 메모 보기</summary><div class="memo">${esc(nw.prev)}</div></details>` : ''}${nd ? '<div class="ack-down">읽은 뒤 맨 아래 <b>[확인했습니다]</b>를 눌러야 출발할 수 있어요 ↓</div>' : ''}</div>`; })()}
             <div class="sec"><label>연락 가능 고객</label>${mem.length ? mem.map((m, k) => `<a class="dm-btn" style="display:inline-block;margin:0 6px 6px 0;text-decoration:none" href="tel:${esc(String(m.cellphone).replace(/[^0-9]/g, ''))}">📞 ${esc(m.branchMemberName || m.name || ('담당 ' + (k + 1)))}</a>`).join('') : '-'}</div>
@@ -1259,6 +1287,7 @@
     const list = (DM.sch && Array.isArray(DM.sch.details)) ? DM.sch.details.slice().sort((a, b) => (+a.sequence || 999) - (+b.sequence || 999)) : [];
     if (!list.length) { w.innerHTML = top('배송') + `<div class="card msg">${DM.busy || (dmLbl(dd) + ' 배송이 없어요.' + (wk ? ` <button type="button" class="dm-btn" data-dm="nb" style="margin-left:6px">다음 배송일(${dmLbl(dmNextBiz(dd))}) 보기</button>` : ''))}</div>`; return; }
     const done = list.filter((x) => x.doneYN === 'Y').length, cur = list.find((x) => x.doneYN !== 'Y' && !ndOf(x));
+    if (FL_ON() && !DM.iframe) return flDlUi(w, list, cur, done, top);
     const today = dmActDay(), uni = false;   // 11/21 출근 복장 사진은 생략 (상진님) — 다시 쓰려면 DM.sch.uniformYN === 'N' 로
     w.innerHTML = top(`배송 ${list.length}곳 · 완료 ${done}`) + (DM.busy ? `<div class="card msg">${DM.busy}</div>` : '')
       + (uni ? `<div class="card warn"><b>오늘의 출근 복장 사진</b>을 먼저 등록해 주세요. (등록해야 출발할 수 있어요)<br><label class="dm-btn y" style="display:inline-block;margin-top:8px" data-uni="1">출근 복장 촬영<input type="file" accept="image/*" capture hidden></label></div>` : '')
@@ -1271,11 +1300,64 @@
         ${tags ? `<div class="dm-tg">${tags}</div>` : ''}${det}</div>`;
     }).join('');
   }
+  // 11/26 새 흐름 배송 화면 — 맨 위 '지금 갈 곳' 한 곳 + 출발 전 확인(하나씩 체크) · 아래 남은 거래처
+  var FLK = { ck: {}, ok: {} };   // ck[id] = 체크한 항목 키, ok[id] = [확인했어요] 누름 (그날 폰에 기억)
+  function flOkGet(id) { if (FLK.ok[id]) return true; try { return localStorage.getItem('wr-fl-ok-' + (DM.d || L.d) + '-' + id) === '1'; } catch (e) { return false; } }
+  function flOkSet(id) { FLK.ok[id] = true; try { localStorage.setItem('wr-fl-ok-' + (DM.d || L.d) + '-' + id, '1'); } catch (e) { /* noop */ } }
+  function flRecOf(x) { try { shDmMatch(); const c = (DM.code || {})[String(dmId(x))]; return c ? L.recs.find((r) => String(r.code) === String(c)) || null : null; } catch (e) { return null; } }
+  function flItems(x) {   // 출발 전에 하나씩 체크할 항목
+    const id = dmId(x), b = dmBr(x), d = DM.det[id], db = d && !d._err ? dmBr(d) : b, r = flRecOf(x), f = (r && fOf(r)) || {}, it = [];
+    const ad = adOf(x); if (ad) it.push(['adr', 'adr', '주소 변경 · ' + mnAt(ad.at), `새 주소: ${esc(ad.addr || '')}${ad.prev ? `<br><s>이전: ${esc(ad.prev)}</s>` : ''}`]);
+    const mn = mnOf(x), memo = db && db.parkingMemo ? String(db.parkingMemo).replace(/\r\n/g, '\n') : '';
+    if (mn) it.push(['mn', 'mn', '메모NEW · 주차/출입 메모가 바뀌었어요 (' + mnAt(mn.at) + ')', `<div class="memo">${esc(memo || mn.memo || '')}</div>${mn.prev ? `<s>이전: ${esc(mn.prev)}</s>` : ''}`]);
+    else if (memo) it.push(['memo', 'etc', '주차/출입 메모', `<div class="memo">${esc(memo)}</div>`]);
+    if (f.new) it.push(['new', 'new', '첫 배송', '오늘 처음 가는 거래처예요. 주소·출입 방법을 꼭 확인하세요.']);
+    if (f.chg) it.push(['chg', 'chg', '담당 변경', `평소 ${esc(f.chg)} 기사님 담당이에요. 진열 위치를 확인하세요.`]);
+    (f.voc || []).forEach((v, k) => it.push(['voc' + k, 'voc', '최근 VOC · ' + esc(String(v.d || '').slice(5).replace('-', '/')), esc(v.t)]));
+    if (f.conf) it.push(['conf', 'conf', '혼동 주의', `같은 건물에 다른 거래처: ${f.conf.map(esc).join(' · ')} — 층·호 꼭 확인`]);
+    if (r && (reqOf(r) || f.pub)) it.push(['card', 'etc', '요약카드', `물류팀이 정리한 안내예요. 열어서 읽어 주세요.<br><span class="cardb" data-flcard="${esc(r.code)}">요약카드 열기</span>`]);
+    if (b.unableDeliveryTime) it.push(['unable', 'etc', '배송 불가 시간', `${esc(b.unableDeliveryTime)} — 이 시간엔 가지 마세요`]);
+    if (b.entranceType === '보안카드') it.push(['sec', 'etc', '출입증', '보안카드(출입증)를 챙겨 가세요']);
+    const ref = DM.ref[db && db.branchId], notes = ref && Array.isArray(ref.content) ? ref.content.filter((n) => n.topFixed) : [];
+    notes.forEach((n, k) => it.push(['ref' + k, 'etc', '배송 참고사항 (고정)', esc(n.contents || '')]));
+    return it;
+  }
+  async function flPrep(x) {   // 출발 전 확인에 필요한 상세(주차 메모·참고사항)를 미리 읽음
+    const id = dmId(x); if (DM.det[id] && !DM.det[id]._err) { const bid = dmBr(DM.det[id]).branchId; if (bid && !DM.ref[bid]) { try { DM.ref[bid] = await dmGet('reference', { branchId: bid }); } catch (e) { DM.ref[bid] = { err: e.message }; } dmUi(); } return; }
+    try { DM.det[id] = await dmGet('schedules/details/' + id); } catch (e) { DM.det[id] = { _err: e.message }; } dmUi(); flPrep(x);
+  }
+  function flDlUi(w, list, cur, done, top) {
+    const today = dmActDay();
+    let h = top(`배송 ${list.length}곳 · 완료 ${done}`) + (DM.busy ? `<div class="card msg">${DM.busy}</div>` : '');
+    if (!cur) h += `<div class="fl-ok">✓ 오늘 배송을 모두 마쳤어요</div><button type="button" class="fl-next" data-flgo="rec">퇴근으로<small>운행 종료${isCorp() ? ' · 계기판 km · 주유 금액' : ''}</small></button>`;
+    else {
+      const id = dmId(cur), b = dmBr(cur), [sc, st] = dmState(cur), i = list.indexOf(cur), d = DM.det[id];
+      const started = !!(cur.deliveryStartAt || cur.taskStartAt), ok = started || flOkGet(id);
+      h += `<div class="fl-cur"><div class="fl-h">지금 갈 곳 · 배송 ${i + 1}번</div><div class="fl-n">${esc(b.branchName || b.companyName || '거래처')}</div><div class="fl-a">${esc(b.address || '')}</div>${st ? `<div style="margin-top:8px"><span class="dm-st ${sc}">${esc(st)}</span></div>` : ''}`;
+      if (!ok) {
+        if (!d) { h += '<div class="fl-ck"><h4>출발 전 확인</h4><div class="dm-d">불러오는 중…</div></div>'; setTimeout(() => flPrep(cur), 0); }
+        else {
+          if (d && !d._err && dmBr(d).branchId && !DM.ref[dmBr(d).branchId]) setTimeout(() => flPrep(cur), 0);
+          const it = flItems(cur), ck = FLK.ck[id] || (FLK.ck[id] = new Set()), all = it.every(([k]) => ck.has(k));
+          h += `<div class="fl-ck"><h4>출발 전 확인 (${it.filter(([k]) => ck.has(k)).length}/${it.length})<small>항목을 하나씩 읽고 눌러 체크해 주세요. 다 체크해야 [확인했어요]를 누를 수 있어요.</small></h4>${it.map(([k, c, t, body]) => `<button type="button" class="fl-it${ck.has(k) ? ' on' : ''}" data-flck="${esc(k)}" data-id="${esc(id)}"><span class="bxk">${ck.has(k) ? '✓' : ''}</span><span><b class="k ${c}">${t}</b>${body}</span></button>`).join('') || '<div class="dm-d">특별히 확인할 항목이 없어요.</div>'}<button type="button" class="fl-go" data-flok="${esc(id)}" ${all ? '' : 'disabled'}>${all ? '확인했어요' : `${it.length - it.filter(([k]) => ck.has(k)).length}개 더 체크해 주세요`}</button></div>`;
+        }
+      } else h += dmActsHtml(cur, id, today, false, '');
+      h += `<div class="acts" style="margin-top:8px">${cur.coordinate && +cur.coordinate.latitude ? `<button type="button" data-dm="nav" data-id="${esc(id)}">길안내</button>` : ''}<button type="button" data-dm="open" data-id="${esc(id)}">배송 정보 ${DM.open === String(id) ? '▴' : '▾'}</button></div>${DM.open === String(id) ? dmDetHtml(cur, d, dmBr(d || cur), id, today, false, '') : ''}</div>`;
+    }
+    const rest = list.filter((x) => x !== cur);
+    if (rest.length) h += `<div class="fl-rest">${cur ? '그다음 거래처' : '오늘 배송'} ${rest.length}곳</div>` + rest.map((x) => { const id = dmId(x), b = dmBr(x), [sc, st] = dmState(x), open = DM.open === String(id), d = DM.det[id] || null;
+      return `<div class="dm-it${x.doneYN === 'Y' ? ' done' : ''}${ndOf(x) ? ' nd' : ''}" data-dm="open" data-id="${esc(id)}"><div class="dm-h"><span class="n">${list.indexOf(x) + 1}</span><div class="t"><b>${esc(b.branchName || b.companyName || '거래처')}</b><span>${esc(b.address || '')}</span></div>${st ? `<span class="dm-st ${sc}">${esc(st)}</span>` : ''}</div>${open ? dmDetHtml(x, d, dmBr(d || x), id, today, false, '') : ''}</div>`; }).join('');
+    w.innerHTML = h;
+  }
   // 점검용 [원본 복사]: ?dm=1 로 연 폰 + 시범 기사 (홈 화면 앱은 주소를 못 바꿔서)
   try { if (new URLSearchParams(location.search).get('dm') === '1') localStorage.setItem('wr-dm-raw', '1'); } catch (e) { /* noop */ }
   const dmRaw = () => { try { return localStorage.getItem('wr-dm-raw') === '1' || DM_PILOT.includes(String(cfg.n || '').replace(/\s/g, '')); } catch (e) { return false; } };
   $('dm-w').onclick = (ev) => dmClick(ev);
   async function dmClick(ev) {
+    const fc = ev.target.closest('[data-flcard]'); if (fc) { ev.stopPropagation(); const r = L.recs.find((y) => String(y.code) === fc.dataset.flcard); if (r) flCardOpen(r); return; }
+    const fk = ev.target.closest('[data-flck]'); if (fk) { const s0 = FLK.ck[fk.dataset.id] || (FLK.ck[fk.dataset.id] = new Set()); if (s0.has(fk.dataset.flck)) s0.delete(fk.dataset.flck); else s0.add(fk.dataset.flck); return dmUi(); }
+    const fo = ev.target.closest('[data-flok]'); if (fo) { if (fo.disabled) return; const id0 = fo.dataset.flok, x0 = dmItem(id0); flOkSet(id0); if (x0) { mnViewed(x0); const r = flRecOf(x0); if (r && reqOf(r) && !SH.reads.has(String(r.code))) { SH.reads.add(String(r.code)); rpc('card_read', { p_name: cfg.n, p_token: cfg.tok, p_date: L.d, p_code: String(r.code) }).catch(() => {}); } } return dmUi(); }
+    const fg = ev.target.closest('[data-flgo]'); if (fg) return showTab(fg.dataset.flgo);
     const b = ev.target.closest('[data-dm]'); if (!b) return;
     const a = b.dataset.dm, id = b.dataset.id;
     if (a === 'open') { if (ev.target.closest('.dm-d')) return; return dmDetail(id); }
@@ -1359,7 +1441,7 @@
     try { pdUi(); } catch (e) { /* 소모품 카드는 나중에 */ }
     if (CVS()) { setTimeout(() => csApply(first), 0); return; }   // 편의점 팀 화면 (아래 모듈이 다 읽힌 뒤)
     const corp = isCorp();
-    tabBtn('rec').hidden = !corp; $('dg-rec').hidden = !corp; tabBtn('mm').hidden = isMaster(); tabBtn('loc').hidden = isMaster(); tabBtn('dl').hidden = isMaster() || shDmOn(); try { $('dl-bar').hidden = shDmOn(); } catch (e) {} tabBtn('sh').hidden = isMaster();
+    tabBtn('rec').hidden = !corp; $('dg-rec').hidden = !corp; tabBtn('mm').hidden = isMaster(); tabBtn('loc').hidden = isMaster(); tabBtn('dl').hidden = isMaster() || (shDmOn() && !FL_ON()); try { $('dl-bar').hidden = shDmOn(); } catch (e) {} tabBtn('sh').hidden = isMaster(); if (FL_ON()) tabBtn('rec').hidden = false;
     try { localStorage.setItem(LS + '-type', corp ? 'corp' : 'jiip'); } catch (e) { /* noop */ }
     const cur = document.querySelector('.tabs button.on');
     if (first) { let t = ''; try { t = sessionStorage.getItem('wr-tab') || ''; } catch (e) { /* noop */ } if (!t || tabBtn(t).hidden) t = isMaster() ? 'lc' : (localStorage.getItem(LS + '-on') === '1') ? 'lc' : (!corp || new Date().getHours() < 14) ? 'sh' : 'rec'; hmKeep = hmWant(); showTab(t); hmKeep = false; if (hmWant()) goHome(); }
@@ -1423,10 +1505,10 @@
     localStorage.setItem(LS + '-pend', JSON.stringify(R.pend)); localStorage.setItem(LS + '-hist', JSON.stringify(R.hist));
     $('r-save').disabled = true; $('r-save').textContent = '보내는 중…';
     await rFlush();
-    $('r-save').disabled = false; $('r-save').textContent = '퇴근 기록 저장';
+    $('r-save').disabled = false; $('r-save').textContent = FL_ON() && isCorp() ? '퇴근 기록 저장 · 운행 종료' : '퇴근 기록 저장';
     rUi();
     if (R.pend.length) { w.hidden = false; w.textContent = '지금은 서버에 못 보냈어요. 기록은 폰에 저장됐고, 다음에 이 화면을 열면 자동으로 보내요.'; }
-    else { if (!CVS()) punch('out').then(aUi).catch(() => { /* noop */ }); if (APP && !CVS()) { try { window.WeRoadApp.stop(); } catch (e) { /* noop */ } } ok.hidden = false; ok.innerHTML = `<b>저장됐어요.</b> ${row.date.slice(5).replace('-', '/')} ${row.shift} · ${vehicle} · ${won(km)} km${fuel ? ' · 주유 ' + won(fuel) + '원' : ''}`; $('r-km').value = ''; $('r-fuel').value = ''; $('r-note').value = ''; }
+    else { if (!CVS()) punch('out').then(() => { aUi(); if (FL_ON()) setTimeout(goHome, 1600); }).catch(() => { /* noop */ }); if (APP && !CVS()) { try { window.WeRoadApp.stop(); } catch (e) { /* noop */ } } ok.hidden = false; ok.innerHTML = `<b>저장됐어요.</b> ${row.date.slice(5).replace('-', '/')} ${row.shift} · ${vehicle} · ${won(km)} km${fuel ? ' · 주유 ' + won(fuel) + '원' : ''}`; $('r-km').value = ''; $('r-fuel').value = ''; $('r-note').value = ''; }
   };
   // 10/30: 계기판 km·주유 금액은 입력하면서 1,234,567 처럼 쉼표 표시 (저장할 때는 숫자만)
   ['r-km', 'r-fuel'].forEach((id) => { const el = $(id); el.addEventListener('input', () => { const d = el.value.replace(/[^\d]/g, ''); el.value = d ? Number(d).toLocaleString('ko-KR') : ''; }); });
@@ -1471,6 +1553,7 @@
     $('st').classList.toggle('on', good);
     $('a-in').textContent = att.in_at ? '운행 시작 ' + hm(att.in_at) + ' · 다시 누르면 시각 유지' : '운행 시작';
     $('a-out').hidden = isCorp() || !att.in_at; $('a-out').textContent = att.out_at ? '운행 종료 ' + hm(att.out_at) : '운행 종료';
+    try { flRecUi(); } catch (e) { /* noop */ }
     $('tmp-help').hidden = APP; $('tc-help').hidden = APP || IS_ANDROID; $('app-help').hidden = !APP; $('apk-help').hidden = APP || !IS_ANDROID;
     if (!good && !APP && !IS_ANDROID) $('tc-help').open = true;
     $('tc-id').textContent = cfg.n || '—'; $('tc-url').textContent = TRACCAR_URL;
@@ -1493,7 +1576,7 @@
   $('a-in').onclick = async () => {
     const ok = $('a-ok'), w = $('a-warn'); ok.hidden = true; w.hidden = true; $('a-in').disabled = true;
     if (APP && locAgreed()) { try { if (window.WeRoadApp.setAuth && cfg.tok) window.WeRoadApp.setAuth(cfg.n, cfg.tok); else window.WeRoadApp.setDriver(cfg.n); window.WeRoadApp.start(); } catch (e) { /* noop */ } }
-    try { const r = await punch('in'); await aLoad(); if (r && r.in_at) A.st = { ...(A.st || {}), att: r }; ok.hidden = false; ok.innerHTML = `<b>운행 시작 ${hm((A.st.att || {}).in_at)}</b> — 안전 운행하세요!` + ((A.st.last_age_min != null && A.st.last_age_min <= 10) ? '' : '<br>위치 앱이 아직 안 보내고 있어요. 아래 안내대로 켜 주세요.'); aPlace(0); }
+    try { const r = await punch('in'); await aLoad(); if (r && r.in_at) A.st = { ...(A.st || {}), att: r }; ok.hidden = false; ok.innerHTML = `<b>운행 시작 ${hm((A.st.att || {}).in_at)}</b> — 안전 운행하세요!` + ((A.st.last_age_min != null && A.st.last_age_min <= 10) ? '' : '<br>위치 앱이 아직 안 보내고 있어요. 아래 안내대로 켜 주세요.') + (FL_ON() && flCur() && flCur() !== 'loc' ? `<br>잠시 뒤 ${esc(hmLbl(flCur()).t)} 화면으로 넘어가요` : ''); aPlace(0); flGo('loc'); }
     catch (e) { w.hidden = false; w.textContent = '운행 시작 실패: ' + e.message; }
     $('a-in').disabled = false; aUi();
   };
@@ -1514,6 +1597,23 @@
     try { await punch('out'); if (APP) { try { window.WeRoadApp.stop(); } catch (e) { /* noop */ } } await aLoad(); ok.hidden = false; ok.innerHTML = `<b>운행 종료 ${hm(((A.st || {}).att || {}).out_at)}</b> — 오늘도 수고하셨어요! 위치 전송도 꺼졌어요.`; }
     catch (e) { w.hidden = false; w.textContent = '운행 종료 실패: ' + e.message; }
     $('a-out').disabled = false; aUi();
+  };
+  // 11/26 새 흐름: 퇴근 화면에서 운행 종료까지 한 번에 (정직원은 아래 계기판 km·주유도 같은 화면, 지입은 운행 종료만)
+  function flRecUi() {
+    try {
+      const fl = FL_ON(), att = (A && A.st && A.st.att) || {};
+      $('r-end').hidden = !fl || isCorp();   // 정직원은 [퇴근 기록 저장]이 운행 종료까지 같이 함
+      if (!$('r-save').disabled) $('r-save').textContent = fl && isCorp() ? '퇴근 기록 저장 · 운행 종료' : '퇴근 기록 저장';
+      document.querySelectorAll('#t-rec > .card.f, #r-save, #t-rec > .card:not(#r-end):not(#r-ok):not(#r-warn)').forEach((e) => { if (fl && !isCorp()) e.hidden = true; else if (e.id !== 'r-ok' && e.id !== 'r-warn') e.hidden = false; });
+      if (fl && !isCorp()) { $('r-out').hidden = !!att.out_at || !att.in_at; $('r-end-s').textContent = att.out_at ? '오늘 운행을 마쳤어요' : att.in_at ? '오늘 배송을 다 마쳤으면 눌러 주세요 · 위치 전송이 꺼져요' : '운행 시작을 아직 안 눌렀어요';
+        $('r-end-ok').hidden = !att.out_at; if (att.out_at) $('r-end-ok').textContent = `✓ 운행 종료 ${hm(att.out_at)} — 오늘도 수고하셨어요!`; }
+    } catch (e) { /* noop */ }
+  }
+  $('r-out').onclick = async () => {
+    $('r-out').disabled = true;
+    try { await punch('out'); if (APP) { try { window.WeRoadApp.stop(); } catch (e) { /* noop */ } } await aLoad(); flRecUi(); setTimeout(goHome, 1600); }
+    catch (e) { alert('운행 종료 실패: ' + e.message); }
+    $('r-out').disabled = false;
   };
   // ---- 로케이션 (v15): 위펀풀필먼트 WEB(wf-full) 그날 내 거래처 · 상온/저온 로케이션 · 상차 체크 → 서버 함수 drv
   const L = { d: today(), recs: [], drivers: [], drv: '', busy: false, auto: true, departed: null, prog: null };
@@ -1569,14 +1669,21 @@
     try { const j = await drv({ act: 'check', date: L.d, driver: L.drv, id: r.id, temp: t, checked: now }); L.recs = j.records || L.recs; L.prog = j.progress; L.departed = j.departed; }
     catch (e) { if (t === 'ambient') r.ckA = !now; else r.ckC = !now; $('lc-warn').hidden = false; $('lc-warn').textContent = '상차 체크 실패: ' + e.message; }
     lcUi();
+    if (FL_ON() && now && L.loadedFor === L.d && shPending().loads === 0) { $('lc-warn').hidden = false; $('lc-warn').className = 'card ok'; $('lc-warn').textContent = '상차 끝! 잠시 뒤 다음 화면으로 넘어가요'; setTimeout(() => { $('lc-warn').className = 'card warn'; $('lc-warn').hidden = true; }, 2500); flGo('lc'); }
   };
   document.querySelectorAll('button[data-copy]').forEach((b) => { b.onclick = async () => { const t = $(b.dataset.copy).textContent; try { await navigator.clipboard.writeText(t); b.textContent = '복사됨'; setTimeout(() => { b.textContent = '복사'; }, 1500); } catch (e) { prompt('복사해 주세요', t); } }; });
 
   // ---- 11/6 일일실적표 · 카드 필수 확인 · 배송 탭 잠금 (상차 체크 전부 + 카드 확인)
-  const SH = { flags: {}, reads: new Set(), fd: '', busy: false, addr: {}, mn: {}, mnBusy: false, mv: new Set(), mnSeen: {}, prevK: null, mnD: '' };
+  const SH = { flags: {}, reads: new Set(), fd: '', busy: false, addr: {}, mn: {}, mnBusy: false, mv: new Set(), mnSeen: {}, prevK: null, mnD: '', ad: {}, adD: '', adBusy: false };
   // 11/24 메모NEW·배송메모 확인 — 상진님 '전체 켜줘'로 기본 켬 (?mn=0 이면 이 기기만 끔, ?mn=1 다시 켬)
   try { const v = new URLSearchParams(location.search).get('mn'); if (v === '1' || v === '0') localStorage.setItem('wr-mn', v); } catch (e) { /* noop */ }
   const MN_ON = () => { try { return localStorage.getItem('wr-mn') !== '0'; } catch (e) { return true; } };
+  // 11/26 주소 변경 안내 (상진님) — 거래처 주소가 바뀌면 그 거래처를 맡은 기사가 '바뀐 뒤 처음' 갈 때만 [주소 변경] 표시
+  //  · 서버 addr_day: 거래처(branchId)마다 주소를 기억해 두고 비교 (처음 보는 거래처는 기준값만), 바뀐 지 30일 안
+  //  · 그 기사가 그 거래처 배송을 끝내면(완료로 올라오면) 서버가 확인 처리 → 다음부터 안 보임
+  //  · ?ad=0 이면 이 기기만 끔, ?ad=1 다시 켬
+  try { const v = new URLSearchParams(location.search).get('ad'); if (v === '1' || v === '0') localStorage.setItem('wr-ad', v); } catch (e) { /* noop */ }
+  const AD_ON = () => { try { return localStorage.getItem('wr-ad') !== '0'; } catch (e) { return true; } };
   async function shFlags(force) {
     if (!force && SH.fd === L.d) return;
     try { const j = await rpc('day_flags_get', { p_name: cfg.n, p_token: cfg.tok, p_date: L.d }); SH.flags = (j && j.flags) || {}; SH.reads = new Set((j && j.reads) || []); SH.fd = L.d; }
@@ -1601,15 +1708,41 @@
   // 11/21 실적표 + 배송 한 화면 (상진님): 실적표 거래처 카드마다 딜리버리 상태·출발·작업 버튼·배송 정보
   //  · 짝 맞춤 = 거래처명(공백·괄호 빼고) → 지점명/기업명, 그래도 없으면 서로 포함 · 못 맞춘 배송은 맨 아래 '실적표에 없는 배송'
   //  · 상차 체크·요약카드 확인이 남아 있으면 출발 버튼 대신 안내 (기존 배송 탭 잠금과 같은 규칙)
+  // ===== 11/26 새 흐름 (상진님) — 스낵: 실적표 → 운행 시작 → 상차 → 배송 → 퇴근, 한 단계가 끝나면 다음 화면으로
+  //  · 실적표는 보기 전용(거래처·주소·매출) + [확인했어요] · 주의사항(주소 변경·메모NEW·혼동 주의·VOC 등)은 배송의 '출발 전 확인'으로
+  //  · 출발 전 확인: 항목을 하나씩 눌러 체크해야 [확인했어요]가 켜짐 → 출발 버튼
+  //  · 운행 시작은 배송 출발의 필수 조건 (위치 동의를 안 한 기사는 예외)
+  //  · ?fl=0 이 기기만 예전 화면, ?fl=1 다시 켬
+  function FL_ON() { try { return localStorage.getItem('wr-fl') !== '0' && !isMaster() && !CVS() && shDmOn(); } catch (e) { return false; } }
+  function flKey(k) { return 'wr-fl-' + k + '-' + (L.d || today()); }
+  function flGet(k) { try { return localStorage.getItem(flKey(k)) === '1'; } catch (e) { return false; } }
+  function flSet(k) { try { localStorage.setItem(flKey(k), '1'); } catch (e) { /* noop */ } }
+  function flSteps() { return ['sh', 'loc', 'lc', 'dl', 'rec'].filter((t) => tabBtn(t) && !tabBtn(t).hidden); }
+  function flDone(t) {
+    try {
+      const att = (A && A.st && A.st.att) || {};
+      if (t === 'sh') return flGet('sh');
+      if (t === 'loc') return !!att.in_at;
+      if (t === 'lc') return L.recs.length > 0 && L.loadedFor === L.d && shPending().loads === 0;
+      if (t === 'dl') { const ls = (DM.sch && DM.d === L.d && DM.sch.details) || []; return ls.length > 0 && ls.every((x) => x.doneYN === 'Y' || ndOf(x)); }
+      if (t === 'rec') return !!att.out_at;
+    } catch (e) { /* noop */ }
+    return false;
+  }
+  function flCur() { const st = flSteps(); return st.find((t) => !flDone(t)) || ''; }
+  function flGo(from) {   // 지금 단계를 끝냈으면 다음 할 단계로 (조금 기다렸다가 넘어감)
+    if (!FL_ON()) return; const nx = flCur(); if (!nx || nx === from) return;
+    setTimeout(() => { const on = document.querySelector('.tabs button.on'); if (document.body.classList.contains('hm') || !on || on.dataset.tab === from) showTab(nx); }, 1300);
+  }
   function shDmOn() { try { return !isMaster() && !CVS() && !!cfg.ph && dmOn(); } catch (e) { return false; } }   // 함수 선언: 위쪽 applyType에서 먼저 불려도 안전
-  try { if (shDmOn() && !$('main').hidden) { tabBtn('dl').hidden = true; if (document.body.classList.contains('hm')) hmRender(); } } catch (e) { /* noop */ }
+  try { if (shDmOn() && !$('main').hidden) { tabBtn('dl').hidden = !FL_ON(); if (FL_ON()) tabBtn('rec').hidden = false; if (document.body.classList.contains('hm')) hmRender(); } } catch (e) { /* noop */ }
   async function shDm(force) {
     if (!shDmOn()) return;
     if (!force && DM.sch && DM.d === L.d && Date.now() - (DM.at || 0) < 60e3) return shUi();
     DM.d = L.d; DM.auto = true; SH.dmBusy = true; shUi();
     try { const d = await dmGet('schedules', L.d === dmToday() ? undefined : { deliveryDate: L.d }); if (d && DM.d === L.d) { DM.sch = d; DM.at = Date.now(); DM.err = ''; } }
     catch (e) { DM.err = e.message; }
-    SH.dmBusy = false; shUi(); mnScan();
+    SH.dmBusy = false; shUi(); mnScan(); adScan();
   }
   function shDmMatch() {   // 실적표 코드 → 배송 detail
     const ls = (DM.sch && DM.d === L.d && Array.isArray(DM.sch.details)) ? DM.sch.details : [], used = new Set(), m = {};
@@ -1678,6 +1811,18 @@
     SH.mv.add(bid); dmRender(); if (document.body.classList.contains('hm')) hmRender();
     try { await rpc('memo_view', { p_name: cfg.n, p_token: cfg.tok, p_date: D, p_bid: bid, p_ver: m ? +m.ver || 1 : 0 }); } catch (e) { /* 다음에 다시 열면 기록 */ }
   }
+  const adOf = (x) => { if (!AD_ON() || !x || x.doneYN === 'Y' || SH.adD !== L.d) return null; const k = mnBid(x); return k && SH.ad[k] ? SH.ad[k] : null; };
+  async function adScan() {
+    if (!AD_ON() || !shDmOn() || isMaster() || SH.adBusy || !(DM.sch && DM.d === L.d)) return;
+    const D = L.d, ls = DM.sch.details || []; SH.adBusy = true;
+    try {
+      const rows = [];
+      for (const x of ls) { const b = dmBr(x), d = DM.det[dmId(x)], bd = d && !d._err ? dmBr(d) : {}, bid = mnBid(x), ad = String(b.address || bd.address || '').trim();
+        if (bid && ad) rows.push({ bid, name: [b.companyName, b.branchName].filter(Boolean).join(' - '), addr: ad, done: x.doneYN === 'Y' }); }
+      if (rows.length) { const r = await rpc('addr_day', { p_name: cfg.n, p_token: cfg.tok, p_date: D, p_rows: rows }); if (L.d === D) { SH.ad = r && typeof r === 'object' ? r : {}; SH.adD = D; } }
+    } catch (e) { log('주소 변경 확인 실패 ' + e.message); }
+    SH.adBusy = false; shUi(); if (document.body.classList.contains('hm')) hmRender();
+  }
   const mnAt = (s) => { const d = s ? new Date(s) : null; return d ? `${d.getMonth() + 1}/${d.getDate()} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}` : ''; };
   function shDmHtml(x, gate) {
     const id = dmId(x), b = dmBr(x), [sc, st] = dmState(x), open = DM.open === String(id), d = DM.det[id] || null, db = dmBr(d || x), today = dmActDay();
@@ -1694,6 +1839,21 @@
     if (!today || !DM.sch || !DM.sch.id || dmFixed(x) || ls.length - fx < 2) return `<em>배송 ${i + 1}번</em>`;
     let o = ''; for (let k = fx; k < ls.length; k++) o += `<option value="${k}"${k === i ? ' selected' : ''}>배송 ${k + 1}번</option>`;
     return `<select class="sh-seq" data-dmseq="${esc(dmId(x))}" aria-label="배송 순서">${o}</select>`;
+  }
+  // 11/26 오전/오후 정하기 (상진님: 기사가 전날 실적표에서 순서와 함께 미리 세팅) — 순서 변경과 같은 요청(sequences)에 meridiem 만 바꿔 보냄
+  function shMerHtml(x, today) {
+    const m = x.meridiem, lb = m === 'AM' ? '오전' : m === 'PM' ? '오후' : '';
+    if (!today || !DM.sch || !DM.sch.id || dmFixed(x) || x.taskStartAt) return lb ? `<em>${lb}</em>` : '';
+    return `<span class="sh-mer" role="group" aria-label="오전·오후"><button type="button" class="${m === 'AM' ? 'on' : ''}" data-dmmer="${esc(dmId(x))}" data-m="AM">오전</button><button type="button" class="${m === 'PM' ? 'on' : ''}" data-dmmer="${esc(dmId(x))}" data-m="PM">오후</button></span>${lb ? '' : '<span class="sh-mer0">미정</span>'}`;
+  }
+  async function dmMer(id, m, btn) {
+    const ls = dmSeqList(), x = ls.find((y) => String(dmId(y)) === String(id)); if (!x || x.meridiem === m) return;
+    const t = ls.filter((y) => !y.taskStartAt), base = ls.length - t.length;
+    const schedules = t.map((y, j) => ({ deliveryScheduleDetailId: dmId(y), meridiem: String(dmId(y)) === String(id) ? m : y.meridiem, sequence: base + j + 1 }));
+    if (btn) btn.disabled = true;
+    try { await dmCall('PATCH', `schedules/${DM.sch.id}/sequences`, undefined, { schedules }); }
+    catch (e) { alert('오전/오후를 못 바꿨어요\n\n' + (e.message || '사유를 받지 못했어요')); }
+    await dmReload(); shUi();
   }
   async function dmSeq(id, k, sel) {
     const ls = dmSeqList(), i = ls.findIndex((y) => String(dmId(y)) === String(id)), fx = ls.filter(dmFixed).length;
@@ -1783,22 +1943,24 @@
     const am = (r) => { const f = fOf(r) || {}; const a = Number(r.amtA || 0), c = Number(r.amtC || 0); return a || c ? { a, c, s: a + c } : { a: null, c: null, s: Number(f.amt || 0) }; };
     const T = rs.reduce((o, r) => { const m = am(r); o.a += m.a || 0; o.c += m.c || 0; o.s += m.s || 0; return o; }, { a: 0, c: 0, s: 0 });
     const cell = (v) => v == null ? '—' : v ? won(v) : '0';
-    $('sh-prog').innerHTML = rs.length ? `<div class="kv"><label>거래처</label><b>${rs.length}<i>곳</i></b></div><div class="kv"><label>상온</label><b>${won(T.a)}<i>원</i></b></div><div class="kv"><label>저온</label><b>${won(T.c)}<i>원</i></b></div><div class="kv"><label>합계</label><b style="color:#FDE68A">${won(T.s)}<i>원</i></b></div>${pend.cards.length ? `<div class="kv"><label>요약카드 확인</label><b>${pend.cards.length}곳 남음</b></div>` : ''}${pend.memos.length ? `<div class="kv"><label>메모 확인</label><b>${pend.memos.length}곳 남음</b></div>` : ''}` : '';
+    $('sh-prog').innerHTML = rs.length ? `<div class="kv"><label>거래처</label><b>${rs.length}<i>곳</i></b></div><div class="kv"><label>상온</label><b>${won(T.a)}<i>원</i></b></div><div class="kv"><label>저온</label><b>${won(T.c)}<i>원</i></b></div><div class="kv"><label>합계</label><b style="color:#FDE68A">${won(T.s)}<i>원</i></b></div>${pend.cards.length ? `<div class="kv"><label>요약카드 확인</label><b>${pend.cards.length}곳 남음</b></div>` : ''}${pend.memos.length && !FL_ON() ? `<div class="kv"><label>메모 확인</label><b>${pend.memos.length}곳 남음</b></div>` : ''}` : '';
     if (!rs.length) { $('sh-list').innerHTML = SH.busy || L.busy ? '<div class="card msg">불러오는 중…</div>' : `<div class="card msg">${dLbl(L.d)} 배정된 거래처가 아직 없어요.</div>`; return; }
     // 착지 수에 맞춰 글씨 크기 자동 (8곳 이하 크게 → 20곳이면 작게)
     const n = rs.length, z = n <= 8 ? 1 : n >= 20 ? 0.78 : 1 - (n - 8) * 0.22 / 12;
     const dmOk = shDmOn(), MT = dmOk ? shDmMatch() : { m: {}, rest: [] }, gate = dmOk && (pend.cards.length || pend.loads) ? [pend.loads ? `상차 체크 ${pend.loads}건` : '', pend.cards.length ? `요약카드 확인 ${pend.cards.length}곳` : ''].filter(Boolean).join('·') + '을 끝내면 출발할 수 있어요' : '';
     // 11/22 배송 순서를 바꾸면 실적표도 그 순서로 (짝 맞은 거래처끼리 자리만 바꿈, 짝 없는 곳은 제자리)
     const ord = rs.slice(); if (dmOk) { const slots = [], ms = []; rs.forEach((r, k) => { if (MT.m[r.code]) { slots.push(k); ms.push(r); } }); ms.sort((a, b) => (+MT.m[a.code].sequence || 999) - (+MT.m[b.code].sequence || 999)); slots.forEach((k, j) => { ord[k] = ms[j]; }); }
+    const FL = FL_ON();
     const body = ord.map((r, i) => { const f = fOf(r) || {}, need = reqOf(r), rd = SH.reads.has(String(r.code)), m = am(r), dx = MT.m[r.code];
-      const tg = [f.new ? '<span class="t-new">첫 배송</span>' : '', f.chg ? `<span class="t-chg">담당 변경 (평소 ${esc(f.chg)})</span>` : '', f.voc ? '<span class="t-voc">최근 VOC</span>' : '', f.conf ? '<span class="t-conf">혼동 주의</span>' : '', r.frozen ? '<span class="t-fz">냉동 배송 있음</span>' : '', noLoc(r) ? '<span class="t-nol">로케이션 없음</span>' : '', SEC[String(r.code)] ? '<span class="t-sec">보안 거래처 · 사진 없이 완료</span>' : ''].join('');
-      const ex = [f.voc ? f.voc.map((v) => `<div class="bx voc"><b class="h">최근 VOC · ${esc(String(v.d || '').slice(5).replace('-', '/'))}</b>${esc(v.t)}</div>`).join('') : '', f.conf ? `<div class="bx conf"><b class="h">혼동 주의</b>같은 건물에 다른 거래처: ${f.conf.map(esc).join(' · ')} — 층·호 꼭 확인</div>` : '', noLoc(r) ? '<div class="bx nol"><b class="h">로케이션 없음</b>도크장 앞 파레트 확인</div>' : ''].join('');
+      const adx = dx ? adOf(dx) : null;
+      const tg = [adx ? '<span class="t-adr">주소 변경</span>' : '', f.new ? '<span class="t-new">첫 배송</span>' : '', f.chg ? `<span class="t-chg">담당 변경 (평소 ${esc(f.chg)})</span>` : '', f.voc ? '<span class="t-voc">최근 VOC</span>' : '', f.conf ? '<span class="t-conf">혼동 주의</span>' : '', r.frozen ? '<span class="t-fz">냉동 배송 있음</span>' : '', noLoc(r) ? '<span class="t-nol">로케이션 없음</span>' : '', SEC[String(r.code)] ? '<span class="t-sec">보안 거래처 · 사진 없이 완료</span>' : ''].join('');
+      const ex = [adx ? `<div class="bx adr"><b class="h">주소 변경 · ${esc(mnAt(adx.at))}</b>새 주소: ${esc(adx.addr || '')}${adx.prev ? `<br><s>이전: ${esc(adx.prev)}</s>` : ''}<br>주소가 바뀐 뒤 처음 가는 거래처예요. 새 주소를 꼭 확인하세요.</div>` : '', f.voc ? f.voc.map((v) => `<div class="bx voc"><b class="h">최근 VOC · ${esc(String(v.d || '').slice(5).replace('-', '/'))}</b>${esc(v.t)}</div>`).join('') : '', f.conf ? `<div class="bx conf"><b class="h">혼동 주의</b>같은 건물에 다른 거래처: ${f.conf.map(esc).join(' · ')} — 층·호 꼭 확인</div>` : '', noLoc(r) ? '<div class="bx nol"><b class="h">로케이션 없음</b>도크장 앞 파레트 확인</div>' : ''].join('');
       const ad = addrOf(r);
       const cl = String(f.cl || ''), ci = cl.indexOf(' - '), wnm = ci >= 0 ? cl.slice(ci + 3) : cl, wco = ci >= 0 ? cl.slice(0, ci) : '';   // 11/22 위펀오피스 기준정보 이름 (금액은 판매가 그대로)
-      return `<div class="shr ${need && !rd ? 'req' : ''}" data-zc="${esc(r.code)}"><div class="shn"><i>${i + 1}</i><b>${esc(wnm || r.name)}</b>${dx ? mnBtn(dx) : ''}</div>${wco ? `<div class="sh-co">${esc(wco)} · 상온코드 ${esc(r.code)}</div>` : ''}
+      return `<div class="shr ${need && !rd ? 'req' : ''}" data-zc="${esc(r.code)}"><div class="shn"><i>${i + 1}</i><b>${esc(wnm || r.name)}</b>${dx && !FL ? mnBtn(dx) : ''}</div>${wco ? `<div class="sh-co">${esc(wco)} · 상온코드 ${esc(r.code)}</div>` : ''}
         ${(() => { const ad2 = ad || (dx && dmBr(dx).address) || ''; return `<div class="sha">${ad2 ? esc(ad2) : '<span style="opacity:.5">주소 정보 없음</span>'}${(dx && dx.coordinate && +dx.coordinate.latitude) || ad2 ? `<button type="button" class="sh-nv" data-dm="nav" data-id="${dx ? esc(dmId(dx)) : ''}" data-addr="${esc(ad2)}" data-nm="${esc(wnm || r.name)}">길안내</button>` : ''}</div>`; })()}
         <div class="shm"><span><label>상온</label>${cell(m.a)}</span><span><label>저온</label>${cell(m.c)}</span><span class="t"><label>합계</label>${won(m.s)}</span></div>
-        ${tg ? `<div class="sh-tg">${tg}</div>` : ''}${ex ? `<div class="sh-x">${ex}</div>` : ''}${need || f.pub ? `<button class="sh-btn ${rd || !need ? 'ok' : ''}" data-card="${esc(r.code)}">${need ? (rd ? '✓ 요약카드 확인함' : '요약카드 확인 (필수)') : '요약카드 보기'}</button>` : ''}${dx ? shDmHtml(dx, gate) : ''}</div>`; }).join('');
+        ${FL ? (dx ? `<div class="sh-ord">${shSeqHtml(dx, dmActDay())}${shMerHtml(dx, dmActDay())}</div>` : '') : `${tg ? `<div class="sh-tg">${tg}</div>` : ''}${ex ? `<div class="sh-x">${ex}</div>` : ''}${need || f.pub ? `<button class="sh-btn ${rd || !need ? 'ok' : ''}" data-card="${esc(r.code)}">${need ? (rd ? '✓ 요약카드 확인함' : '요약카드 확인 (필수)') : '요약카드 보기'}</button>` : ''}${dx ? shDmHtml(dx, gate) : ''}`}</div>`; }).join('');
     const dmTop = !dmOk ? '' : DM.err ? `<div class="card warn">배송 정보를 못 불러왔어요: ${esc(DM.err)} <button type="button" class="dm-btn" data-dm="old">구 버전화면</button></div>`
       : SH.dmBusy && !(DM.sch && DM.d === L.d) ? '<div class="card msg">배송 진행 상태 읽는 중…</div>'
       : `<div class="sh-dmbar"><span>배송 ${((DM.sch && DM.sch.details) || []).length}곳 · 완료 ${((DM.sch && DM.sch.details) || []).filter((x) => x.doneYN === 'Y').length}</span><button type="button" class="dm-btn" data-dm="old">구 버전화면</button></div>`;
@@ -1806,7 +1968,10 @@
     // 11/22 거래처 1곳 크게 보기 (카드 빈 곳을 누르면 열림)
     let zH = ''; if (SH.zoom) { const tmp = document.createElement('div'); tmp.innerHTML = body; const zr = tmp.querySelector(`.shr[data-zc="${CSS.escape(String(SH.zoom))}"]`);
       if (zr) zH = `<div class="sh-zoom"><div class="sh-zt"><b>크게 보기</b><button type="button" data-zclose="1">닫기 ✕</button></div><div class="shl" style="--z:1.2">${zr.outerHTML}</div></div>`; else SH.zoom = null; }
-    $('sh-list').innerHTML = zH + dmTop + `<div class="card shl" style="--z:${z.toFixed(3)}">${body}<div class="shr tot"><div class="shn"><b>합계 ${n}곳</b></div><div class="shm"><span><label>상온</label>${won(T.a)}</span><span><label>저온</label>${won(T.c)}</span><span class="t"><label>합계</label>${won(T.s)}</span></div></div></div>` + restH;
+    try { document.querySelectorAll('#t-sh > .card.msg').forEach((e) => { e.hidden = FL; }); } catch (e) { /* noop */ }
+    const merN = FL && dmOk ? ((DM.sch && DM.d === L.d && DM.sch.details) || []).filter((x) => !x.meridiem && x.doneYN !== 'Y').length : 0;
+    const flBtn = FL ? (flGet('sh') ? `<div class="fl-ok">✓ 오늘 실적표 확인했어요</div>${flCur() && flCur() !== 'sh' ? `<button type="button" class="fl-next" data-fl="next">다음: ${esc(hmLbl(flCur()).t)} →</button>` : ''}` : `<button type="button" class="fl-next" data-fl="sh">확인했어요<small>다음: 운행 시작</small></button>`) : '';
+    $('sh-list').innerHTML = zH + (FL ? (merN ? `<div class="card warn">오전/오후가 안 정해진 거래처가 <b>${merN}곳</b> 있어요. 거래처마다 [오전]·[오후]를 눌러 정해 주세요.</div>` : '') : dmTop) + `<div class="card shl" style="--z:${z.toFixed(3)}">${body}<div class="shr tot"><div class="shn"><b>합계 ${n}곳</b></div><div class="shm"><span><label>상온</label>${won(T.a)}</span><span><label>저온</label>${won(T.c)}</span><span class="t"><label>합계</label>${won(T.s)}</span></div></div></div>` + (FL ? flBtn : restH);
   }
   $('sh-prev').onclick = () => { L.d = addDay(L.d, -1); L.auto = false; shLoad(true); };
   $('sh-next').onclick = () => { L.d = addDay(L.d, 1); L.auto = false; shLoad(true); };
@@ -1815,11 +1980,16 @@
   $('sh-list').onchange = (ev) => { const sl = ev.target.closest && ev.target.closest('select[data-dmseq]'); if (sl) dmSeq(sl.dataset.dmseq, +sl.value, sl); };
   $('sh-list').onclick = (ev) => {
     if (ev.target.closest('[data-zclose]')) { SH.zoom = null; shUi(); return; }
+    const mb2 = ev.target.closest('button[data-dmmer]'); if (mb2) return dmMer(mb2.dataset.dmmer, mb2.dataset.m, mb2);
+    const fb = ev.target.closest('[data-fl]'); if (fb) { if (fb.dataset.fl === 'sh') { flSet('sh'); shUi(); } const nx = flCur(); if (nx) showTab(nx); return; }
     const mb = ev.target.closest('button[data-mnew]'); if (mb) { if (DM.open !== String(mb.dataset.mnew)) dmDetail(mb.dataset.mnew); return; }
     if (ev.target.closest('[data-dm]')) return dmClick(ev);   // 11/21 배송 버튼
     const b = ev.target.closest('button[data-card]');
     if (!b) { if (ev.target.closest('button, select, a, input, label, .sh-zoom')) return; const zr = ev.target.closest('.shr[data-zc]'); if (zr) { SH.zoom = zr.dataset.zc; shUi(); window.scrollTo(0, 0); } return; }
     const r = L.recs.find((x) => String(x.code) === b.dataset.card); if (!r) return;
+    flCardOpen(r);
+  };
+  function flCardOpen(r) {
     const f = fOf(r) || {}; shCur = r;
     const ocl = String(f.cl || ''), oci = ocl.indexOf(' - '), onm = (oci >= 0 ? ocl.slice(oci + 3) : ocl) || r.name;
     $('sh-ovt').textContent = onm;
@@ -1838,6 +2008,13 @@
     if (!L.recs.length || L.loadedFor !== L.d) { try { await lcLoad(); L.loadedFor = L.d; } catch (e) { /* 아래에서 판단 */ } }
     await shFlags();
     const p = shPending();
+    if (FL_ON()) {
+      const noRun = !tabBtn('loc').hidden && !((A && A.st && A.st.att) || {}).in_at;
+      if (!noRun && !p.loads) { $('dl-lock').hidden = true; $('dl-w').hidden = false; dlOpen(); return; }
+      $('dl-w').hidden = true; $('dm-w').hidden = true; $('dl-lock').hidden = false;
+      $('dl-lock').innerHTML = `<b>배송 시작 전에 끝내 주세요</b>${noRun ? '· <b style="display:inline">운행 시작</b>을 아직 안 눌렀어요<br>' : ''}${p.loads ? `· 상차 체크 <b style="display:inline">${p.loads}건</b> 남음<br>` : ''}${noRun ? '<button data-go="loc">운행 시작으로</button>' : ''}${p.loads ? '<button data-go="lc">상차로</button>' : ''}<button data-go="dl">다시 확인</button>`;
+      return;
+    }
     if (!p.cards.length && !p.loads) { $('dl-lock').hidden = true; $('dl-w').hidden = false; dlOpen(); return; }
     $('dl-w').hidden = true; $('dl-lock').hidden = false;
     $('dl-lock').innerHTML = `<b>배송 시작 전에 끝내 주세요</b>${p.loads ? `· 상차 체크 <b style="display:inline">${p.loads}건</b> 남음 (상차 탭에서 ☐ 체크)<br>` : ''}${p.cards.length ? `· 요약카드 확인 <b style="display:inline">${p.cards.length}곳</b> 남음: ${p.cards.slice(0, 4).map((r) => esc(r.name)).join(', ')}${p.cards.length > 4 ? ' 외' : ''}<br>` : ''}${p.loads ? '<button data-go="lc">상차 탭으로</button>' : ''}${p.cards.length ? '<button data-go="sh">실적표로</button>' : ''}<button data-go="dl">다시 확인</button>`;
