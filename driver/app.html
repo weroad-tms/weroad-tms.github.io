@@ -1493,10 +1493,20 @@
   $('a-in').onclick = async () => {
     const ok = $('a-ok'), w = $('a-warn'); ok.hidden = true; w.hidden = true; $('a-in').disabled = true;
     if (APP && locAgreed()) { try { if (window.WeRoadApp.setAuth && cfg.tok) window.WeRoadApp.setAuth(cfg.n, cfg.tok); else window.WeRoadApp.setDriver(cfg.n); window.WeRoadApp.start(); } catch (e) { /* noop */ } }
-    try { const r = await punch('in'); await aLoad(); if (r && r.in_at) A.st = { ...(A.st || {}), att: r }; ok.hidden = false; ok.innerHTML = `<b>운행 시작 ${hm((A.st.att || {}).in_at)}</b> — 안전 운행하세요!` + ((A.st.last_age_min != null && A.st.last_age_min <= 10) ? '' : '<br>위치 앱이 아직 안 보내고 있어요. 아래 안내대로 켜 주세요.'); }
+    try { const r = await punch('in'); await aLoad(); if (r && r.in_at) A.st = { ...(A.st || {}), att: r }; ok.hidden = false; ok.innerHTML = `<b>운행 시작 ${hm((A.st.att || {}).in_at)}</b> — 안전 운행하세요!` + ((A.st.last_age_min != null && A.st.last_age_min <= 10) ? '' : '<br>위치 앱이 아직 안 보내고 있어요. 아래 안내대로 켜 주세요.'); aPlace(0); }
     catch (e) { w.hidden = false; w.textContent = '운행 시작 실패: ' + e.message; }
     $('a-in').disabled = false; aUi();
   };
+  // 11/26 운행 시작 위치 알림 (막지 않음): 센터(진우리·궁평리) 300m 밖에서 눌렀으면 알림만 — 위치가 아직 없으면 20초·60초 뒤 다시 확인
+  async function aPlace(n) {
+    if (isMaster()) return;
+    let p = null; try { p = await rpc('my_start_place', { p_name: cfg.n, p_token: cfg.tok, p_team: TEAM }); } catch (e) { return; }
+    if (!p) return;
+    if (p.place === 'nogps' && n < 2) { setTimeout(() => aPlace(n + 1), n ? 60000 : 20000); return; }
+    if (p.place !== 'out') return;
+    const w = $('a-warn'); w.hidden = false;
+    w.innerHTML = `<b>센터(진우리·궁평리) 근처에서 [운행 시작]을 눌러 주세요.</b><br>이번 운행은 시작됐어요. 지금 위치는 ${p.center || '센터'}에서 약 ${p.km}km 떨어진 곳이에요.`;
+  }
   $('a-out').onclick = async () => {
     const ok = $('a-ok'), w = $('a-warn'); ok.hidden = true; w.hidden = true;
     if (((A.st || {}).att || {}).out_at && !confirm('이미 운행 종료됐어요. 종료 시각을 지금으로 바꿀까요?')) return;
